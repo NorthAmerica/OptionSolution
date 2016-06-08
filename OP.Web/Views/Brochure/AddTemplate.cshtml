@@ -34,7 +34,7 @@
     }
 
     th {
-        background: #328aa4 url(tr_back.gif) repeat-x;
+        background: #328aa4;
         color: #fff;
     }
 
@@ -98,14 +98,16 @@
         var EndDateDescrip = UE.getEditor('EndDateDescrip');
         var TradeDateDescrip = UE.getEditor('TradeDateDescrip');
         BindAddTemplateClickEvent();
-        @if (Model == null)
+
+        @if (Model.BrochureID.ToString() == "00000000-0000-0000-0000-000000000000")
         {
             <text>
-        alert('没有模型')
+
         </text>
         }
         else
         {
+            
             <text>
         BindTemplateData();
         </text>
@@ -168,18 +170,37 @@
         })
     }
     function BindTemplateData() {
-        $('#TempName').val(@Model.TempName);
-        $('#TempDescrip').val(@Model.TempDescrip);
-        $('#ContractDescrip').val(@Model.ContractDescrip);
-        $('#BuyBegin').val(@Model.BuyBegin);
-        $('#BuyTime').val(@Model.BuyTime);
-        UE.getEditor('PayDescrip').setContent(@Model.PayDescrip);
-        UE.getEditor('SettlementFormula').setContent(@Model.SettlementFormula);
-        UE.getEditor('StartDateDescrip').setContent(@Model.StartDateDescrip);
-        UE.getEditor('EndDateDescrip').setContent(@Model.EndDateDescrip);
-        UE.getEditor('TradeDateDescrip').setContent(@Model.TradeDateDescrip);
-
+        debugger
+        $('#TempName').val('@Model.TempName');
+        $('#TempDescrip').val('@Model.TempDescrip');
+        $('#ContractDescrip').val('@Model.ContractDescrip');
+        $('#BuyBegin').val('@Model.BuyBegin');
+        $('#BuyTime').val('@Model.BuyTime');
+        UE.getEditor('PayDescrip').addListener('ready', function (editor) {
+            UE.getEditor('PayDescrip').setContent('@Html.Raw(Model.PayDescrip)', false);
+        });
+        UE.getEditor('SettlementFormula').addListener('ready', function (editor) {
+            UE.getEditor('SettlementFormula').setContent('@Html.Raw(Model.SettlementFormula)', false);
+        });
+        UE.getEditor('StartDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('StartDateDescrip').setContent('@Html.Raw(Model.StartDateDescrip)', false);
+        });
+        UE.getEditor('EndDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('EndDateDescrip').setContent('@Html.Raw(Model.EndDateDescrip)', false);
+        });
+        UE.getEditor('TradeDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('TradeDateDescrip').setContent('@Html.Raw(Model.TradeDateDescrip)', false);
+        });
+        $('#RiskAnnouncementURL').val('@Model.RiskAnnouncementURL');
+        $('#PurchaseAgreementURL').val('@Model.PurchaseAgreementURL');
+        UE.getEditor('FAQ').addListener('ready', function (editor) {
+            UE.getEditor('FAQ').setContent('@Html.Raw(Model.FAQ)', false);
+        });
+        UE.getEditor('ExampleDescrip').addListener('ready', function (editor) {
+            UE.getEditor('ExampleDescrip').setContent('@Html.Raw(Model.ExampleDescrip)', false);
+        });
     }
+
     function CloseAddTempPage() {
         var tab = $('#main-tab').tabs('getSelected');
         tab.panel('refresh', '/Brochure/TemplateConfig');

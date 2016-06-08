@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -101,7 +101,7 @@
     function setContent(isAppendTo) {
         var arr = [];
         arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
-        UE.getEditor('editor').setContent('欢迎使用ueditor', isAppendTo);
+        UE.getEditor('editor').setContent('<p>假设客户小王在20xx年8月20日（星期二、非法定节假日）14:30前花费100元，成功购买本产品10吨。那么到期客户小王的银行账户结算情况为：</p><p>（1）8月20日为购买日，购买日当天螺纹钢主力合约收盘价为2028元/吨，即基准价为2028元/吨。</p><p>（2）8月30日为到期日，上海期货交易所公布的基准价对应的期货合约21日到30日内所有交易日收盘价的均价为1976元/吨（即结算价为1976元/吨）。</p><p>（3）客户小王产品到期获得的补偿款=（2028-1976）*50%*10=260元</p><p>（4）260元补偿款会自动转至客户小王绑定的银行账户。</p><p><br/></p>', isAppendTo);
         alert(arr.join("\n"));
     }
     function setDisabled() {

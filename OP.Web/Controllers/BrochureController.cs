@@ -65,7 +65,7 @@ namespace OP.Web.Controllers
                     return View(bro);
                 }
             }
-            return View();
+            return View(new Brochure());
         }
         public ActionResult UpdateTemplate()
         {
