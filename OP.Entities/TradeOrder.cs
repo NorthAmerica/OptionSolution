@@ -30,5 +30,7 @@ namespace OP.Entities
         public decimal Charge { get; set; }
         [DisplayName("成交金额")]
         public decimal TradePrice { get; set; }
+        [DisplayName("是否通过查询WIND数据后成交入库")]
+        public bool IsWindInsert { get; set; }
     }
 }
