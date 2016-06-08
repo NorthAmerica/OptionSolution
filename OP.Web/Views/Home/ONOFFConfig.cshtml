@@ -1,0 +1,414 @@
+﻿
+@{
+    Layout = null;
+}
+
+<link href="~/Content/highlight.css" rel="stylesheet" />
+<link href="~/Content/bootstrap-switch.min.css" rel="stylesheet" />
+
+<script src="~/Scripts/highlight.js" type="text/javascript"></script>
+<script src="~/Scripts/bootstrap-switch.min.js" type="text/javascript"></script>
+<script src="~/Scripts/switch-main.js"></script>
+<script src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initTable();
+        initSwitch();
+        BindAddONTimeClickEvent();
+        BindUpdateONTimeClickEvent();
+    });
+    function initSwitch() {
+        $.getJSON("/Home/GetONOFFSet", { }, function (data) {
+            if (data && data.Success) {
+                if (data.ONOFFMode == 0) {
+                    $('#switch-ONOFFMode').bootstrapSwitch('state', true);
+                    if ($('#switch-HandSwitch').bootstrapSwitch('disabled')) {
+                        $('#switch-HandSwitch').bootstrapSwitch('toggleDisabled', true, true);
+                    }
+                    if (data.HandSwitch) {
+                        $('#switch-HandSwitch').bootstrapSwitch('state', true);
+                    } else {
+                        $('#switch-HandSwitch').bootstrapSwitch('state', false);
+                    }
+                } else {
+                    $('#switch-ONOFFMode').bootstrapSwitch('state', false);
+                    if (!$('#switch-HandSwitch').bootstrapSwitch('disabled')) {
+                        $('#switch-HandSwitch').bootstrapSwitch('toggleDisabled', true, true);
+                    }
+                }
+            } else {
+                $.messager.alert("提示", "Switch初始化失败");
+            }
+
+        });
+
+        $('#switch-ONOFFMode').on('switchChange.bootstrapSwitch', function (event, state) {
+            //debugger
+            if (state) {
+                //手动设置
+                if ($('#switch-HandSwitch').bootstrapSwitch('disabled')) {
+                    $('#switch-HandSwitch').bootstrapSwitch('toggleDisabled', true, true);
+                }
+            } else {
+                //时间自动设置
+                if (!$('#switch-HandSwitch').bootstrapSwitch('disabled')) {
+                    $('#switch-HandSwitch').bootstrapSwitch('toggleDisabled', true, true);
+                }
+            }
+        });
+    }
+    function SwitchSet() {
+        $.messager.confirm("启用产品全局开关设置", "您确定开始启用产品全局开关设置？该设置会即时生效！", function (Begin) {
+            if (Begin) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/SwitchSet',
+                    cache: false,
+                    headers: headers,
+                    data: {
+                        ONOFFMode: $('#switch-ONOFFMode').bootstrapSwitch('state'),
+                        HandSwitch: $('#switch-HandSwitch').bootstrapSwitch('state')
+                    },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '启用产品全局开关设置成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+                        }
+                        else {
+                            alert("启用失败，请您检查");
+                        }
+                    },
+                    error: function () {
+                        alert("启用失败，请您检查")
+                    }
+                });
+            }
+        });
+    }
+    function initTable() {
+        $('#ONTimeGrid').datagrid({
+            title: '开启时间配置',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/ONTimeGrid_Read',
+            sortName: 'ONTimeID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'ONTimeID',
+            //pageSize: 10,
+            //pagination: true,
+            //rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'ONTimeID', title: 'ID', width: 50, sortable: true },
+                { field: 'BeginTime', title: '开始时间', width: 300, sortable: true, formatter: formatDateBoxTime },
+                { field: 'EndTime', title: "结束时间", width: 300, sortable: true, formatter: formatDateBoxTime }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加开启时间',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddONTimeDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改开启时间',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateONTimeDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除开启时间',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteONTime();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTable();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateONTimeDialog();
+            }
+        });
+    }
+    function UpdateONTimeDialog() {
+        var UpdateONTimeID = $("#ONTimeGrid").datagrid("getSelections");
+        if (UpdateONTimeID.length == 1) {
+            $("#UpdateONTimeDialog").dialog("open").dialog("setTitle", "修改开启时间");
+            BingONTimeDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateManageStatusID.length + "</font>行");
+        }
+    }
+    function BingONTimeDetails() {
+        //首先获取选中的处理状态的ID
+        var CheckID = $("#ONTimeGrid").datagrid("getSelections")[0].ONTimeID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Home/GetONTimeDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#UpdateONTimeID").val(CheckID);
+                $("#UpdateBeginTime").timespinner('setValue',data.BeginTime);
+                $("#UpdateEndTime").timespinner('setValue',data.EndTime);
+            } else {
+                $.messager.alert("提示", "数据查询失败");
+            }
+
+        });
+    }
+    //修改处理状态事件
+    function BindUpdateONTimeClickEvent() {
+        $("#btnUpdateONTime").click(function () {
+            //首先判断前台的验证是否通过
+            var valid = $('#UpdateONTimeForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                ONTimeID: $("#UpdateONTimeID").val(),
+                BeginTime: $("#UpdateBeginTime").val(),
+                EndTime: $("#UpdateEndTime").val()
+            };
+
+            //使用异步实现修改处理状态信息
+            $.ajax({
+                type: 'POST',
+                url: '/Home/UpdateONTime',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '修改开启时间成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $("#UpdateONTimeDialog").dialog('close');
+                        $("#ONTimeGrid").datagrid('reload');
+                    }
+                    else {
+                        alert("修改失败，请检查"+data.Message);
+                    }
+                },
+                error: function () {
+                    alert("修改失败，请您检查")
+                }
+            });
+
+        });
+    }
+    function AddONTimeDialog() {
+        $('#AddONTimeDialog').dialog('open').dialog('setTitle', '添加开启时间');
+        ClearText();
+    }
+    //添加开启时间事件
+    function BindAddONTimeClickEvent() {
+        $("#btnAddONTime").click(function () {
+            //验证所有的文本框是否通过验证
+            var valid = $('#AddONTimeForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                BeginTime: $("#addBeginTime").val(),
+                EndTime: $("#addEndTime").val()
+            };
+
+            //发送异步请求到后台保存数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddONTime',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增开始时间成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddONTimeDialog').dialog('close');
+                        $("#ONTimeGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    function DeleteONTime() {
+        //获取到资金状态选定ID
+        var deleteONTime = $("#ONTimeGrid").datagrid("getSelections");
+        //判断资金状态选择了多少条数据
+        if (deleteONTime.length == 1) {
+            var ONTimeID = deleteONTime[0].ONTimeID;
+            $.messager.confirm("删除信息", "您确认删除这条开启时间吗？", function (DeleteFundStatus) {
+                if (DeleteFundStatus) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Home/DeleteONTime',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: ONTimeID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#ONTimeGrid").datagrid("reload");
+                                $("#ONTimeGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data.Message);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    function ClearText() {
+        $('#addBeginTime').val('');
+        $("#addEndTime").val('');
+    }
+
+</script>
+<style>
+    #SearchForm table tr td {
+        padding-left: 5px;
+    }
+</style>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><input id="switch-ONOFFMode" type="checkbox" checked data-on-text="手动设置" data-off-text="时间自动设置"></td>
+                    <td><input id="switch-HandSwitch" type="checkbox" data-on-text="启用" data-off-text="停用"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="SwitchSet()">设置</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="ONTimeGrid" style="color:green"></table>
+    @*添加开启时间*@
+    <div id="AddONTimeDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddONTimeForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="BeginTime">开始时间：</label></td>
+                    <td>
+                        <input id="addBeginTime" class="easyui-timespinner" style="width:120px;height:30px"
+                               required="required" data-options="min:'00:00',showSeconds:true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="EndTime">结束时间：</label></td>
+                    <td>
+                        <input id="addEndTime" class="easyui-timespinner" style="width:120px;height:30px"
+                               required="required" data-options="min:'00:00',showSeconds:true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddONTime" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddONTimeDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改开启时间*@
+    <div id="UpdateONTimeDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateONTimeForm" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="UpdateONTimeID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="UpdateONTimeID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="UpdateBeginTime">开始时间：</label></td>
+                    <td>
+                        <input id="UpdateBeginTime" name="BeginTime" class="easyui-timespinner" style="width:120px;height:30px"
+                               required="required" data-options="min:'00:00',showSeconds:true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="UpdateEndTime">结束时间：</label></td>
+                    <td>
+                        <input id="UpdateEndTime" name="EndTime" class="easyui-timespinner" style="width:120px;height:30px"
+                               required="required" data-options="min:'00:00',showSeconds:true" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateONTime" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateONTimeDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

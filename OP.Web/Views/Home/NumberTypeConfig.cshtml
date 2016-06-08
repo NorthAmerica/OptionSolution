@@ -1,0 +1,301 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initTable();
+        BindAddNumberTypeClickEvent();
+        BindUpdateNumberTypeClickEvent();
+    });
+    function initTable() {
+        $('#NumberTypeGrid').datagrid({
+            title: '数字类型列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/NumberTypeConfig_Read',
+            sortName: 'NumberTypeID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'NumberTypeID',
+            //pageSize: 10,
+            //pagination: true,
+            //rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'NumberTypeID', title: 'ID', width: 50, sortable: true },
+                { field: 'NumberTypeName', title: '数字类型名称', width: 300, sortable: true },
+                { field: 'NumberTypeDescribe', title: "数字类型描述", width: 350, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加数字类型',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddNumberTypeDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改数字类型',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateNumberTypeDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除数字类型',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteNumberType();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTable();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateNumberTypeDialog();
+            }
+        });
+    }
+    function AddNumberTypeDialog() {
+        $('#AddNumberTypeDialog').dialog('open').dialog('setTitle', '添加数字类型');
+        ClearText();
+    }
+    //添加数字类型添加事件
+    function BindAddNumberTypeClickEvent() {
+        $("#btnAddNumberType").click(function () {
+            //验证所有的文本框是否通过数字类型的验证
+            var valid = $('#AddNumberTypeForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                NumberTypeName: $("#NumberTypeName").val(),
+                NumberTypeDescribe: $("#NumberTypeDescribe").val()
+            };
+
+            //发送异步请求到后台保存数字类型数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddNumberType',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增数字类型成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddNumberTypeDialog').dialog('close');
+                        $("#NumberTypeGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    function UpdateNumberTypeDialog() {
+        var UpdateNumberTypeID = $("#NumberTypeGrid").datagrid("getSelections");
+        if (UpdateNumberTypeID.length == 1) {
+            $("#UpdateNumberTypeDialog").dialog("open").dialog("setTitle", "修改数字类型信息");
+            BingNumberTypeDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateNumberTypeID.length + "</font>行");
+        }
+    }
+    function BingNumberTypeDetails() {
+        //首先获取选中的数字类型的ID
+        var CheckID = $("#NumberTypeGrid").datagrid("getSelections")[0].NumberTypeID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Home/GetNumberTypeDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#NumberTypeID").val(CheckID);
+                $("#NumberTypeName1").val(data.NumberTypeName);
+                $("#NumberTypeDescribe1").val(data.NumberTypeDescribe);
+            } else {
+                $.messager.alert("提示", "数据查询失败");
+            }
+
+        });
+    }
+    //修改数字类型事件
+    function BindUpdateNumberTypeClickEvent() {
+        $("#btnUpdateNumberType").click(function () {
+            //首先判断前台的验证是否通过
+            var valid = $('#UpdateNumberType').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                NumberTypeID: $("#NumberTypeID").val(),
+                NumberTypeName: $("#NumberTypeName1").val(),
+                NumberTypeDescribe: $("#NumberTypeDescribe1").val()
+            };
+
+            //使用异步实现修改数字类型信息
+            $.ajax({
+                type: 'POST',
+                url: '/Home/UpdateNumberType',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '修改数字类型成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $("#UpdateNumberTypeDialog").dialog('close');
+                        $("#NumberTypeGrid").datagrid('reload');
+                    }
+                    else {
+                        alert("修改失败，请检查");
+                    }
+                },
+                error: function () {
+                    alert("修改失败，请您检查")
+                }
+            });
+
+        });
+    }
+    function DeleteNumberType() {
+        //获取到角色选定ID
+        var deleteTypeID = $("#NumberTypeGrid").datagrid("getSelections");
+        //判断角色选择了多少条数据
+        if (deleteTypeID.length == 1) {
+            var NumberTypeName = deleteTypeID[0].NumberTypeName;
+            var NumberTypeID = deleteTypeID[0].NumberTypeID;
+            $.messager.confirm("删除信息", "您确认删除<font color='Red' size='3'>" + NumberTypeName + "</font>吗？", function (DeleteType) {
+                if (DeleteType) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Home/DeleteNumberType',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: NumberTypeID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除数字类型成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#NumberTypeGrid").datagrid("reload");
+                                $("#NumberTypeGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //清空文本框中的值
+    function ClearText() {
+        $("#NumberTypeName").val("");
+        $("#NumberTypeDescribe").val("");
+    }
+</script>
+<div>
+    <table id="NumberTypeGrid"></table>
+    @*添加数字类型弹窗*@
+    <div id="AddNumberTypeDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddNumberTypeForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="NumberTypeName">数字类型名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="NumberTypeName" name="NumberTypeName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="NumberTypeDescribe">数字类型描述：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="NumberTypeDescribe" name="NumberTypeDescribe" data-options="required:false,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddNumberType" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddNumberTypeDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改数字类型弹窗*@
+    <div id="UpdateNumberTypeDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateNumberType" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="NumberTypeID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="NumberTypeID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="NumberTypeName">数字类型名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="NumberTypeName1" name="NumberTypeName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="NumberTypeDescribe">数字类型描述：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="NumberTypeDescribe1" name="NumberTypeDescribe" data-options="required:false,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateNumberType" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateNumberTypeDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

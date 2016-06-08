@@ -1,0 +1,167 @@
+﻿
+@{
+    Layout = null;
+}
+<script src="~/Scripts/ECharts/echarts.min.js"></script>
+<script>
+    $(function () {
+        var arrName1 = [];
+        var arrNum1 = [];
+        $.getJSON("/Report/GetTradeSum", { }, function (data) {
+            if (data) {
+                if (arrName1.length != 0 || arrNum1.length != 0) {
+                    arrName1 = [];
+                    arrNum1 = [];
+                }
+                if (data.length!=0) {
+                    for (var i = 0; i < data.length; i++) {
+                        //console.log(data[i].Date);
+                        arrName1.push(data[i].ProductName);
+                        arrNum1.push(data[i].TradeNumSum);
+                    }
+                    ShowChart(arrName1, arrNum1);
+                    ShowChartBar(arrName1, arrNum1);
+                }
+                else {
+                    $('#TradeReport').text("");
+                    $('#TradeReport').append("查询的时间段没有数据...");
+                }
+                
+            } else {
+                $.messager.alert("提示", "数据查询失败，请联系管理员");
+                return;
+            }
+        });
+    })
+</script>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SBeginDateTR1">开始日期  从:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SBeginDateTR1" name="BeginDate" data-options="height:30"></td>
+                    <td>-------</td>
+                    <td><label for="SBeginDateTR2">到:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SBeginDateTR2" name="BeginDate" data-options="height:30"></td>
+
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="SearchTR()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div id="TradeReportBar" style="width:auto;height:400px;"></div>
+    <div id="TradeReport" style="width:auto;height:400px;"></div>
+    
+</div>
+
+
+<script>
+    function SearchTR() {
+
+        var arrName = [];
+        var arrNum = [];
+        
+        var BeginDate1 = $('#SBeginDateTR1').datebox('getText');
+        var BeginDate2 = $('#SBeginDateTR2').datebox('getText');
+        $.getJSON("/Report/GetTradeSum", { BeginDate1: BeginDate1, BeginDate2: BeginDate2 }, function (data) {
+            if (data) {
+                if (arrName.length != 0 || arrNum.length != 0) {
+                    arrName = [];
+                    arrNum = [];
+                }
+                if (data.length!=0) {
+                    for (var i = 0; i < data.length; i++) {
+                        //console.log(data[i].Date);
+                        arrName.push(data[i].ProductName);
+                        arrNum.push(data[i].TradeNumSum);
+                    }
+                    ShowChart(arrName, arrNum);
+                    ShowChartBar(arrName, arrNum);
+                } else {
+                    $('#TradeReport').text("");
+                    $('#TradeReport').append("查询的时间段没有数据...");
+                    
+                }
+                
+            } else {
+                $.messager.alert("提示", "数据查询失败，请联系管理员");
+                return;
+            }
+        });
+        
+    }
+    function ShowChart(arrName, arrNum) {
+        var datas = [];//构建json对象
+        for (var i = 0; i < arrName.length; i++) {
+            var data = {};
+            data["value"] = arrNum[i];
+            data["name"] = arrName[i];
+            datas.push(data);
+        }
+        
+        var myChart = echarts.init(document.getElementById('TradeReport'));
+        var option = {
+            
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data: arrName
+            },
+            series: [
+                {
+                    name: '成交数据',
+                    type: 'pie',
+                    radius: ['50%', '70%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        normal: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            show: true,
+                            textStyle: {
+                                fontSize: '20',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            show: false
+                        }
+                    },
+                    data: datas
+                }
+            ]
+        };
+        myChart.setOption(option);
+    }
+    function ShowChartBar(arrName, arrNum) {
+        var myChart = echarts.init(document.getElementById('TradeReportBar'));
+        var option = {
+            title: {
+                text: '期权产品成交量'
+            },
+            tooltip: {},
+            legend: {
+                data: arrName
+            },
+            xAxis: {
+                data: arrName
+            },
+            yAxis: {},
+            series: [{
+                name: '成交量',
+                type: 'bar',
+                data: arrNum
+            }]
+        };
+        myChart.setOption(option);
+    }
+</script>

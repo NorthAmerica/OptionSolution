@@ -1,0 +1,302 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initTable();
+        BindAddFundStatusClickEvent();
+        BindUpdateFundStatusClickEvent();
+    });
+    function initTable() {
+        $('#FundStatusGrid').datagrid({
+            title: '资金状态列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/FundStatusConfig_Read',
+            sortName: 'FundStatusID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'FundStatusID',
+            //pageSize: 10,
+            //pagination: true,
+            //rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'FundStatusID', title: 'ID', width: 50, sortable: true },
+                { field: 'FundStatusName', title: '资金状态名称', width: 300, sortable: true },
+                { field: 'FundStatusNum', title: "资金状态标志", width: 350, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加资金状态',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddFundStatusDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改资金状态',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateFundStatusDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除资金状态',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteFundStatus();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTable();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateFundStatusDialog();
+            }
+        });
+    }
+    function AddFundStatusDialog() {
+        $('#AddFundStatusDialog').dialog('open').dialog('setTitle', '添加资金状态');
+        ClearText();
+    }
+    //添加资金状态添加事件
+    function BindAddFundStatusClickEvent() {
+        $("#btnAddFundStatus").click(function () {
+            //验证所有的文本框是否通过资金状态的验证
+            var valid = $('#AddFundStatusForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                FundStatusName: $("#FundStatusName").val(),
+                FundStatusNum: $("#FundStatusNum").val()
+            };
+
+            //发送异步请求到后台保存资金状态数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddFundStatus',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增资金状态成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddFundStatusDialog').dialog('close');
+                        $("#FundStatusGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    function UpdateFundStatusDialog() {
+        var UpdateFundStatusID = $("#FundStatusGrid").datagrid("getSelections");
+        if (UpdateFundStatusID.length == 1) {
+            $("#UpdateFundStatusDialog").dialog("open").dialog("setTitle", "修改资金状态信息");
+            BingFundStatusDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateFundStatusID.length + "</font>行");
+        }
+    }
+    function BingFundStatusDetails() {
+        //首先获取选中的资金状态的ID
+        var CheckID = $("#FundStatusGrid").datagrid("getSelections")[0].FundStatusID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Home/GetFundStatusDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#FundStatusID").val(CheckID);
+                $("#FundStatusName1").val(data.FundStatusName);
+                $("#FundStatusNum1").val(data.FundStatusNum);
+            } else {
+                $.messager.alert("提示", "数据查询失败");
+            }
+
+        });
+    }
+    //修改资金状态事件
+    function BindUpdateFundStatusClickEvent() {
+        $("#btnUpdateFundStatus").click(function () {
+            //首先判断前台的验证是否通过
+            var valid = $('#UpdateFundStatus').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                FundStatusID: $("#FundStatusID").val(),
+                FundStatusName: $("#FundStatusName1").val(),
+                FundStatusNum: $("#FundStatusNum1").val()
+            };
+
+            //使用异步实现修改资金状态信息
+            $.ajax({
+                type: 'POST',
+                url: '/Home/UpdateFundStatus',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '修改资金状态成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $("#UpdateFundStatusDialog").dialog('close');
+                        $("#FundStatusGrid").datagrid('reload');
+                    }
+                    else {
+                        alert("修改失败，请检查");
+                    }
+                },
+                error: function () {
+                    alert("修改失败，请您检查")
+                }
+            });
+            
+        });
+    }
+    function DeleteFundStatus() {
+        //获取到资金状态选定ID
+        var deleteFundStatus = $("#FundStatusGrid").datagrid("getSelections");
+        //判断资金状态选择了多少条数据
+        if (deleteFundStatus.length == 1) {
+            var FundStatusName = deleteFundStatus[0].FundStatusName;
+            var FundStatusID = deleteFundStatus[0].FundStatusID;
+            $.messager.confirm("删除信息", "您确认删除<font color='Red' size='3'>" + FundStatusName + "</font>吗？", function (DeleteFundStatus) {
+                if (DeleteFundStatus) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Home/DeleteFundStatus',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: FundStatusID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除资金状态成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#FundStatusGrid").datagrid("reload");
+                                $("#FundStatusGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data.Message);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+                    
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //清空文本框中的值
+    function ClearText() {
+        $("#FundStatusName").val("");
+        $("#FundStatusNum").val("");
+    }
+</script>
+<div>
+    <table id="FundStatusGrid"></table>
+    @*添加资金状态弹窗*@
+    <div id="AddFundStatusDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddFundStatusForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="FundStatusName">资金状态名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="FundStatusName" name="FundStatusName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="FundStatusNum">资金状态标志：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="FundStatusNum" name="FundStatusNum" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddFundStatus" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddFundStatusDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改资金状态弹窗*@
+    <div id="UpdateFundStatusDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateFundStatus" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="FundStatusID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="FundStatusID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="FundStatusName">资金状态名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="FundStatusName1" name="FundStatusName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="FundStatusNum">资金状态标志：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="FundStatusNum1" name="FundStatusNum" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateFundStatus" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateFundStatusDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

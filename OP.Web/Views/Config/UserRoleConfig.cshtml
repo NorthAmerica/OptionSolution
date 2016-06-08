@@ -1,0 +1,266 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initRoleTree();
+        initUserGrid();
+        AddUserGrid();
+    });
+    function initRoleTree() {
+        $('#RoleTree').tree({
+            url: '/Config/RoleTree_Read',
+            onLoadSuccess: function (node, data) { $("#RoleTreeloading").css('display', 'none') },
+            onClick: function (node) {
+                // 在用户点击的时候提示
+                $('#UserRoleGrid').datagrid('loadData', { total: 0, rows: [] });
+                $('#UserRoleGrid').datagrid('load', {
+                    id: node.id
+                });
+            }
+        })
+    }
+    function initUserGrid() {
+        $('#UserRoleGrid').datagrid({
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/UserRole_Read',
+            //sortName: 'UserID',
+            //sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'UserID',
+            singleSelect: false,
+            fitColumns: false,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'UserID', title: 'ID', width: 50, sortable: true },
+                { field: 'UserName', title: '用户名称', width: 200, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加用户角色关系',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddUserRoleDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除用户角色关系',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteUserRole();
+                }
+            }, '-']
+        });
+    }
+    //添加用户列表
+    function AddUserGrid() {
+        $('#AddUserGrid').datagrid({
+            title: '用户列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/UserConfig_Read',
+            sortName: 'UserID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'UserID',
+            //pageSize: 10,
+            //pagination: true,
+            rownumbers: true,
+            singleSelect: false,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'UserID', title: 'ID', width: 50, sortable: true },
+                { field: 'UserName', title: '用户名', width: 300, sortable: true },
+                {
+                    field: 'Enable', title: "是否启用", width: 300, formatter: function (value, row, index) {
+                        if (value == true) {
+                            return value = '是';
+                        } else {
+                            return value = '否';
+                        }
+                    }
+                },
+                {
+                    field: 'IsAdmin', title: "是否为管理员", width: 300, formatter: function (value, row, index) {
+                        if (value == true) {
+                            return value = '是';
+                        } else {
+                            return value = '否';
+                        }
+                    }
+                },
+                { field: 'Date', title: '创建时间', width: 300, sortable: true }
+
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加用户',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddUserRole();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    AddUserGrid();
+                }
+            }]
+        });
+    }
+    //添加用户角色对话框
+    function AddUserRoleDialog() {
+        var selectRole = $("#RoleTree").tree("getSelected");
+        if (selectRole == null) {
+            $.messager.alert("友情提示", "请先选择一个角色");
+            return;
+        }
+        $('#AddUserRoleDialog').dialog('open').dialog('setTitle', '添加用户');
+        $('#AddUserGrid').datagrid('clearSelections');
+        $('#AddUserGrid').datagrid('reload');
+        
+    }
+    //删除用户角色关系
+    function DeleteUserRole() {
+        
+        var selectRole = $("#RoleTree").tree("getSelected");
+        if (selectRole == null) {
+            $.messager.alert("友情提示", "请先选择一个需要删除用户的角色");
+            return;
+        }
+        var selectsUser = $("#UserRoleGrid").datagrid("getSelections");
+        if (selectsUser.length == 0) {
+            $.messager.alert("友情提示", "请先选择一个需要删除的用户");
+            return;
+        }
+        var UserIDs = "";
+        var RoleID = selectRole.id;
+        var selectsUser = $("#UserRoleGrid").datagrid("getSelections");
+        if (selectsUser.length != 0) {
+            for (var i = 0; i < selectsUser.length; i++) {
+                UserIDs += selectsUser[i].UserID + ",";
+            }
+        } else {
+            $.messager.alert("友情提示", "请先选择一个用户");
+            return;
+        }
+        var postdata = {
+            RoleID: RoleID,
+            UserIDs: UserIDs.slice(0, UserIDs.length - 1)
+        };
+        $.messager.confirm("删除信息", "您确认删除这些用户角色关系吗？", function (DeleteUserInfo) {
+            if (DeleteUserInfo) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                //使用异步实现删除用户角色信息
+                $.ajax({
+                    type: 'POST',
+                    url: '/Config/DeleteUserRole',
+                    cache: false,
+                    headers: headers,
+                    data: postdata,
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '删除用户角色成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#UserRoleGrid").datagrid('reload');
+                        }
+                        else {
+                            alert("删除失败，请检查");
+                        }
+                    },
+                    error: function () {
+                        alert("删除失败，请您检查")
+                    }
+                });
+                
+            }
+        });
+    }
+    //添加用户角色关系
+    function AddUserRole() {
+        var selectRole = $("#RoleTree").tree("getSelected");
+        if (selectRole==null) {
+            $.messager.alert("友情提示", "请先选择一个需要添加用户的角色");
+            return;
+        }
+        var RoleID = selectRole.id;
+        var UserIDs="";
+        //debugger
+        var selectsUser = $("#AddUserGrid").datagrid("getSelections");
+        if (selectsUser.length != 0) {
+            for (var i = 0; i < selectsUser.length; i++) {
+                UserIDs +=selectsUser[i].UserID + ",";
+            }
+        } else {
+            $.messager.alert("友情提示", "请先选择一个用户");
+            return;
+        }
+        //console.info(UserIDs.slice(0,UserIDs.length-1));
+        var token = $('@Html.AntiForgeryToken()').val();
+        var headers = {};
+        headers["__RequestVerificationToken"] = token;
+        var postdata = {
+            RoleID: RoleID,
+            UserIDs: UserIDs.slice(0, UserIDs.length-1)
+        };
+        
+        $.ajax({
+            type: 'POST',
+            url: '/Config/UpdateUserRole',
+            cache: false,
+            headers: headers,
+            data: postdata,
+            success: function (data) {
+                if (data && data.Success) {
+                    $.messager.show({
+                        title: '我的消息',
+                        msg: '添加用户角色成功。',
+                        timeout: 5000,
+                        showType: 'slide'
+                    });
+                    $("#AddUserRoleDialog").dialog('close');
+                    $("#UserRoleGrid").datagrid('reload');
+                }
+                else {
+                    alert("添加失败，请检查");
+                }
+            },
+            error: function () {
+                alert("添加失败，请您检查")
+            }
+        });
+        
+    }
+</script>
+<div id="cc" class="easyui-layout" style="height:700px;" fit="true">
+    <div data-options="region:'west',title:'角色列表',split:true,collapsible:false" style="width:150px;">
+        <img id="RoleTreeloading" src="~/Images/loading.gif" width="160" height="160" />
+        <ul id="RoleTree"></ul>
+    </div>
+    <div data-options="region:'center',title:'人员列表-选择角色后自动更新'" style="padding:5px;background:#eee;height:400px;">
+        <table id="UserRoleGrid"></table>
+    </div>
+</div>
+<div id="AddUserRoleDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+     closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+    <table id="AddUserGrid"></table>
+</div>

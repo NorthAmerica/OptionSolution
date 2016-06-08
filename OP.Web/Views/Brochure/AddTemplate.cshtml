@@ -1,0 +1,302 @@
+﻿@model OP.Entities.Brochure
+@{
+    Layout = null;
+}
+<link href="~/Scripts/UEditor/themes/default/css/ueditor.min.css" rel="stylesheet" />
+
+<style type="text/css">
+    caption {
+        padding: 0 0 5px 0;
+        font: italic 30px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+        text-align: center;
+    }
+
+    /*
+
+        TableCloth
+        by Alen Grakalic, brought to you by cssglobe.com
+
+    */ /* general styles */
+    table, td {
+        font: 100% Arial, Helvetica, sans-serif;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+    }
+
+    th, td {
+        text-align: left;
+        padding: .5em;
+        border: 1px solid #fff;
+    }
+
+    th {
+        background: #328aa4 url(tr_back.gif) repeat-x;
+        color: #fff;
+    }
+
+    td {
+        background: #e5f1f4;
+        text-align: center;
+    }
+
+        td.td-info {
+            width: 120px;
+        }
+    /* tablecloth styles */
+    tr.even td {
+        background: #e5f1f4;
+    }
+
+    tr.odd td {
+        background: #f8fbfc;
+    }
+
+    th.over, tr.even th.over, tr.odd th.over {
+        background: #4a98af;
+    }
+
+    th.down, tr.even th.down, tr.odd th.down {
+        background: #bce774;
+    }
+
+    th.selected, tr.even th.selected, tr.odd th.selected {
+    }
+
+    td.over, tr.even td.over, tr.odd td.over {
+        background: #ecfbd4;
+    }
+
+    td.down, tr.even td.down, tr.odd td.down {
+        background: #bce774;
+        color: #fff;
+    }
+
+    td.selected, tr.even td.selected, tr.odd td.selected {
+        background: #bce774;
+        color: #555;
+    }
+
+    /* use this if you want to apply different styleing to empty table cells*/
+    td.empty, tr.odd td.empty, tr.even td.empty {
+        background: #fff;
+    }
+</style>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/ueditor.all.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+    $(function () {
+        var FAQ = UE.getEditor('FAQ');
+        var ExampleDescrip = UE.getEditor('ExampleDescrip');
+        var PayDescrip = UE.getEditor('PayDescrip');
+        var SettlementFormula = UE.getEditor('SettlementFormula');
+        var StartDateDescrip = UE.getEditor('StartDateDescrip');
+        var EndDateDescrip = UE.getEditor('EndDateDescrip');
+        var TradeDateDescrip = UE.getEditor('TradeDateDescrip');
+        BindAddTemplateClickEvent();
+        @if (Model == null)
+        {
+            <text>
+        alert('没有模型')
+        </text>
+        }
+        else
+        {
+            <text>
+        BindTemplateData();
+        </text>
+        }
+    });
+
+
+    function BindAddTemplateClickEvent() {
+        $('#btnAddTemplate').click(function () {
+            var valid = $('#AddTemplateForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                TempName: $("#TempName").val(),
+                TempDescrip: $("#TempDescrip").val(),
+                ContractDescrip: $("#ContractDescrip").val(),
+                BuyBegin: $("#BuyBegin").val(),
+                BuyTime: $("#BuyTime").val(),
+                PayDescrip: UE.getEditor('PayDescrip').getContent(),
+                SettlementFormula: UE.getEditor('SettlementFormula').getContent(),
+                StartDateDescrip: UE.getEditor('StartDateDescrip').getContent(),
+                EndDateDescrip: UE.getEditor('EndDateDescrip').getContent(),
+                TradeDateDescrip: UE.getEditor('TradeDateDescrip').getContent(),
+                RiskAnnouncementURL: $("#RiskAnnouncementURL").val(),
+                PurchaseAgreementURL: $('#PurchaseAgreementURL').val(),
+                FAQ: UE.getEditor('FAQ').getContent(),
+                ExampleDescrip: UE.getEditor('ExampleDescrip').getContent()
+            }
+            console.info(postdata);
+            $.ajax({
+                type: 'POST',
+                url: '/Brochure/AddTemplateAction',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增宣传册模板成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        var tab = $('#main-tab').tabs('getSelected');
+                        tab.panel('refresh', '/Brochure/TemplateConfig');
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        })
+    }
+    function BindTemplateData() {
+        $('#TempName').val(@Model.TempName);
+        $('#TempDescrip').val(@Model.TempDescrip);
+        $('#ContractDescrip').val(@Model.ContractDescrip);
+        $('#BuyBegin').val(@Model.BuyBegin);
+        $('#BuyTime').val(@Model.BuyTime);
+        UE.getEditor('PayDescrip').setContent(@Model.PayDescrip);
+        UE.getEditor('SettlementFormula').setContent(@Model.SettlementFormula);
+        UE.getEditor('StartDateDescrip').setContent(@Model.StartDateDescrip);
+        UE.getEditor('EndDateDescrip').setContent(@Model.EndDateDescrip);
+        UE.getEditor('TradeDateDescrip').setContent(@Model.TradeDateDescrip);
+
+    }
+    function CloseAddTempPage() {
+        var tab = $('#main-tab').tabs('getSelected');
+        tab.panel('refresh', '/Brochure/TemplateConfig');
+    }
+</script>
+<div>
+    <form id="AddTemplateForm" method="post" novalidate="novalidate">
+        <table id="TempTable">
+            <thead>
+                <tr>
+                    <th colspan="2" style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
+                </tr>
+            </thead>
+            <tr style="visibility:hidden">
+                <td><label for="BrochureID">ID:</label></td>
+                <td><input class="easyui-validatebox" type="text" id="BrochureID" name="BrochureID" readonly="readonly" /></td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="TempName">模板名称：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="TempName" name="TempName" data-options="required:true,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="TempDescrip">模板描述：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="TempDescrip" name="TempDescrip" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="ContractDescrip">标的合约描述：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="ContractDescrip" name="ContractDescrip" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="BuyBegin">购买起点：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="BuyBegin" name="BuyBegin" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="BuyTime">购买时间：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="BuyTime" name="BuyTime" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="PayDescrip">补偿说明：</label></td>
+                <td>
+                    <script id="PayDescrip" type="text/plain" style="width:700px;height:200px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="SettlementFormula">结算公式：</label></td>
+                <td>
+                    <script id="SettlementFormula" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td-info"><label for="StartDateDescrip">购买日：</label></td>
+                <td>
+                    <script id="StartDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="EndDateDescrip">到期日：</label></td>
+                <td>
+                    <script id="EndDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="TradeDateDescrip">交易日：</label></td>
+                <td>
+                    <script id="TradeDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="RiskAnnouncementURL">风险揭示书链接：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="RiskAnnouncementURL" name="RiskAnnouncementURL" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="PurchaseAgreementURL">价格补偿服务购买协议链接：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="PurchaseAgreementURL" name="PurchaseAgreementURL" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="FAQ">常见问题：</label></td>
+                <td>
+                    <script id="FAQ" type="text/plain" style="width:700px;height:300px;">
+                    </script>
+
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="ExampleDescrip">示例说明：</label></td>
+                <td>
+                    <script id="ExampleDescrip" type="text/plain" style="width:700px;height:300px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left; padding-top:10px;padding-left:150px;">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddTemplate" iconcls="icon-ok">保存</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="CloseAddTempPage()">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>

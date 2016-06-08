@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大有期货期权项目管理系统-首页</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/easyui")
+    @RenderSection("scripts", required: false)
+    <script>
+    $(function () {
+        $('#main-tab').tabs({
+            border: false,
+            width: $("#main-tab").parent().width(),
+            height: "auto",
+            onSelect: function (title,index) {
+                $('li.nav-li').each(function () { $(this).removeClass('active') });
+                $('li.nav-li a').each(function () {
+                    if ($(this).text() == title) {
+                        $(this).parent().addClass('active');
+                    }
+                });
+            }
+        });
+    });
+    function newone(title, url, a) {
+        $('li.nav-li').each(function () { $(this).removeClass('active') });
+        $(a).parent().addClass('active');
+        if ($('#main-tab').tabs('exists', title)) {
+            $('#main-tab').tabs('select', title);
+        } else {
+            $('#main-tab').tabs('add', {
+                title: title,
+                href: url,
+                closable: true
+            });
+        }
+    }
+    
+    </script>
+</head>
+<body class="easyui-layout">
+    <div data-options="region:'north'" style="height:65px;overflow:hidden">
+        @Html.Action("Head")
+    </div>
+    
+    <div data-options="region:'west',title:'菜单',split:true" style="width:260px;">
+        @Html.Action("HomeMenu")
+    </div>
+    <div data-options="region:'center'" style="padding:5px;background:#eee;">
+        @RenderBody()
+    </div>
+</body>
+</html>

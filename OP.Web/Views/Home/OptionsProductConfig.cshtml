@@ -1,0 +1,1408 @@
+﻿
+@{
+    Layout = null;
+}
+<script src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initTable();
+        BindAddProductClickEvent();
+        initFallRoleGrid();
+        initRiseRoleGrid();
+        BindAddFallRoleClickEvent();
+        BindAddRiseRoleClickEvent();
+        BindUploadOptionsProductClickEvent();
+    });
+    function initTable() {
+
+        $('#OptionsProductGrid').datagrid({
+            title: '期权产品列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/OptionsProductConfig_Read',
+            //sortName: 'AddDate',
+            //sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'OptionsProductID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: false,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'OptionsProductID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'PartnerName', title: '合作者名称', width: 300, sortable: true },
+                { field: 'ProductName', title: '产品名称', width: 300, sortable: true },
+                { field: 'ProductDescription', title: '产品特征', width: 300, sortable: true },
+                { field: 'OptionType', title: '期权类型', width: 300, sortable: true },
+                { field: 'Contract', title: '合约', width: 300, sortable: true },
+                { field: 'BeginDate', title: '启动日期', width: 300, sortable: true },
+                { field: 'Deadline', title: '产品期限(天)', width: 300, sortable: true },
+                //{ field: 'Unit', title: '产品单位', width: 300, sortable: true },
+                { field: 'Charge', title: '产品手续费', width: 300, sortable: true },
+                { field: 'ChargeType', title: '手续费类型', width: 300, sortable: true },
+                { field: 'Price', title: '产品费用', width: 300, sortable: true },
+                {
+                    field: 'AmountType', title: '金额类型', width: 300, sortable: true,
+                    styler: function (value, row, index) {
+                        if (value == '保证金') {
+                            return 'color:green;';
+                        }
+                        else {
+                            return 'color:red;';
+                        }
+                    }
+                },
+                {
+                    field: 'PriceType', title: '费用类型', width: 300, sortable: true,
+                    styler: function (value, row, index) {
+                        if (value == '单位值') {
+                            return 'color:green;';
+                        }
+                        else if (value == '固定值') {
+                            return 'color:red;';
+                        } else{
+                            return 'background-color:#ffee00;color:red;';
+                        }
+                    }
+                },
+                { field: 'CallPriceType', title: '结算价类型', width: 300, sortable: true },
+                //{ field: 'Margin', title: '产品保证金', width: 300, sortable: true },
+                //{ field: 'MarginType', title: '保证金类型', width: 300, sortable: true },
+                { field: 'MaxNum', title: '最大购买数量', width: 300, sortable: true },
+                {
+                    field: 'AddDate', title: '创建日期', width: 300, sortable: true//, formatter: formatDateBox,
+                    //sorter: function (a, b) {
+                    //    a = a.split('-');
+                    //    b = b.split('-');
+                    //    if (a[2] == b[2]) {
+                    //        if (a[0] == b[0]) {
+                    //            return (a[1] > b[1] ? 1 : -1);
+                    //        } else {
+                    //            return (a[0] > b[0] ? 1 : -1);
+                    //        }
+                    //    } else {
+                    //        return (a[2] > b[2] ? 1 : -1);
+                    //    }
+                    //}
+                },
+                {
+                    field: 'Status', title: "产品状态", width: 300,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return 'color:red;';
+                        }
+                        else if (value == 1) {
+                            return 'color:green;';
+                        } else if (value == 2) {
+                            return 'background-color:#ffee00;color:red;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return value = '初始化';
+                        } else if (value == 1) {
+                            return value = '启动';
+                        } else if (value == 2) {
+                            return value = '停用';
+                        }
+                    }
+                },
+                {
+                    field: 'IsUpLoad', title: '是否上传', width: 300, sortable: true,
+                    styler: function (value, row, index) {
+                        if (value == true) {
+                            return 'color:green;';
+                        }
+                        else{
+                            return 'background-color:#ffee00;color:red;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == true) {
+                            return value = '已上传';
+                        } else {
+                            return value = '未上传';
+                        }
+                    }
+                }
+            ]],
+            toolbar: [{
+                id: 'btnup',
+                text: '上传产品到第三方',
+                iconCls: 'icon-yun',
+                handler: function () {
+                    UpOptionsProduct();
+                }
+            }, '-', {
+                id: 'btnadd',
+                text: '添加期权产品',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddOptionsProductDialog();
+                }
+            }, '-',{
+                id: 'btnupload',
+                text: '上传产品Excel',
+                iconCls: 'icon-excel',
+                handler: function () {
+                    UploadOptionsProductDialog();
+                }
+            },
+            //'-',{
+            //    id: 'btnedit',
+            //    text: '修改期权产品',
+            //    iconCls: 'icon-edit',
+            //    handler: function () {
+            //        UpdateOptionsProductDialog();
+            //    }
+            //},
+            //'-', {
+            //    id: 'btncopy',
+            //    text: '复制期权产品',
+            //    iconCls: 'icon-add',
+            //    handler: function () {
+            //        CopyOptionsProduct();
+            //    }
+            //},
+            '-',
+            {
+                id: 'btnfall',
+                text: '下跌规则',
+                iconCls: 'icon-down',
+                handler: function () {
+                    ConfigFallRoleDialog();
+                }
+            }, '-', {
+                id: 'btnrise',
+                text: '上涨规则',
+                iconCls: 'icon-up',
+                handler: function () {
+                    ConfigRiseRoleDialog();
+                }
+            }, '-', {
+                id: 'btnbegin',
+                text: '启用',
+                iconCls: 'icon-begin',
+                handler: function () {
+                    BeginOptionsProduct();
+                }
+            }, '-', {
+                id: 'btnend',
+                text: '作废',
+                iconCls: 'icon-end',
+                handler: function () {
+                    EndOptionsProduct();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTable();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                ShowOptionsProductDialog();
+            }
+        });
+    }
+    //上传产品
+    function UpOptionsProduct() {
+        $.messager.confirm("上传产品","该操作将会把启用状态的产品上传至第三方平台，您确定开始上传产品？", function (Begin1) {
+            if (Begin1) {
+                $.messager.confirm("再次确认", "您确定开始上传产品？", function (Begin2) {
+                    if (Begin2) {
+                        var token = $('@Html.AntiForgeryToken()').val();
+                        var headers = {};
+                        headers["__RequestVerificationToken"] = token;
+                        var Selections = $("#OptionsProductGrid").datagrid("getSelections");
+                        var IDs = [];
+                        if (Selections.length != 0) {
+                            for (var i = 0; i < Selections.length; i++) {
+                                IDs.push(Selections[i].OptionsProductID);
+                                console.info(IDs);
+                            }
+                        } else {
+                            $.messager.alert("友情提示", "请先选择您要上传的产品。");
+                            return;
+                        }
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Home/UpOptionsProduct',
+                            cache: false,
+                            headers: headers,
+                            data: { PartnerName: '联创集团',id: IDs },
+                            success: function (data) {
+                                if (data && data.Success) {
+                                    $.messager.show({
+                                        title: '我的消息',
+                                        msg: '上传产品成功。',
+                                        timeout: 5000,
+                                        showType: 'slide'
+                                    });
+
+                                    $("#OptionsProductGrid").datagrid("reload");
+                                }
+                                else {
+                                    alert("上传失败，请您检查" + data.Message);
+                                }
+                            },
+                            error: function () {
+                                alert("上传失败，请您检查")
+                            }
+                        });
+                        
+                    }
+                });
+            }
+        });
+    }
+    //启用产品
+    function BeginOptionsProduct() {
+        
+        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 1) {
+            $.messager.alert("友情提示", "产品已经启动了，不能重复启动。");
+            return;
+        }
+        //if ($("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
+        //    $.messager.alert("友情提示", "产品已经停用了，不能再次启动。");
+        //    return;
+        //}
+        ////判断产品是否被启用过，如果被启用过就不能被再次启动
+        //if ($("#OptionsProductGrid").datagrid("getSelected").BeginDate != null) {
+        //    $.messager.alert("友情提示", "产品已经被启动过一次，不能再次启动。请新增一个产品。");
+        //    return;
+        //}
+        $.messager.confirm("启用产品", "您确定开始启用该产品？", function (Begin) {
+            if (Begin) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#OptionsProductGrid").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].OptionsProductID);
+                        console.info(IDs);
+                    }
+                }
+                //console.info(IDs);
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/BeginOptionsProduct',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '启用产品成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#OptionsProductGrid").datagrid("reload");
+                        }
+                        else {
+                            alert("启用失败，请您检查");
+                        }
+                    },
+                    error: function () {
+                        alert("启用失败，请您检查")
+                    }
+                });
+
+            }
+        })
+    }
+    //作废产品
+    function EndOptionsProduct() {
+        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
+            $.messager.alert("友情提示", "产品已经作废了，不能重复作废。");
+            return;
+        }
+        $.messager.confirm("停用产品", "您确定停用该产品？", function (End) {
+            if (End) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#OptionsProductGrid").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].OptionsProductID);
+                        console.info(IDs);
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Home/EndOptionsProduct',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '停用产品成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#OptionsProductGrid").datagrid("reload");
+                        }
+                        else {
+                            alert("停用失败，请您检查");
+                        }
+                    },
+                    error: function () {
+                        alert("停用失败，请您检查")
+                    }
+                });
+
+            }
+
+        })
+    }
+    //添加期权产品
+    function AddOptionsProductDialog() {
+        $('#AddOptionsProductDialog').dialog('open').dialog('setTitle', '添加期权产品');
+        $('#AddOptionsProductForm').form('clear');
+    }
+    //显示期权产品明细
+    function ShowOptionsProductDialog() {
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        if (selects.length==1) {
+            $('#ShowOptionsProductDialog').dialog('open').dialog('setTitle', '显示期权产品');
+            BingOptionsProductDetails();
+        } else {
+            $.messager.alert("友情提示", "请先选择一个您需要查看的产品。");
+            return;
+        }
+    }
+    //上传产品Excel-------------------------------------------------------------------------------------
+    function UploadOptionsProductDialog() {
+        $("#UploadOptionsProductDialog").dialog("open").dialog("setTitle", "上传期权产品数据");
+        //数据清空
+        $('#UploadedFile').val('');
+        $("#FileProgress").css("width",
+              '0%');
+        $('#FileProgress span').text("0%");
+        $("#FileName").text('');
+        $("#FileSize").text('');
+    }
+    //新增产品数据事件
+    function BindUploadOptionsProductClickEvent() {
+        $("#btnUploadOptionsProduct").click(function () {
+            var form = $('#UploadOptionsProductForm')[0];
+            var dataString = new FormData(form);
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //dataString.append('ProductID', $("#ProductGrid").datagrid("getSelections")[0].ProductID);
+            $.ajax({
+                url: '/Home/UploadOptionsProduct',  //Server script to process data
+                type: 'POST',
+                xhr: function () {  // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) { // Check if upload property exists
+                        //myXhr.upload.onprogress = progressHandlingFunction
+                        myXhr.upload.addEventListener('progress', progressHandlingFunction,
+                        false); // For handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                //Ajax events
+                success: successHandler,
+                error: errorHandler,
+                complete: completeHandler,
+                headers: headers,
+                // Form data
+                data: dataString,
+                //Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    }
+    function successHandler(data) {
+        if (data.statusCode == 400) {
+            $.messager.alert('错误', data.status);
+        } else if (data.statusCode == 200) {
+            $.messager.alert('成功', data.status);
+        }
+    }
+    function errorHandler(e) {
+        alert(e.status);
+    }
+    function completeHandler(data) {
+        $("#UploadOptionsProductDialog").dialog("close");
+        $('#OptionsProductGrid').datagrid('reload');
+    }
+    function progressHandlingFunction(e) {
+        if (e.lengthComputable) {
+            var percentComplete = Math.round(e.loaded * 100 / e.total);
+            $("#FileProgress").css("width",
+              percentComplete + '%').attr('aria-valuenow', percentComplete);
+            $('#FileProgress span').text(percentComplete + "%");
+        }
+        else {
+            $('#FileProgress span').text('unable to compute');
+        }
+    }
+    function singleFileSelected(evt) {
+        //var selectedFile = evt.target.files can use this  or select input file element
+        //and access it's files object
+        var selectedFile = ($("#UploadedFile"))[0].files[0];//FileControl.files[0];
+        if (selectedFile) {
+            if (selectedFile.name.split('.').length >= 2) {
+                var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
+                if (FileType != "xlsx" && FileType != "xls") {
+                    $.messager.alert('友情提示', '上传文件必须为Excel的文件格式，请重新选择');
+                    $('#UploadedFile').val('');
+                    $("#FileName").text('');
+                    $("#FileSize").text('');
+                    return false;
+                }
+            }
+            var FileSize = 0;
+            //var imageType = /image.*/;
+            if (selectedFile.size > 1048576) {
+                FileSize = Math.round(selectedFile.size * 100 / 1048576) / 100 + " MB";
+            }
+            else if (selectedFile.size > 1024) {
+                FileSize = Math.round(selectedFile.size * 100 / 1024) / 100 + " KB";
+            }
+            else {
+                FileSize = selectedFile.size + " Bytes";
+            }
+            // here we will add the code of thumbnail preview of upload images
+
+            $("#FileName").text("名称 : " + selectedFile.name);
+            $("#FileSize").text("大小 : " + FileSize);
+
+        }
+    }
+    //-----------------------------------------------------------------------------------------------
+    //读取期权产品信息
+    function BingOptionsProductDetails() {
+        //首先获取选中的菜单的ID
+        var OptionsProductID = $("#OptionsProductGrid").treegrid("getSelections")[0].OptionsProductID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Home/GetOptionsProductDetails", { ID: OptionsProductID }, function (data) {
+            if (data && data.Success) {
+                //$("#MenuName2").val(data.MenuName);
+                $("#SPartnerName").val(data.PartnerName),
+                $("#SProductName").val(data.ProductName),
+                $("#SProductDescription").val(data.ProductDescription),
+                $("#SOptionType").val(data.OptionType),
+                $("#SContract").val(data.Contract),
+                $("#SContractChs").val(data.ContractChs),
+                $("#SDeadline").val(data.Deadline),
+                $("#SUnit").val(data.Unit),
+                $("#SCharge").val(data.Charge),
+                $("#SChargeType").val(data.ChargeType),
+                $("#SPrice").val(data.Price),
+                $("#SPriceType").val(data.PriceType),
+                $("#SCallPriceType").val(data.CallPriceType),
+                //Margin: $("#Margin").numberbox('getValue'),
+                $("#SAmountType").val(data.AmountType),
+                $("#SMaxNum").val(data.MaxNum),
+                $("#SProductDesc").textbox('setText', data.ProductDesc),
+                $("#SProductDtlDesc").textbox('setText', data.ProductDtlDesc),
+                $("#SFormula").textbox('setText', data.Formula),
+                $("#SProductUrl").textbox('setText', data.ProductUrl)
+            } else {
+                $.messager.alert("提示", "用户数据查询失败");
+            }
+
+        });
+    }
+    //拷贝期权产品
+    //function CopyOptionsProduct() {
+    //    var SelectProduct = $("#OptionsProductGrid").datagrid("getSelections");
+    //    if (SelectProduct.length != 1) {
+    //        $.messager.alert("提示", "请您先选择一个需要拷贝的产品。");
+    //        return;
+    //    }
+    //    var OptionsProductID = SelectProduct[0].OptionsProductID;
+
+    //    $.post("/Home/CopyOptionsProduct", { ID: OptionsProductID }, function (data) {
+    //        if (data && data.Success) {
+    //            $.messager.show({
+    //                title: '新的消息',
+    //                msg: '拷贝期权产品成功。',
+    //                timeout: 5000,
+    //                showType: 'slide'
+    //            });
+    //            $("#OptionsProductGrid").datagrid("reload");
+    //        } else {
+    //            $.messager.alert("提示", "数据查询失败");
+    //        }
+
+    //    });
+    //}
+    //添加期权产品事件
+    function BindAddProductClickEvent() {
+        $("#btnAddOptionsProduct").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddOptionsProductForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            //默认产品状态为作废
+            var CBStatus = false;
+            //debugger
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                PartnerName: $("#PartnerName").combobox('getText'),
+                ProductName: $("#ProductName").val(),
+                ProductDescription: $("#ProductDescription").val(),
+                OptionType: $("#OptionType").combobox('getText'),
+                Contract: $("#Contract").val(),
+                ContractChs:$("#ContractChs").val(),
+                Deadline: $("#Deadline").numberbox('getValue'),
+                Unit: $("#Unit").val(),
+                Charge: $("#Charge").numberbox('getValue'),
+                ChargeType: $("#ChargeType").combobox('getText'),
+                Price: $("#Price").numberbox('getValue'),
+                PriceType: $("#PriceType").combobox('getText'),
+                CallPriceType: $("#CallPriceType").combobox('getText'),
+                //Margin: $("#Margin").numberbox('getValue'),
+                AmountType: $("#AmountType").combobox('getValue'),
+                MaxNum: $("#MaxNum").numberbox('getValue'),
+                ProductDesc: $("#ProductDesc").val(),
+                ProductDtlDesc: $("#ProductDtlDesc").val(),
+                Formula: $("#Formula").val(),
+                ProductUrl:$("#ProductUrl").val(),
+                Status: CBStatus
+            };
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddOptionsProduct',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增期权产品成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddOptionsProductDialog').dialog('close');
+                        $("#OptionsProductGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    //修改期权产品
+    function UpdateOptionsProductDialog() {
+
+    }
+    //添加下跌规则
+    function ConfigFallRoleDialog() {
+        var select = $("#OptionsProductGrid").datagrid("getSelected");
+        if (select == null) {
+            $.messager.alert("友情提示", "请先选择一个产品");
+            return;
+        }
+        $('#ConfigFallRoleDialog').dialog('open').dialog('setTitle', '配置下跌规则');
+        //$('#AddUserGrid').datagrid('clearSelections');
+        //$('#AddUserGrid').datagrid('reload');
+        $('#FallRoleGrid').datagrid('loadData', { total: 0, rows: [] });
+        $('#FallRoleGrid').datagrid('load', {
+            id: select.OptionsProductID
+        });
+    }
+    //添加上涨规则
+    function ConfigRiseRoleDialog() {
+        var select = $("#OptionsProductGrid").datagrid("getSelected");
+        if (select == null) {
+            $.messager.alert("友情提示", "请先选择一个产品");
+            return;
+        }
+        $('#ConfigRiseRoleDialog').dialog('open').dialog('setTitle', '配置上涨规则');
+        //$('#AddUserGrid').datagrid('clearSelections');
+        //$('#AddUserGrid').datagrid('reload');
+        $('#RiseRoleGrid').datagrid('loadData', { total: 0, rows: [] });
+        $('#RiseRoleGrid').datagrid('load', {
+            id: select.OptionsProductID
+        });
+    }
+    //初始化下跌规则列表
+    function initFallRoleGrid() {
+        $('#FallRoleGrid').datagrid({
+            title: '下跌规则列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/FallRoleGrid_Read',
+            sortName: 'FallRoleID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'FallRoleID',
+            //pageSize: 10,
+            //pagination: true,
+            //rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'FallRoleID', title: 'ID', width: 50, sortable: true },
+                { field: 'FallRoleName', title: '规则名称', width: 300, sortable: true },
+                { field: 'CreateDate', title: '创建时间', width: 300, sortable: true },
+                { field: 'Up', title: '上区间', width: 300, sortable: true },
+                { field: 'Down', title: '下区间', width: 300, sortable: true },
+                { field: 'UpDownType', title: '区间类型', width: 300, sortable: true },
+                { field: 'PartType', title: '部分类型', width: 300, sortable: true },
+                { field: 'CompensateNum', title: '赔付数', width: 300, sortable: true },
+                { field: 'CompensateType', title: '赔付类型', width: 300, sortable: true },
+                { field: 'TopCompensateNum', title: '最高赔付数', width: 300, sortable: true },
+                { field: 'TopCompensateType', title: '最高赔付类型', width: 300, sortable: true },
+            ]],
+            toolbar: [{
+                id: 'btnaddFallRole',
+                text: '添加下跌规则',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddFallRoleDialog();
+                }
+            }, '-', {
+                id: 'btnrefreshFallRole',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initFallRoleGrid();
+                }
+            }]
+        });
+    }
+    //初始化上涨规则列表
+    function initRiseRoleGrid() {
+        $('#RiseRoleGrid').datagrid({
+            title: '上涨规则列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/RiseRoleGrid_Read',
+            sortName: 'RiseRoleID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'RiseRoleID',
+            //pageSize: 10,
+            //pagination: true,
+            //rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'RiseRoleID', title: 'ID', width: 50, sortable: true },
+                { field: 'RiseRoleName', title: '规则名称', width: 300, sortable: true },
+                { field: 'CreateDate', title: '创建时间', width: 300, sortable: true },
+                { field: 'Up', title: '上区间', width: 300, sortable: true },
+                { field: 'Down', title: '下区间', width: 300, sortable: true },
+                { field: 'UpDownType', title: '区间类型', width: 300, sortable: true },
+                { field: 'PartType', title: '部分类型', width: 300, sortable: true },
+                { field: 'DividendNum', title: '分红数', width: 300, sortable: true },
+                { field: 'DividendType', title: '分红类型', width: 300, sortable: true },
+                { field: 'TopDividendNum', title: '最高分红数', width: 300, sortable: true },
+                { field: 'TopDividendType', title: '最高分红类型', width: 300, sortable: true },
+            ]],
+            toolbar: [{
+                id: 'btnaddRiseRole',
+                text: '添加上涨规则',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddRiseRoleDialog();
+                }
+            }, '-', {
+                id: 'btnrefreshFallRole',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initRiseRoleGrid();
+                }
+            }]
+        });
+    }
+    //打开新增下跌规则窗口
+    function AddFallRoleDialog() {
+        //判断产品是否启动
+        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 1 || $("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
+            $.messager.alert("友情提示", "产品已经处于启动或停止状态不能再变更参数。");
+            return;
+        }
+
+        $('#AddFallRoleDialog').dialog('open').dialog('setTitle', '添加下跌规则');
+        $('#AddFallRoleDialogForm').form('clear');
+        $('#CompensateType').val('百分比');
+        $('#TopCompensateType').val('固定值');
+        $('#UpDownType').val('固定值');
+        $('#AddFallRoleOptionsProductID').val($("#OptionsProductGrid").datagrid("getSelected").OptionsProductID);
+    }
+    //打开新增上涨规则窗口
+    function AddRiseRoleDialog() {
+        //判断产品是否启动
+        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 1 || $("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
+            $.messager.alert("友情提示", "产品已经处于启动或停止状态不能再变更参数。");
+            return;
+        }
+
+        $('#AddRiseRoleDialog').dialog('open').dialog('setTitle', '添加上涨规则');
+        $('#AddRiseRoleDialogForm').form('clear');
+        $('#DividendType').val('百分比');
+        $('#TopDividendType').val('固定值');
+        $('#UpDownType1').val('固定值');
+        $('#AddRiseRoleOptionsProductID').val($("#OptionsProductGrid").datagrid("getSelected").OptionsProductID);
+    }
+    //绑定新增下跌规则按钮
+    function BindAddFallRoleClickEvent() {
+        $('#btnAddFallRole').click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddFallRoleDialogForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //debugger
+            //创建传递的参数
+            var postdata = {
+                FallRoleName: $("#FallRoleName").val(),
+                Up: $("#Up").numberbox('getValue'),
+                Down: $("#Down").numberbox('getValue'),
+                UpDownType: $("#UpDownType").val(),
+                PartType: $("#PartType").combobox('getText'),
+                CompensateNum: $("#CompensateNum").numberbox('getValue'),
+                CompensateType: $("#CompensateType").val(),
+                TopCompensateNum: $("#TopCompensateNum").numberbox('getValue'),
+                TopCompensateType: $("#TopCompensateType").val(),
+                OptionsProductID: $('#AddFallRoleOptionsProductID').val()
+            };
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddFallRole',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增下跌规则成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddFallRoleDialog').dialog('close');
+                        $("#FallRoleGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    //绑定新增上涨规则按钮
+    function BindAddRiseRoleClickEvent() {
+        $('#btnAddRiseRole').click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddRiseRoleDialogForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                RiseRoleName: $("#RiseRoleName").val(),
+                Up: $("#Up1").numberbox('getValue'),
+                Down: $("#Down1").numberbox('getValue'),
+                UpDownType: $("#UpDownType1").val(),
+                PartType: $("#PartType1").combobox('getText'),
+                DividendNum: $("#DividendNum").numberbox('getValue'),
+                DividendType: $("#DividendType").val(),
+                TopDividendNum: $("#TopDividendNum").numberbox('getValue'),
+                TopDividendType: $("#TopDividendType").val(),
+                OptionsProductID: $('#AddRiseRoleOptionsProductID').val()
+            };
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Home/AddRiseRole',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增上涨规则成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddRiseRoleDialog').dialog('close');
+                        $("#RiseRoleGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+            
+        });
+    }
+    //查询事件
+    function Search() {
+        $('#OptionsProductGrid').datagrid('load', {
+            PartnerName: $('#SearchPartnerName').combobox('getText'),
+            ProductName: $('#SearchProductName').val(),
+            OptionType: $('#SearchOptionType').combobox('getText'),
+            BeginDate: $('#SearchBeginDate').datebox('getText')
+        });
+    }
+</script>
+<style>
+    #SearchForm table tr td {
+        padding-left: 5px;
+    }
+</style>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchPartnerName">合作者名称:</label></td>
+                    <td>
+                        <input id="SearchPartnerName" class="easyui-combobox" name="PartnerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',height:30,width:150" />
+                        @*<input type="text" class="form-control input-sm" id="SGSMC" name="GSMC" placeholder="公司名称">*@
+                    </td>
+
+                    <td><label for="SearchProductName">产品名称:</label></td>
+                    <td><input type="text" class="form-control input-sm" id="SearchProductName" name="ProductName" placeholder="产品名称"></td>
+
+                    <td><label for="SearchOptionType">期权类型:</label></td>
+                    <td>
+                        <input id="SearchOptionType" class="easyui-combobox" name="OptionType"
+                               data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',height:30,width:150" />
+                        @*<input type="text" class="form-control input-sm" id="SLXR" name="LXR" placeholder="主要联系人">*@
+                    </td>
+
+                    <td><label for="SearchBeginDate">启动日期:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchBeginDate" name="BeginDate" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="OptionsProductGrid" style="color:green"></table>
+    @*添加期权产品弹窗*@
+    <div id="AddOptionsProductDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddOptionsProductForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="PartnerName">合作者名称：</label></td>
+                    <td>
+                        <input id="PartnerName" class="easyui-combobox" name="PartnerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ProductName">产品名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="ProductName" name="ProductName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ProductDescription">产品特征：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="ProductDescription" name="ProductDescription" data-options="required:false,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Contract">合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="Contract" name="Contract" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ContractChs">中文合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="ContractChs" name="ContractChs" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="OptionType">期权类型：</label></td>
+                    <td>
+                        <input id="OptionType" class="easyui-combobox" name="OptionType"
+                               data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',required:true,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Deadline">产品期限(天)：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="Deadline" name="Deadline" data-options="required:true,validType:'length[1,32]',height:30" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Unit">产品单位：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="Unit" name="Unit" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Charge">产品手续费：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="Charge" name="Charge" data-options="required:false,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ChargeType">手续费类型：</label></td>
+                    <td>
+                        <input id="ChargeType" class="easyui-combobox" name="ChargeType"
+                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="Price">产品费用：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="Price" name="Price" data-options="required:false,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="PriceType">金额类型：</label></td>
+                    <td>
+                        <input id="PriceType" class="easyui-combobox" name="PriceType"
+                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td><label for="AmountType">产品费用类型：</label></td>
+                    <td>
+                        <select id="AmountType" class="easyui-combobox" name="AmountType"
+                                data-options="editable:false,required:false,height:30,width:200">
+                            <option value="保证金">保证金</option>
+                            <option value="保费">保费</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="CallPriceType">结算价类型：</label></td>
+                    <td>
+                        <input id="CallPriceType" class="easyui-combobox" name="CallPriceType"
+                               data-options="editable:false,valueField:'CallPriceTypeID',textField:'CallPriceTypeName',url:'/Home/GetCallPriceType',required:false,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="MaxNum">最大购买数：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="MaxNum" name="MaxNum" data-options="required:true,height:30" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ProductDesc">产品描述（显示在提交订单中）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="ProductDesc" name="ProductDesc" data-options="multiline:true" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ProductDtlDesc">产品详细描述（显示在保单详情，用/n分行）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="ProductDtlDesc" name="ProductDtlDesc" data-options="multiline:true" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Formula">收益计算公式：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="Formula" name="Formula" data-options="" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ProductUrl">产品详情链接：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="ProductUrl" name="ProductUrl" data-options="" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOptionsProduct" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddOptionsProductDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*-----------------------------------------------------------------------------------------------------------------
+        上传产品Excel数据弹窗*@
+    <div id="UploadOptionsProductDialog" class="easyui-dialog" style="width:560px;height:500px;padding:10px 20px;display:block;"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <div class="alert alert-danger" role="alert">
+            <strong>提醒!</strong><br />上传的数据必须符合数据模板的规格.
+        </div>
+        <div class="alert alert-info" role="alert">
+            <div id="FileName" class="info"></div>
+            <div id="FileSize" class="info"></div>
+        </div>
+        <form id="UploadOptionsProductForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="Address">产品数据上传：</label></td>
+                    <td>
+                        <input type="file" name="UploadedFile" id="UploadedFile" onchange="singleFileSelected()" />
+                    </td>
+                </tr>
+                @*<tr>
+                        <td><label for="Address">数据模板下载：</label></td>
+                        <td>
+                            <a href="~/FileUpLoad/数据模板.xlsx" title="数据模板下载" target="_blank">数据模板.xlsx</a>||
+                            <a href="~/FileUpLoad/数据模板.xls" title="数据模板下载" target="_blank">数据模板.xls</a>
+                        </td>
+                    </tr>*@
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadOptionsProduct" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadOptionsProductDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div class="progress">
+            <div id="FileProgress"
+                 class="progress-bar progress-bar-striped" role="progressbar"
+                 aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0%;">
+                <span></span>
+            </div>
+        </div>
+    </div>
+    @*显示期权产品弹窗*@
+    <div id="ShowOptionsProductDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="ShowOptionsProductForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="SPartnerName">合作者名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPartnerName" name="PartnerName" readonly="readonly" style="width:350px;" />
+                        @*<input id="PartnerName" class="easyui-combobox" name="PartnerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SProductName">产品名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SProductName" name="ProductName" readonly="readonly" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDescription">产品特征：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SProductDescription" name="ProductDescription" readonly="readonly" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SContract">合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SContract" name="Contract" readonly="readonly" data-options="validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SContractChs">中文合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SContractChs" name="ContractChs" readonly="readonly" data-options="validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SOptionType">期权类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SOptionType" name="OptionType" readonly="readonly" style="width:350px;" />
+                        @*<input id="OptionType" class="easyui-combobox" name="OptionType"
+                               data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SDeadline">产品期限(天)：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SDeadline" name="Deadline" readonly="readonly" style="width:350px;" />
+                    @*<input class="easyui-numberbox" type="text" id="Deadline" name="Deadline" data-options="required:true,validType:'length[1,32]',height:30" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SUnit">产品单位：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SUnit" name="Unit" readonly="readonly" style="width:350px;" />
+                    @*<input class="easyui-validatebox form-control" type="text" id="Unit" name="Unit" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SCharge">产品手续费：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SCharge" name="Charge" readonly="readonly" style="width:350px;" />
+                    @*<input class="easyui-numberbox" type="text" id="Charge" name="Charge" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SChargeType">手续费类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SChargeType" name="ChargeType" readonly="readonly" style="width:350px;" />
+                        @*<input id="ChargeType" class="easyui-combobox" name="ChargeType"
+                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="SPrice">产品费用：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPrice" name="Price" readonly="readonly" style="width:350px;" />
+                    @*<input class="easyui-numberbox" type="text" id="Price" name="Price" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SPriceType">金额类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPriceType" name="PriceType" readonly="readonly" style="width:350px;" />
+                        @*<input id="PriceType" class="easyui-combobox" name="PriceType"
+                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label for="SAmountType">产品费用类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SAmountType" name="AmountType" readonly="readonly" style="width:350px;" />
+                        @*<select id="AmountType" class="easyui-combobox" name="AmountType"
+                                data-options="editable:false,required:false,height:30,width:200">
+                            <option value="保证金">保证金</option>
+                            <option value="保费">保费</option>
+                        </select>*@
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="SCallPriceType">结算价类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SCallPriceType" name="CallPriceType" readonly="readonly" style="width:350px;" />
+                        @*<input id="CallPriceType" class="easyui-combobox" name="CallPriceType"
+                               data-options="editable:false,valueField:'CallPriceTypeID',textField:'CallPriceTypeName',url:'/Home/GetCallPriceType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SMaxNum">最大购买数：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SMaxNum" name="MaxNum" readonly="readonly" style="width:350px;" />
+                    @*<input class="easyui-numberbox" type="text" id="MaxNum" name="MaxNum" data-options="required:true,height:30" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDesc">产品描述（显示在提交订单中）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductDesc" name="ProductDesc" data-options="multiline:true" readonly="readonly" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDtlDesc">产品详细描述（显示在保单详情，分行）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductDtlDesc" name="ProductDtlDesc" data-options="multiline:true" readonly="readonly" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SFormula">收益计算公式：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SFormula" name="Formula" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductUrl">产品详情链接：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductUrl" name="ProductUrl" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        @*<a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOptionsProduct" iconcls="icon-ok">确定</a>*@
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#ShowOptionsProductDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @* 下跌规则列表弹窗 *@
+    <div id="ConfigFallRoleDialog" class="easyui-dialog" style="width:900px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="FallRoleGrid"></table>
+    </div>
+    @*添加下跌规则弹窗*@
+    <div id="AddFallRoleDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddFallRoleDialogForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="FallRoleName">下跌规则名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="FallRoleName" name="FallRoleName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Up">上区间(小于)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Up" name="Up" data-options="required:true,height:30,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Down">下区间(大于等于)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Down" name="Down" data-options="required:true,height:30,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="UpDownType">区间类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="UpDownType" name="UpDownType" value="固定值" readonly="readonly" style="width:350px;" />
+                        @*<input id="UpDownType" class="easyui-combobox" name="UpDownType"
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PartType">部分类型：</label></td>
+                    <td>
+                        <input id="PartType" class="easyui-combobox" name="PartType"
+                               data-options="editable:false,valueField:'PartTypeID',textField:'PartTypeName',url:'/Home/GetPartType',required:true,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="CompensateNum">赔付数%：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="CompensateNum" name="CompensateNum" data-options="required:true,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="CompensateType">赔付类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="CompensateType" name="CompensateType" value="百分比" readonly="readonly" style="width:350px;" />
+                        @*<input id="CompensateType" class="easyui-combobox" name="CompensateType"
+                            data-options="valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="TopCompensateNum">最高赔付数：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="TopCompensateNum" name="TopCompensateNum" data-options="required:false,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="TopCompensateType">最高赔付类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="TopCompensateType" name="TopCompensateType" value="单位值" readonly="readonly" style="width:350px;" />
+                        @*<input id="TopCompensateType" class="easyui-combobox" name="TopCompensateType"
+                            data-options="valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr hidden="hidden">
+                    <td><label for="OptionsProductID">产品ID：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="AddFallRoleOptionsProductID" name="OptionsProductID" data-options="required:false" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddFallRole" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddFallRoleDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @* 上涨规则列表弹窗 *@
+    <div id="ConfigRiseRoleDialog" class="easyui-dialog" style="width:900px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="RiseRoleGrid"></table>
+    </div>
+    @*添加上涨规则弹窗*@
+    <div id="AddRiseRoleDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddRiseRoleDialogForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="RiseRoleName">上涨规则名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="RiseRoleName" name="RiseRoleName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Up">上区间(小于)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Up1" name="Up" data-options="required:true,height:30,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Down">下区间(大于等于)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Down1" name="Down" data-options="required:true,height:30,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="UpDownType">区间类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="UpDownType1" name="UpDownType" value="固定值" readonly="readonly" style="width:350px;" />
+                        @*<input id="UpDownType1" class="easyui-combobox" name="UpDownType"
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PartType">部分类型：</label></td>
+                    <td>
+                        <input id="PartType1" class="easyui-combobox" name="PartType"
+                               data-options="editable:false,valueField:'PartTypeID',textField:'PartTypeName',url:'/Home/GetPartType',required:true,height:30,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="DividendNum">分红数%：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="DividendNum" name="DividendNum" data-options="required:true,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="DividendType">分红类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="DividendType" name="DividendType" readonly="readonly" style="width:350px;" />
+                        @*<input id="DividendType" class="easyui-combobox" name="DividendType"
+                            data-options="valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="TopDividendNum">最高分红数：</label></td>
+                    <td><input class="easyui-numberbox" type="text" id="TopDividendNum" name="TopDividendNum" data-options="required:false,height:30,precision:2" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="TopDividendType">最高分红类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="TopDividendType" name="TopDividendType" value="单位值" readonly="readonly" style="width:350px;" />
+                        @*<input id="TopDividendType" class="easyui-combobox" name="TopDividendType"
+                            data-options="valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr hidden="hidden">
+                    <td><label for="OptionsProductID">产品ID：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="AddRiseRoleOptionsProductID" name="OptionsProductID" data-options="required:false" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddRiseRole" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddRiseRoleDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

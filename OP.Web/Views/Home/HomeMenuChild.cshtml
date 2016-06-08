@@ -1,0 +1,17 @@
+﻿
+@model List<OP.Web.Models.MenuTreeModel>
+
+
+    @if (Model.Count > 0)
+    {
+        <ul class="nav nav-pills nav-stacked">
+            @{foreach (var item in Model)
+                {
+                    <li class="nav-li" role="presentation">
+                        <a href="#" onclick="newone('@Html.Encode(item.MenuName)','@Html.Encode(item.MenuURL)',this)">@Html.Encode(item.MenuName)</a>
+                    </li>
+                }
+            }
+        </ul>
+    }
+        
