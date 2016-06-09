@@ -51,7 +51,7 @@ namespace OP.Web.Controllers
             });
         }
         /// <summary>
-        /// 新增宣传册模板
+        /// 新增，更新宣传册模板
         /// </summary>
         /// <returns></returns>
         public ActionResult AddTemplate(string id)
@@ -67,10 +67,7 @@ namespace OP.Web.Controllers
             }
             return View(new Brochure());
         }
-        public ActionResult UpdateTemplate()
-        {
-            return View();
-        }
+
         /// <summary>
         /// 新增宣传册模板事件
         /// </summary>
@@ -101,6 +98,83 @@ namespace OP.Web.Controllers
             catch (Exception)
             {
                 return Json(new {
+                    Success = false
+                });
+            }
+        }
+        /// <summary>
+        /// 修改宣传册模板事件
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateInput(false)]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult UpdateTemplateAction(Brochure model)
+        {
+            try
+            {
+                if (model!=null)
+                {
+                    model.TempDate = DateTime.Now.ToLocalTime();
+                    if (BrochureRepository.Update(model))
+                    {
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
+        }
+        /// <summary>
+        /// 删除宣传册模板事件
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult DeleteTemplateAction(string ID)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ID))
+                {
+                    Guid gid = new Guid(ID);
+                    Brochure find = BrochureRepository.Find(b => b.BrochureID == gid);
+                    if (find!=null)
+                    {
+                        if (BrochureRepository.Delete(find))
+                        {
+                            return Json(new
+                            {
+                                Success = true
+                            });
+                        }
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
                     Success = false
                 });
             }

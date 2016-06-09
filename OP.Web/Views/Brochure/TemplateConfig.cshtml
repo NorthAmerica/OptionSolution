@@ -65,7 +65,7 @@
                 }
             }],
             onDblClickRow: function (index, row) {
-                ShowTemplateDialog();
+                UpdateTemplateDialog();
             }
         });
     }
@@ -84,10 +84,48 @@
         }
     }
     function DeleteTemplate() {
-
-    }
-    function ShowTemplateDialog() {
-
+        //获取到选定ID
+        var deleteTypeID = $("#TemplateGrid").datagrid("getSelections");
+        //判断选择了多少条数据
+        if (deleteTypeID.length == 1) {
+            var TempName = deleteTypeID[0].TempName;
+            var BrochureID = deleteTypeID[0].BrochureID;
+            $.messager.confirm("删除信息", "您确认删除<font color='Red' size='3'>" + TempName + "</font>吗？", function (DeleteType) {
+                if (DeleteType) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Brochure/DeleteTemplateAction',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: BrochureID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除模板成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#TemplateGrid").datagrid("reload");
+                                $("#TemplateGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
     }
     //清空文本框中的值
     function ClearText() {

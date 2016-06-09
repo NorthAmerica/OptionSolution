@@ -5,7 +5,7 @@
 <link href="~/Scripts/UEditor/themes/default/css/ueditor.min.css" rel="stylesheet" />
 
 <style type="text/css">
-    caption {
+    #TempDiv caption {
         padding: 0 0 5px 0;
         font: italic 30px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
         text-align: center;
@@ -17,71 +17,71 @@
         by Alen Grakalic, brought to you by cssglobe.com
 
     */ /* general styles */
-    table, td {
+    #TempDiv table,#TempDiv  td {
         font: 100% Arial, Helvetica, sans-serif;
     }
 
-    table {
+    #TempDiv table {
         width: 100%;
         border-collapse: collapse;
         margin: 1em 0;
     }
 
-    th, td {
+    #TempDiv th,#TempDiv  td {
         text-align: left;
         padding: .5em;
         border: 1px solid #fff;
     }
 
-    th {
+    #TempDiv th {
         background: #328aa4;
         color: #fff;
     }
 
-    td {
+    #TempDiv td {
         background: #e5f1f4;
         text-align: center;
     }
 
-        td.td-info {
+    #TempDiv  td.td-info {
             width: 120px;
         }
     /* tablecloth styles */
-    tr.even td {
+    #TempDiv tr.even td {
         background: #e5f1f4;
     }
 
-    tr.odd td {
+    #TempDiv tr.odd td {
         background: #f8fbfc;
     }
 
-    th.over, tr.even th.over, tr.odd th.over {
+    #TempDiv th.over,#TempDiv  tr.even th.over,#TempDiv  tr.odd th.over {
         background: #4a98af;
     }
 
-    th.down, tr.even th.down, tr.odd th.down {
+    #TempDiv th.down,#TempDiv  tr.even th.down,#TempDiv  tr.odd th.down {
         background: #bce774;
     }
 
-    th.selected, tr.even th.selected, tr.odd th.selected {
+    #TempDiv th.selected,#TempDiv  tr.even th.selected,#TempDiv  tr.odd th.selected {
     }
 
-    td.over, tr.even td.over, tr.odd td.over {
+    #TempDiv td.over,#TempDiv  tr.even td.over,#TempDiv  tr.odd td.over {
         background: #ecfbd4;
     }
 
-    td.down, tr.even td.down, tr.odd td.down {
+    #TempDiv td.down,#TempDiv  tr.even td.down,#TempDiv  tr.odd td.down {
         background: #bce774;
         color: #fff;
     }
 
-    td.selected, tr.even td.selected, tr.odd td.selected {
+    #TempDiv td.selected,#TempDiv  tr.even td.selected,#TempDiv  tr.odd td.selected {
         background: #bce774;
         color: #555;
     }
 
     /* use this if you want to apply different styleing to empty table cells*/
-    td.empty, tr.odd td.empty, tr.even td.empty {
+    #TempDiv td.empty,#TempDiv  tr.odd td.empty,#TempDiv  tr.even td.empty {
         background: #fff;
     }
 </style>
@@ -97,25 +97,26 @@
         var StartDateDescrip = UE.getEditor('StartDateDescrip');
         var EndDateDescrip = UE.getEditor('EndDateDescrip');
         var TradeDateDescrip = UE.getEditor('TradeDateDescrip');
-        BindAddTemplateClickEvent();
-
+        
         @if (Model.BrochureID.ToString() == "00000000-0000-0000-0000-000000000000")
         {
+            //新增模板
             <text>
-
+        BindAddTemplateClickEvent(false);
         </text>
         }
         else
         {
-            
+            //修改模板
             <text>
         BindTemplateData();
+        BindAddTemplateClickEvent(true);
         </text>
         }
     });
 
 
-    function BindAddTemplateClickEvent() {
+    function BindAddTemplateClickEvent(IsUpdate) {
         $('#btnAddTemplate').click(function () {
             var valid = $('#AddTemplateForm').form('validate');
             if (valid == false) {
@@ -125,6 +126,7 @@
             var headers = {};
             headers["__RequestVerificationToken"] = token;
             var postdata = {
+                BrochureID:$('#BrochureID').val(),
                 TempName: $("#TempName").val(),
                 TempDescrip: $("#TempDescrip").val(),
                 ContractDescrip: $("#ContractDescrip").val(),
@@ -140,10 +142,19 @@
                 FAQ: UE.getEditor('FAQ').getContent(),
                 ExampleDescrip: UE.getEditor('ExampleDescrip').getContent()
             }
-            console.info(postdata);
+            var postURL = '';
+            var msgString = '';
+            debugger
+            if (IsUpdate) {
+                postURL = '/Brochure/UpdateTemplateAction';
+                msgString = '修改宣传册模板成功。';
+            } else {
+                postURL = '/Brochure/AddTemplateAction';
+                msgString = '新增宣传册模板成功。';
+            }
             $.ajax({
                 type: 'POST',
-                url: '/Brochure/AddTemplateAction',
+                url: postURL,
                 cache: false,
                 headers: headers,
                 data: postdata,
@@ -151,7 +162,7 @@
                     if (data && data.Success) {
                         $.messager.show({
                             title: '我的消息',
-                            msg: '新增宣传册模板成功。',
+                            msg: msgString,
                             timeout: 5000,
                             showType: 'slide'
                         });
@@ -163,6 +174,7 @@
                     }
                 },
                 error: function () {
+                    debugger
                     alert("添加失败，请您检查")
                 }
             });
@@ -170,7 +182,7 @@
         })
     }
     function BindTemplateData() {
-        debugger
+        $('#BrochureID').val('@Model.BrochureID');
         $('#TempName').val('@Model.TempName');
         $('#TempDescrip').val('@Model.TempDescrip');
         $('#ContractDescrip').val('@Model.ContractDescrip');
@@ -206,7 +218,7 @@
         tab.panel('refresh', '/Brochure/TemplateConfig');
     }
 </script>
-<div>
+<div id="TempDiv">
     <form id="AddTemplateForm" method="post" novalidate="novalidate">
         <table id="TempTable">
             <thead>
@@ -214,10 +226,7 @@
                     <th colspan="2" style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
                 </tr>
             </thead>
-            <tr style="visibility:hidden">
-                <td><label for="BrochureID">ID:</label></td>
-                <td><input class="easyui-validatebox" type="text" id="BrochureID" name="BrochureID" readonly="readonly" /></td>
-            </tr>
+            
             <tr>
                 <td class="td-info"><label for="TempName">模板名称：</label></td>
                 <td>
@@ -310,6 +319,10 @@
                     <script id="ExampleDescrip" type="text/plain" style="width:700px;height:300px;">
                     </script>
                 </td>
+            </tr>
+            <tr style="visibility:hidden">
+                <td><label for="BrochureID">ID:</label></td>
+                <td><input class="easyui-validatebox" type="text" id="BrochureID" name="BrochureID" readonly="readonly" /></td>
             </tr>
             <tr>
                 <td colspan="2" style="text-align:left; padding-top:10px;padding-left:150px;">
