@@ -1231,7 +1231,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         public ActionResult FallRoleGrid_Read(string id)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            //JavaScriptSerializer serializer = new JavaScriptSerializer();
 
             if (!string.IsNullOrEmpty(id))
             {

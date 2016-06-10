@@ -298,6 +298,7 @@
     <Content Include="Scripts\UEditor\net\controller.ashx" />
     <Content Include="Scripts\UEditor\net\README.md" />
     <Content Include="Scripts\UEditor\net\Web.config" />
+    <Content Include="Views\Brochure\UpdateBrochure.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

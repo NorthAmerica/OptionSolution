@@ -12,7 +12,7 @@ function formatDateBoxFull(value) {
     if (value == null || value == '') {
         return '';
     }
-    debugger
+   // debugger
     var dt = parseToDate(value);
     return dt.format("yyyy-MM-dd hh:mm:ss");
 }
@@ -21,7 +21,7 @@ function formatDateBoxTime(value) {
     if (value == null || value == '') {
         return '';
     }
-    debugger
+    //debugger
     var dt = parseToDate(value);
     return dt.format("hh:mm:ss");
 }

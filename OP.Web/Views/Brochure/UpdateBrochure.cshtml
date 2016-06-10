@@ -1,0 +1,320 @@
+﻿@model OP.Entities.Brochure
+@{
+    Layout = null;
+}
+
+<link href="~/Scripts/UEditor/themes/default/css/ueditor.min.css" rel="stylesheet" />
+
+<style type="text/css">
+    #TempDiv caption {
+        padding: 0 0 5px 0;
+        font: italic 30px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+        text-align: center;
+    }
+
+    /*
+
+        TableCloth
+        by Alen Grakalic, brought to you by cssglobe.com
+
+    */ /* general styles */
+    #TempDiv table, #TempDiv td {
+        font: 100% Arial, Helvetica, sans-serif;
+    }
+
+    #TempDiv table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+    }
+
+    #TempDiv th, #TempDiv td {
+        text-align: left;
+        padding: .5em;
+        border: 1px solid #fff;
+    }
+
+    #TempDiv th {
+        background: #328aa4;
+        color: #fff;
+    }
+
+    #TempDiv td {
+        background: #e5f1f4;
+        text-align: center;
+    }
+
+        #TempDiv td.td-info {
+            width: 120px;
+        }
+    /* tablecloth styles */
+    #TempDiv tr.even td {
+        background: #e5f1f4;
+    }
+
+    #TempDiv tr.odd td {
+        background: #f8fbfc;
+    }
+
+    #TempDiv th.over, #TempDiv tr.even th.over, #TempDiv tr.odd th.over {
+        background: #4a98af;
+    }
+
+    #TempDiv th.down, #TempDiv tr.even th.down, #TempDiv tr.odd th.down {
+        background: #bce774;
+    }
+
+    #TempDiv th.selected, #TempDiv tr.even th.selected, #TempDiv tr.odd th.selected {
+    }
+
+    #TempDiv td.over, #TempDiv tr.even td.over, #TempDiv tr.odd td.over {
+        background: #ecfbd4;
+    }
+
+    #TempDiv td.down, #TempDiv tr.even td.down, #TempDiv tr.odd td.down {
+        background: #bce774;
+        color: #fff;
+    }
+
+    #TempDiv td.selected, #TempDiv tr.even td.selected, #TempDiv tr.odd td.selected {
+        background: #bce774;
+        color: #555;
+    }
+
+    /* use this if you want to apply different styleing to empty table cells*/
+    #TempDiv td.empty, #TempDiv tr.odd td.empty, #TempDiv tr.even td.empty {
+        background: #fff;
+    }
+</style>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/ueditor.all.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/Scripts/UEditor/lang/zh-cn/zh-cn.js"></script>
+<script>
+    $(function () {
+        var FAQ = UE.getEditor('UFAQ');
+        var ExampleDescrip = UE.getEditor('UExampleDescrip');
+        var PayDescrip = UE.getEditor('UPayDescrip');
+        var SettlementFormula = UE.getEditor('USettlementFormula');
+        var StartDateDescrip = UE.getEditor('UStartDateDescrip');
+        var EndDateDescrip = UE.getEditor('UEndDateDescrip');
+        var TradeDateDescrip = UE.getEditor('UTradeDateDescrip');
+
+        @if (Model.BrochureID.ToString() != "00000000-0000-0000-0000-000000000000")
+        {
+            //新增模板
+            <text>
+        BindBrochureData();
+        BindUpdateBrochureClickEvent();
+            </text>
+        }
+    })
+    function BindUpdateBrochureClickEvent() {
+        $('#btnUpdateBrochure').click(function () {
+            var valid = $('#UpdateBrochureForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                BrochureID: $('#UBrochureID').val(),
+                //TempName: $("#UTempName").val(),
+                //TempDescrip: $("#UTempDescrip").val(),
+                ContractDescrip: $("#UContractDescrip").val(),
+                BuyBegin: $("#UBuyBegin").val(),
+                BuyTime: $("#UBuyTime").val(),
+                PayDescrip: UE.getEditor('UPayDescrip').getContent(),
+                SettlementFormula: UE.getEditor('USettlementFormula').getContent(),
+                StartDateDescrip: UE.getEditor('UStartDateDescrip').getContent(),
+                EndDateDescrip: UE.getEditor('UEndDateDescrip').getContent(),
+                TradeDateDescrip: UE.getEditor('UTradeDateDescrip').getContent(),
+                RiskAnnouncementURL: $("#URiskAnnouncementURL").val(),
+                PurchaseAgreementURL: $('#UPurchaseAgreementURL').val(),
+                FAQ: UE.getEditor('UFAQ').getContent(),
+                ExampleDescrip: UE.getEditor('UExampleDescrip').getContent()
+            }
+            
+            $.ajax({
+                type: 'POST',
+                url: '/Brochure/UpdateBrochureAction',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '更新宣传册完成',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        var tab = $('#main-tab').tabs('getSelected');
+                        tab.panel('refresh', '/Home/OptionsProductConfig');
+                    }
+                    else {
+                        alert("更新失败，请您检查");
+                    }
+                },
+                error: function () {
+                    //debugger
+                    alert("更新失败，请您检查")
+                }
+            });
+
+        })
+    }
+    function BindBrochureData() {
+        $('#UBrochureID').val('@Model.BrochureID');
+        @*$('#UTempName').val('@Model.TempName');
+        $('#UTempDescrip').val('@Model.TempDescrip');*@
+        $('#UContractDescrip').val('@Model.ContractDescrip');
+        $('#UBuyBegin').val('@Model.BuyBegin');
+        $('#UBuyTime').val('@Model.BuyTime');
+        UE.getEditor('UPayDescrip').addListener('ready', function (editor) {
+            UE.getEditor('UPayDescrip').setContent('@Html.Raw(Model.PayDescrip)', false);
+        });
+        UE.getEditor('USettlementFormula').addListener('ready', function (editor) {
+            UE.getEditor('USettlementFormula').setContent('@Html.Raw(Model.SettlementFormula)', false);
+        });
+        UE.getEditor('UStartDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('UStartDateDescrip').setContent('@Html.Raw(Model.StartDateDescrip)', false);
+        });
+        UE.getEditor('UEndDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('UEndDateDescrip').setContent('@Html.Raw(Model.EndDateDescrip)', false);
+        });
+        UE.getEditor('UTradeDateDescrip').addListener('ready', function (editor) {
+            UE.getEditor('UTradeDateDescrip').setContent('@Html.Raw(Model.TradeDateDescrip)', false);
+        });
+        $('#URiskAnnouncementURL').val('@Model.RiskAnnouncementURL');
+        $('#UPurchaseAgreementURL').val('@Model.PurchaseAgreementURL');
+        UE.getEditor('UFAQ').addListener('ready', function (editor) {
+            UE.getEditor('UFAQ').setContent('@Html.Raw(Model.FAQ)', false);
+        });
+        UE.getEditor('UExampleDescrip').addListener('ready', function (editor) {
+            UE.getEditor('UExampleDescrip').setContent('@Html.Raw(Model.ExampleDescrip)', false);
+        });
+    }
+
+    function CloseUpdateBrochurePage() {
+        var tab = $('#main-tab').tabs('getSelected');
+        tab.panel('refresh', '/Home/OptionsProductConfig');
+    }
+</script>
+
+<div id="TempDiv">
+    <form id="UpdateBrochureForm" method="post" novalidate="novalidate">
+        <table id="BrochureTable">
+            <thead>
+                <tr>
+                    <th colspan="2" style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
+                </tr>
+            </thead>
+
+            @*<tr>
+                <td class="td-info"><label for="TempName">模板名称：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UTempName" name="TempName" data-options="required:true,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="TempDescrip">模板描述：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UTempDescrip" name="TempDescrip" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>*@
+            <tr>
+                <td class="td-info"><label for="ContractDescrip">标的合约描述：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UContractDescrip" name="ContractDescrip" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="BuyBegin">购买起点：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UBuyBegin" name="BuyBegin" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="BuyTime">购买时间：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UBuyTime" name="BuyTime" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="PayDescrip">补偿说明：</label></td>
+                <td>
+                    <script id="UPayDescrip" type="text/plain" style="width:700px;height:200px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="SettlementFormula">结算公式：</label></td>
+                <td>
+                    <script id="USettlementFormula" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td-info"><label for="StartDateDescrip">购买日：</label></td>
+                <td>
+                    <script id="UStartDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="EndDateDescrip">到期日：</label></td>
+                <td>
+                    <script id="UEndDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="TradeDateDescrip">交易日：</label></td>
+                <td>
+                    <script id="UTradeDateDescrip" type="text/plain" style="width:700px;height:100px;">
+                    </script>
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="RiskAnnouncementURL">风险揭示书链接：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="URiskAnnouncementURL" name="RiskAnnouncementURL" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="PurchaseAgreementURL">价格补偿服务购买协议链接：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UPurchaseAgreementURL" name="PurchaseAgreementURL" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="FAQ">常见问题：</label></td>
+                <td>
+                    <script id="UFAQ" type="text/plain" style="width:700px;height:300px;">
+                    </script>
+
+                </td>
+            </tr>
+            <tr>
+                <td class="td-info"><label for="ExampleDescrip">示例说明：</label></td>
+                <td>
+                    <script id="UExampleDescrip" type="text/plain" style="width:700px;height:300px;">
+                    </script>
+                </td>
+            </tr>
+            <tr style="visibility:hidden">
+                <td><label for="BrochureID">ID:</label></td>
+                <td><input class="easyui-validatebox" type="text" id="UBrochureID" name="BrochureID" readonly="readonly" /></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left; padding-top:10px;padding-left:150px;">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure" iconcls="icon-ok">保存</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="CloseUpdateBrochurePage()">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</div>

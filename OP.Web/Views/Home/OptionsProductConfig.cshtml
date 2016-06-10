@@ -9,6 +9,7 @@
         BindAddProductClickEvent();
         initFallRoleGrid();
         initRiseRoleGrid();
+        
         BindAddFallRoleClickEvent();
         BindAddRiseRoleClickEvent();
         BindUploadOptionsProductClickEvent();
@@ -68,7 +69,7 @@
                         }
                         else if (value == '固定值') {
                             return 'color:red;';
-                        } else{
+                        } else {
                             return 'background-color:#ffee00;color:red;';
                         }
                     }
@@ -78,20 +79,7 @@
                 //{ field: 'MarginType', title: '保证金类型', width: 300, sortable: true },
                 { field: 'MaxNum', title: '最大购买数量', width: 300, sortable: true },
                 {
-                    field: 'AddDate', title: '创建日期', width: 300, sortable: true//, formatter: formatDateBox,
-                    //sorter: function (a, b) {
-                    //    a = a.split('-');
-                    //    b = b.split('-');
-                    //    if (a[2] == b[2]) {
-                    //        if (a[0] == b[0]) {
-                    //            return (a[1] > b[1] ? 1 : -1);
-                    //        } else {
-                    //            return (a[0] > b[0] ? 1 : -1);
-                    //        }
-                    //    } else {
-                    //        return (a[2] > b[2] ? 1 : -1);
-                    //    }
-                    //}
+                    field: 'AddDate', title: '创建日期', width: 300, sortable: true
                 },
                 {
                     field: 'Status', title: "产品状态", width: 300,
@@ -121,7 +109,7 @@
                         if (value == true) {
                             return 'color:green;';
                         }
-                        else{
+                        else {
                             return 'background-color:#ffee00;color:red;';
                         }
                     },
@@ -148,7 +136,7 @@
                 handler: function () {
                     AddOptionsProductDialog();
                 }
-            }, '-',{
+            }, '-', {
                 id: 'btnupload',
                 text: '上传产品Excel',
                 iconCls: 'icon-excel',
@@ -156,22 +144,22 @@
                     UploadOptionsProductDialog();
                 }
             },
-            //'-',{
-            //    id: 'btnedit',
-            //    text: '修改期权产品',
-            //    iconCls: 'icon-edit',
-            //    handler: function () {
-            //        UpdateOptionsProductDialog();
-            //    }
-            //},
-            //'-', {
-            //    id: 'btncopy',
-            //    text: '复制期权产品',
-            //    iconCls: 'icon-add',
-            //    handler: function () {
-            //        CopyOptionsProduct();
-            //    }
-            //},
+            '-',{
+                id: 'btntemp',
+                text: '选择宣传册模板',
+                iconCls: 'icon-temp',
+                handler: function () {
+                    ShowBrochureTempDialog();
+                }
+            },
+            '-', {
+                id: 'btncopy',
+                text: '编辑宣传册',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    EditBrochure();
+                }
+            },
             '-',
             {
                 id: 'btnfall',
@@ -214,9 +202,108 @@
             }
         });
     }
+    //编辑宣传册
+    function EditBrochure() {
+        var Selections = $("#OptionsProductGrid").datagrid("getSelections");
+        if (Selections.length == 1) {
+            var OptionsProductID = $("#OptionsProductGrid").datagrid("getSelections")[0].OptionsProductID;
+            var tab = $('#main-tab').tabs('getSelected');
+            tab.panel('refresh', '/Brochure/UpdateBrochure/' + OptionsProductID);
+        } else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='3'>" + Selections.length + "</font>行");
+        }
+    }
+    function ShowBrochureTempDialog() {
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            var select = $("#OptionsProductGrid").datagrid("getSelected");
+        } else {
+            $.messager.alert("友情提示", "每次只能选择一行数据");
+            return;
+        }
+        //debugger
+        initBrochureTempGrid();
+        $('#ShowBrochureTempDialog').dialog('open').dialog('setTitle', '宣传册模板列表');
+        $("#BrochureTempGrid").datagrid("clearSelections");
+    }
+    //初始化宣传册模板列表
+    function initBrochureTempGrid() {
+        $('#BrochureTempGrid').datagrid({
+            title: '宣传册模板列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Brochure/TemplateGrid_Read',
+            sortName: 'TempDate',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'BrochureID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'BrochureID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'TempName', title: '模板名称', width: 100, sortable: true },
+                { field: 'TempDescrip', title: '模板描述', width: 100, sortable: true },
+                { field: 'TempDate', title: '新增修改模板时间', width: 100, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnaddFallRole',
+                text: '选择该模板',
+                iconCls: 'icon-add',
+                handler: function () {
+                    SelectBrochureTemp();
+                }
+            }, '-']
+        });
+    }
+    //选择宣传册模板
+    function SelectBrochureTemp() {
+        //debugger
+        var OptionsProductID = $("#OptionsProductGrid").datagrid("getSelected").OptionsProductID;
+        var select = $("#BrochureTempGrid").datagrid("getSelected");
+        if (select!=null) {
+            
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            $.ajax({
+                type: 'POST',
+                url: '/Brochure/SelectBrochureTemp',
+                cache: false,
+                headers: headers,
+                data: { OptionsProductID: OptionsProductID, BrochureID: select.BrochureID },
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '选择宣传册模板成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#ShowBrochureTempDialog').dialog('close');
+                        $("#OptionsProductGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("上传失败，请您检查" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("上传失败，请您检查")
+                }
+            });
+        }
+    }
     //上传产品
     function UpOptionsProduct() {
-        $.messager.confirm("上传产品","该操作将会把启用状态的产品上传至第三方平台，您确定开始上传产品？", function (Begin1) {
+        $.messager.confirm("上传产品", "该操作将会把启用状态的产品上传至第三方平台，您确定开始上传产品？", function (Begin1) {
             if (Begin1) {
                 $.messager.confirm("再次确认", "您确定开始上传产品？", function (Begin2) {
                     if (Begin2) {
@@ -239,7 +326,7 @@
                             url: '/Home/UpOptionsProduct',
                             cache: false,
                             headers: headers,
-                            data: { PartnerName: '联创集团',id: IDs },
+                            data: { PartnerName: '联创集团', id: IDs },
                             success: function (data) {
                                 if (data && data.Success) {
                                     $.messager.show({
@@ -259,15 +346,15 @@
                                 alert("上传失败，请您检查")
                             }
                         });
-                        
+
                     }
                 });
             }
         });
     }
-    //启用产品
+    //启用产品(支持多项选择)
     function BeginOptionsProduct() {
-        
+
         if ($("#OptionsProductGrid").datagrid("getSelected").Status == 1) {
             $.messager.alert("友情提示", "产品已经启动了，不能重复启动。");
             return;
@@ -324,7 +411,7 @@
             }
         })
     }
-    //作废产品
+    //作废产品（支持多项选择）
     function EndOptionsProduct() {
         if ($("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
             $.messager.alert("友情提示", "产品已经作废了，不能重复作废。");
@@ -381,7 +468,7 @@
     //显示期权产品明细
     function ShowOptionsProductDialog() {
         var selects = $("#OptionsProductGrid").datagrid("getSelections");
-        if (selects.length==1) {
+        if (selects.length == 1) {
             $('#ShowOptionsProductDialog').dialog('open').dialog('setTitle', '显示期权产品');
             BingOptionsProductDetails();
         } else {
@@ -574,7 +661,7 @@
                 ProductDescription: $("#ProductDescription").val(),
                 OptionType: $("#OptionType").combobox('getText'),
                 Contract: $("#Contract").val(),
-                ContractChs:$("#ContractChs").val(),
+                ContractChs: $("#ContractChs").val(),
                 Deadline: $("#Deadline").numberbox('getValue'),
                 Unit: $("#Unit").val(),
                 Charge: $("#Charge").numberbox('getValue'),
@@ -588,7 +675,7 @@
                 ProductDesc: $("#ProductDesc").val(),
                 ProductDtlDesc: $("#ProductDtlDesc").val(),
                 Formula: $("#Formula").val(),
-                ProductUrl:$("#ProductUrl").val(),
+                ProductUrl: $("#ProductUrl").val(),
                 Status: CBStatus
             };
 
@@ -627,9 +714,11 @@
     }
     //添加下跌规则
     function ConfigFallRoleDialog() {
-        var select = $("#OptionsProductGrid").datagrid("getSelected");
-        if (select == null) {
-            $.messager.alert("友情提示", "请先选择一个产品");
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            var select = $("#OptionsProductGrid").datagrid("getSelected");
+        } else {
+            $.messager.alert("友情提示", "每次只能修改一行数据");
             return;
         }
         $('#ConfigFallRoleDialog').dialog('open').dialog('setTitle', '配置下跌规则');
@@ -642,9 +731,11 @@
     }
     //添加上涨规则
     function ConfigRiseRoleDialog() {
-        var select = $("#OptionsProductGrid").datagrid("getSelected");
-        if (select == null) {
-            $.messager.alert("友情提示", "请先选择一个产品");
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            var select = $("#OptionsProductGrid").datagrid("getSelected");
+        } else {
+            $.messager.alert("友情提示", "每次只能修改一行数据");
             return;
         }
         $('#ConfigRiseRoleDialog').dialog('open').dialog('setTitle', '配置上涨规则');
@@ -893,7 +984,7 @@
                     alert("添加失败，请您检查")
                 }
             });
-            
+
         });
     }
     //查询事件
@@ -1010,7 +1101,7 @@
                                data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />
                     </td>
                 </tr>
-                
+
                 <tr>
                     <td><label for="AmountType">产品费用类型：</label></td>
                     <td>
@@ -1114,7 +1205,7 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SPartnerName" name="PartnerName" readonly="readonly" style="width:350px;" />
                         @*<input id="PartnerName" class="easyui-combobox" name="PartnerName"
-                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:30,width:200" />*@
+                            data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:30,width:200" />*@
                     </td>
                 </tr>
                 <tr>
@@ -1138,28 +1229,28 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SOptionType" name="OptionType" readonly="readonly" style="width:350px;" />
                         @*<input id="OptionType" class="easyui-combobox" name="OptionType"
-                               data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',required:true,height:30,width:200" />*@
+                            data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',required:true,height:30,width:200" />*@
                     </td>
                 </tr>
                 <tr>
                     <td><label for="SDeadline">产品期限(天)：</label></td>
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SDeadline" name="Deadline" readonly="readonly" style="width:350px;" />
-                    @*<input class="easyui-numberbox" type="text" id="Deadline" name="Deadline" data-options="required:true,validType:'length[1,32]',height:30" style="width:350px;" />*@
+                        @*<input class="easyui-numberbox" type="text" id="Deadline" name="Deadline" data-options="required:true,validType:'length[1,32]',height:30" style="width:350px;" />*@
                     </td>
                 </tr>
                 <tr>
                     <td><label for="SUnit">产品单位：</label></td>
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SUnit" name="Unit" readonly="readonly" style="width:350px;" />
-                    @*<input class="easyui-validatebox form-control" type="text" id="Unit" name="Unit" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />*@
+                        @*<input class="easyui-validatebox form-control" type="text" id="Unit" name="Unit" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />*@
                     </td>
                 </tr>
                 <tr>
                     <td><label for="SCharge">产品手续费：</label></td>
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SCharge" name="Charge" readonly="readonly" style="width:350px;" />
-                    @*<input class="easyui-numberbox" type="text" id="Charge" name="Charge" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                        @*<input class="easyui-numberbox" type="text" id="Charge" name="Charge" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
                     </td>
                 </tr>
                 <tr>
@@ -1167,7 +1258,7 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SChargeType" name="ChargeType" readonly="readonly" style="width:350px;" />
                         @*<input id="ChargeType" class="easyui-combobox" name="ChargeType"
-                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
                     </td>
                 </tr>
                 <tr>
@@ -1178,7 +1269,7 @@
                     <td><label for="SPrice">产品费用：</label></td>
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SPrice" name="Price" readonly="readonly" style="width:350px;" />
-                    @*<input class="easyui-numberbox" type="text" id="Price" name="Price" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                        @*<input class="easyui-numberbox" type="text" id="Price" name="Price" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
                     </td>
                 </tr>
                 <tr>
@@ -1186,7 +1277,7 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SPriceType" name="PriceType" readonly="readonly" style="width:350px;" />
                         @*<input id="PriceType" class="easyui-combobox" name="PriceType"
-                               data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
                     </td>
                 </tr>
 
@@ -1195,10 +1286,10 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SAmountType" name="AmountType" readonly="readonly" style="width:350px;" />
                         @*<select id="AmountType" class="easyui-combobox" name="AmountType"
-                                data-options="editable:false,required:false,height:30,width:200">
-                            <option value="保证金">保证金</option>
-                            <option value="保费">保费</option>
-                        </select>*@
+                                    data-options="editable:false,required:false,height:30,width:200">
+                                <option value="保证金">保证金</option>
+                                <option value="保费">保费</option>
+                            </select>*@
                     </td>
                 </tr>
                 <tr>
@@ -1210,14 +1301,14 @@
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SCallPriceType" name="CallPriceType" readonly="readonly" style="width:350px;" />
                         @*<input id="CallPriceType" class="easyui-combobox" name="CallPriceType"
-                               data-options="editable:false,valueField:'CallPriceTypeID',textField:'CallPriceTypeName',url:'/Home/GetCallPriceType',required:false,height:30,width:200" />*@
+                            data-options="editable:false,valueField:'CallPriceTypeID',textField:'CallPriceTypeName',url:'/Home/GetCallPriceType',required:false,height:30,width:200" />*@
                     </td>
                 </tr>
                 <tr>
                     <td><label for="SMaxNum">最大购买数：</label></td>
                     <td>
                         <input class="easyui-validatebox form-control" type="text" id="SMaxNum" name="MaxNum" readonly="readonly" style="width:350px;" />
-                    @*<input class="easyui-numberbox" type="text" id="MaxNum" name="MaxNum" data-options="required:true,height:30" style="width:350px;" />*@
+                        @*<input class="easyui-numberbox" type="text" id="MaxNum" name="MaxNum" data-options="required:true,height:30" style="width:350px;" />*@
                     </td>
                 </tr>
                 <tr>
@@ -1404,5 +1495,10 @@
                 </tr>
             </table>
         </form>
+    </div>
+    @* 宣传册模板列表弹窗 *@
+    <div id="ShowBrochureTempDialog" class="easyui-dialog" style="width:900px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="BrochureTempGrid"></table>
     </div>
 </div>

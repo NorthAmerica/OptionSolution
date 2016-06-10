@@ -18,7 +18,7 @@
         BindUpdateONTimeClickEvent();
     });
     function initSwitch() {
-        $.getJSON("/Home/GetONOFFSet", { }, function (data) {
+        $.getJSON("/Home/GetONOFFSet", {}, function (data) {
             if (data && data.Success) {
                 if (data.ONOFFMode == 0) {
                     $('#switch-ONOFFMode').bootstrapSwitch('state', true);
@@ -170,8 +170,8 @@
         $.getJSON("/Home/GetONTimeDetails", { ID: CheckID }, function (data) {
             if (data && data.Success) {
                 $("#UpdateONTimeID").val(CheckID);
-                $("#UpdateBeginTime").timespinner('setValue',data.BeginTime);
-                $("#UpdateEndTime").timespinner('setValue',data.EndTime);
+                $("#UpdateBeginTime").timespinner('setValue', data.BeginTime);
+                $("#UpdateEndTime").timespinner('setValue', data.EndTime);
             } else {
                 $.messager.alert("提示", "数据查询失败");
             }
@@ -215,7 +215,7 @@
                         $("#ONTimeGrid").datagrid('reload');
                     }
                     else {
-                        alert("修改失败，请检查"+data.Message);
+                        alert("修改失败，请检查" + data.Message);
                     }
                 },
                 error: function () {

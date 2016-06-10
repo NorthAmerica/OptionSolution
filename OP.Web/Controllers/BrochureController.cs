@@ -38,7 +38,7 @@ namespace OP.Web.Controllers
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            var find = BrochureRepository.FindAll().Where(b => b.IsTemp = true);
+            var find = BrochureRepository.FindAll().Where(b => b.IsTemp == true);
             var returntemp = find.OrderByDescending(b => b.TempDate).Select(b => new {
                 b.BrochureID,
                 b.TempName,
@@ -116,6 +116,7 @@ namespace OP.Web.Controllers
             {
                 if (model!=null)
                 {
+                    model.IsTemp = true;
                     model.TempDate = DateTime.Now.ToLocalTime();
                     if (BrochureRepository.Update(model))
                     {
@@ -164,6 +165,114 @@ namespace OP.Web.Controllers
                                 Success = true
                             });
                         }
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+        }
+        /// <summary>
+        /// 选择宣传册模板作为正式宣传册
+        /// </summary>
+        /// <param name="OptionsProductID"></param>
+        /// <param name="BrochureID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult SelectBrochureTemp(string OptionsProductID,string BrochureID)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(OptionsProductID) && !string.IsNullOrEmpty(BrochureID))
+                {
+                    Guid bid = new Guid(BrochureID);
+                    Guid opid = new Guid(OptionsProductID);
+                    Brochure find = BrochureRepository.Find(b => b.BrochureID == bid);
+                    find.IsTemp = false;
+                    find.AddDate = DateTime.Now.ToLocalTime();
+                    find.OptionsProductID = opid;
+                    Brochure addBro = BrochureRepository.Add(find);
+                    if (addBro!=null)
+                    {
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+        }
+        /// <summary>
+        /// 跳转更新正式宣传册页面
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult UpdateBrochure(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                Guid OptionsProductID = new Guid(id);
+                Brochure findBro = BrochureRepository.Find(b => b.OptionsProductID == OptionsProductID&&b.IsTemp==false);
+                if (findBro!=null)
+                {
+                    return View(findBro);
+                }
+            }
+            return View(new Brochure());
+        }
+        /// <summary>
+        /// 更新正式宣传册事件
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateInput(false)]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult UpdateBrochureAction(Brochure model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    Brochure find = BrochureRepository.Find(b => b.BrochureID == model.BrochureID);
+                    find.AddDate = DateTime.Now.ToLocalTime();
+                    find.BuyBegin = model.BuyBegin;
+                    find.BuyTime = model.BuyTime;
+                    find.ContractDescrip = model.ContractDescrip;
+                    find.EndDateDescrip = model.EndDateDescrip;
+                    find.ExampleDescrip = model.ExampleDescrip;
+                    find.FAQ = model.FAQ;
+                    find.PayDescrip = model.PayDescrip;
+                    find.PurchaseAgreementURL = model.PurchaseAgreementURL;
+                    find.RiskAnnouncementURL = model.RiskAnnouncementURL;
+                    find.SettlementFormula = model.SettlementFormula;
+                    find.StartDateDescrip = model.StartDateDescrip;
+                    find.IsTemp = false;
+                    if (BrochureRepository.Update(find))
+                    {
+                        return Json(new
+                        {
+                            Success = true
+                        });
                     }
                 }
                 return Json(new
