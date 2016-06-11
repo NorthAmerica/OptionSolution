@@ -270,33 +270,36 @@
         var OptionsProductID = $("#OptionsProductGrid").datagrid("getSelected").OptionsProductID;
         var select = $("#BrochureTempGrid").datagrid("getSelected");
         if (select!=null) {
-            
-            var token = $('@Html.AntiForgeryToken()').val();
-            var headers = {};
-            headers["__RequestVerificationToken"] = token;
-            $.ajax({
-                type: 'POST',
-                url: '/Brochure/SelectBrochureTemp',
-                cache: false,
-                headers: headers,
-                data: { OptionsProductID: OptionsProductID, BrochureID: select.BrochureID },
-                success: function (data) {
-                    if (data && data.Success) {
-                        $.messager.show({
-                            title: '我的消息',
-                            msg: '选择宣传册模板成功。',
-                            timeout: 5000,
-                            showType: 'slide'
-                        });
-                        $('#ShowBrochureTempDialog').dialog('close');
-                        $("#OptionsProductGrid").datagrid("reload");
-                    }
-                    else {
-                        alert("上传失败，请您检查" + data.Message);
-                    }
-                },
-                error: function () {
-                    alert("上传失败，请您检查")
+            $.messager.confirm("选择宣传册模板", "该操作将会把原有的宣传册覆盖，您确定选择新的宣传册模板吗？", function (Begin1) {
+                if (Begin1) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Brochure/SelectBrochureTemp',
+                        cache: false,
+                        headers: headers,
+                        data: { OptionsProductID: OptionsProductID, BrochureID: select.BrochureID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '选择宣传册模板成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $('#ShowBrochureTempDialog').dialog('close');
+                                $("#OptionsProductGrid").datagrid("reload");
+                            }
+                            else {
+                                alert("上传失败，请您检查" + data.Message);
+                            }
+                        },
+                        error: function () {
+                            alert("上传失败，请您检查")
+                        }
+                    });
                 }
             });
         }

@@ -203,6 +203,11 @@ namespace OP.Web.Controllers
                     Brochure addBro = BrochureRepository.Add(find);
                     if (addBro!=null)
                     {
+                        if (BrochureRepository.Exist(b => b.OptionsProductID == opid))
+                        {
+                            //删除原有的正式宣传册
+                            BrochureRepository.Delete(BrochureRepository.Find(b => b.OptionsProductID == opid));
+                        }
                         return Json(new
                         {
                             Success = true

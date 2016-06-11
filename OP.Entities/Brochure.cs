@@ -36,7 +36,7 @@ namespace OP.Entities
         public string PayDescrip { get; set; }
         [DisplayName("结算公式")]
         public string SettlementFormula { get; set; }
-        [DisplayName("结算公式图")]
+        [DisplayName("结算公式图(盈亏结构图)")]
         public string SFPic { get; set; }
         [DisplayName("购买日")]
         public string StartDateDescrip { get; set; }

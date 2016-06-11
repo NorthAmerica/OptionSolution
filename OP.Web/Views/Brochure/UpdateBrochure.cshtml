@@ -134,7 +134,7 @@
                 FAQ: UE.getEditor('UFAQ').getContent(),
                 ExampleDescrip: UE.getEditor('UExampleDescrip').getContent()
             }
-            
+
             $.ajax({
                 type: 'POST',
                 url: '/Brochure/UpdateBrochureAction',
@@ -196,13 +196,111 @@
         });
     }
 
+    function UploadBrochureImageDialog() {
+        $("#UploadBrochureImageDialog").dialog("open").dialog("setTitle", "上传宣传册图片");
+        //数据清空
+        $('#UploadedSFPic').val('');
+        $('#UploadedExamplePic').val('');
+        $("#FileProgress").css("width",
+              '0%');
+        $('#FileProgress span').text("0%");
+    }
+
+    //新增盈亏结构图
+    function BindUploadedSFPicClickEvent() {
+        $("#btnUploadedSFPic").click(function () {
+            var form = $('#UploadSFPicForm')[0];
+            var dataString = new FormData(form);
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //dataString.append('ProductID', $("#ProductGrid").datagrid("getSelections")[0].ProductID);
+            $.ajax({
+                url: '/Home/UploadSFPicAction',  //Server script to process data
+                type: 'POST',
+                xhr: function () {  // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) { // Check if upload property exists
+                        //myXhr.upload.onprogress = progressHandlingFunction
+                        myXhr.upload.addEventListener('progress', progressHandlingFunction,
+                        false); // For handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                //Ajax events
+                success: successHandler,
+                error: errorHandler,
+                complete: completeHandler,
+                headers: headers,
+                // Form data
+                data: dataString,
+                //Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    }
+    function successHandler(data) {
+        if (data.statusCode == 400) {
+            $.messager.alert('错误', data.status);
+        } else if (data.statusCode == 200) {
+            $.messager.alert('成功', data.status);
+        }
+    }
+    function errorHandler(e) {
+        alert(e.status);
+    }
+    function completeHandler(data) {
+        $("#UploadOptionsProductDialog").dialog("close");
+        $('#OptionsProductGrid').datagrid('reload');
+    }
+    function progressHandlingFunction(e) {
+        if (e.lengthComputable) {
+            var percentComplete = Math.round(e.loaded * 100 / e.total);
+            $("#FileProgress").css("width",
+              percentComplete + '%').attr('aria-valuenow', percentComplete);
+            $('#FileProgress span').text(percentComplete + "%");
+        }
+        else {
+            $('#FileProgress span').text('unable to compute');
+        }
+    }
+    function singleFileSelected1(evt) {
+        //var selectedFile = evt.target.files can use this  or select input file element
+        //and access it's files object
+        var selectedFile = ($("#UploadedSFPic"))[0].files[0];//FileControl.files[0];
+        if (selectedFile) {
+            if (selectedFile.name.split('.').length >= 2) {
+                var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
+                if (FileType != "png" && FileType != "jpg" && FileType != "gif") {
+                    $.messager.alert('友情提示', '上传文件必须为图片文件格式，请重新选择');
+                    return false;
+                }
+            }
+        }
+    }
+    function singleFileSelected2(evt) {
+        //var selectedFile = evt.target.files can use this  or select input file element
+        //and access it's files object
+        var selectedFile = ($("#UploadedExamplePic"))[0].files[0];//FileControl.files[0];
+        if (selectedFile) {
+            if (selectedFile.name.split('.').length >= 2) {
+                var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
+                if (FileType != "png" && FileType != "jpg" && FileType != "gif") {
+                    $.messager.alert('友情提示', '上传文件必须为图片文件格式，请重新选择');
+                    return false;
+                }
+            }
+        }
+    }
     function CloseUpdateBrochurePage() {
         var tab = $('#main-tab').tabs('getSelected');
         tab.panel('refresh', '/Home/OptionsProductConfig');
     }
 </script>
 
-<div id="TempDiv">
+<div id="BrochureDiv">
     <form id="UpdateBrochureForm" method="post" novalidate="novalidate">
         <table id="BrochureTable">
             <thead>
@@ -316,5 +414,55 @@
             </tr>
         </table>
     </form>
+    @*-----------------------------------------------------------------------------------------------------------------
+        上传宣传册图片弹窗*@
+    <div id="UploadBrochureImageDialog" class="easyui-dialog" style="width:560px;height:500px;padding:10px 20px;display:block;"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <div class="alert alert-danger" role="alert">
+            <strong>提醒!</strong><br />上传的数据必须符合数据模板的规格.
+        </div>
 
+        <form id="UploadSFPicForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="UploadedSFPic">盈亏结构图上传：</label></td>
+                    <td>
+                        <input type="file" name="UploadedFile" id="UploadedSFPic" onchange="singleFileSelected1()" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedSFPic" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <form id="UploadExamplePicForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="UploadedExamplePic">示例图上传：</label></td>
+                    <td>
+                        <input type="file" name="UploadedFile" id="UploadedExamplePic" onchange="singleFileSelected2()" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedExamplePic" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div class="progress">
+            <div id="FileProgress"
+                 class="progress-bar progress-bar-striped" role="progressbar"
+                 aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0%;">
+                <span></span>
+            </div>
+        </div>
+    </div>
 </div>
