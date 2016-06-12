@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using OP.Entities;
 
 namespace OP.Brochure.Controllers
 {
@@ -11,14 +12,23 @@ namespace OP.Brochure.Controllers
     {
         private InterfaceBrochureRepository BrochureRepository;
         private InterfaceGuestBookRepository GuestBookRepository;
+        private InterfaceOptionsProductRepository OptionsProductRepository;
         public HomeController(InterfaceBrochureRepository br,
-            InterfaceGuestBookRepository gbr)
+            InterfaceGuestBookRepository gbr,
+            InterfaceOptionsProductRepository opr)
         {
             BrochureRepository = br;
             GuestBookRepository = gbr;
+            OptionsProductRepository = opr;
         }
-        public ActionResult Index()
+        public ActionResult Index(string id)
         {
+            if (!string.IsNullOrEmpty(id))
+            {
+                Guid OPID = new Guid(id);
+                Entities.Brochure findbr =  BrochureRepository.Find(b => b.OptionsProductID == OPID);
+                OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == OPID);
+            }
             return View();
         }
 

@@ -557,7 +557,7 @@
         if (selectedFile) {
             if (selectedFile.name.split('.').length >= 2) {
                 var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
-                if (FileType != "xlsx" && FileType != "xls") {
+                if (FileType.toLowerCase() != "xlsx" && FileType.toLowerCase() != "xls") {
                     $.messager.alert('友情提示', '上传文件必须为Excel的文件格式，请重新选择');
                     $('#UploadedFile').val('');
                     $("#FileName").text('');

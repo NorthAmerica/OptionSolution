@@ -3,6 +3,7 @@ using OP.Repository;
 using OP.Web.Attribute;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -259,6 +260,8 @@ namespace OP.Web.Controllers
                 if (model != null)
                 {
                     Brochure find = BrochureRepository.Find(b => b.BrochureID == model.BrochureID);
+                    find.ExamplePic = model.ExamplePic;
+                    find.SFPic = model.SFPic;
                     find.AddDate = DateTime.Now.ToLocalTime();
                     find.BuyBegin = model.BuyBegin;
                     find.BuyTime = model.BuyTime;
@@ -293,5 +296,44 @@ namespace OP.Web.Controllers
                 });
             }
         }
+        /// <summary>
+        /// 上传盈亏结构图和示例图
+        /// </summary>
+        /// <returns></returns>
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult UploadPicAction(HttpPostedFileBase uploadedFile)
+        {
+            try
+            {
+                if (uploadedFile != null && uploadedFile.ContentLength > 0)
+                {
+                    string fileExtenSion = Path.GetExtension(uploadedFile.FileName);
+                    string path = System.IO.Path.Combine(Server.MapPath("~/FileUpLoad/"), System.IO.Path.GetFileName(uploadedFile.FileName));
+                    uploadedFile.SaveAs(path);//将文件保存到本地
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        status = "已经上传了" + uploadedFile.FileName + "文件。"
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        status = "文件传输有误，请重新上传。"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    status = "文件上传发生异常," + ex.Message
+                });
+            }
+        }
+        
     }
 }

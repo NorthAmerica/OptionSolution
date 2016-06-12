@@ -710,7 +710,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据数量为空，请重新检查文件。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     if (ds.Tables["OptionsProduct"].Columns.Count < 2)
                     {
@@ -718,7 +718,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据列数量有误，请重新检查数据是否合格。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     int count = 0;
                     foreach (DataRow item in ds.Tables["OptionsProduct"].Rows)
@@ -808,7 +808,7 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 200,
                         status = "已经上传" + count.ToString() + "条数据。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
                 else
                 {
@@ -816,7 +816,7 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 400,
                         status = "文件传输有误，请重新上传。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
             }
             catch (Exception ex)
@@ -825,7 +825,7 @@ namespace OP.Web.Controllers
                 {
                     statusCode = 400,
                     status = "文件上传发生异常," + ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                });
             }
 
         }

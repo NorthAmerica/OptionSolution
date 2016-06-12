@@ -44,9 +44,9 @@
         text-align: center;
     }
 
-        #TempDiv td.td-info {
-            width: 120px;
-        }
+    #TempDiv td.td-info {
+        width: 120px;
+    }
     /* tablecloth styles */
     #TempDiv tr.even td {
         background: #e5f1f4;
@@ -101,11 +101,21 @@
 
         @if (Model.BrochureID.ToString() != "00000000-0000-0000-0000-000000000000")
         {
-            //新增模板
+            //修改宣传册
             <text>
         BindBrochureData();
         BindUpdateBrochureClickEvent();
-            </text>
+        BindUploadedSFPicClickEvent();
+        BindUploadedExamplePicClickEvent();
+        </text>
+        }else
+        {
+            //没有该宣传册
+            <text>
+        $.messager.alert('提示', '该产品暂时没有设置宣传册模板，请先设置宣传册模板再做修改操作。');
+        var tab = $('#main-tab').tabs('getSelected');
+        tab.panel('refresh', '/Home/OptionsProductConfig');
+        </text>
         }
     })
     function BindUpdateBrochureClickEvent() {
@@ -119,8 +129,8 @@
             headers["__RequestVerificationToken"] = token;
             var postdata = {
                 BrochureID: $('#UBrochureID').val(),
-                //TempName: $("#UTempName").val(),
-                //TempDescrip: $("#UTempDescrip").val(),
+                SFPic: $("#USFPic").val(),
+                ExamplePic: $("#UExamplePic").val(),
                 ContractDescrip: $("#UContractDescrip").val(),
                 BuyBegin: $("#UBuyBegin").val(),
                 BuyTime: $("#UBuyTime").val(),
@@ -166,8 +176,8 @@
     }
     function BindBrochureData() {
         $('#UBrochureID').val('@Model.BrochureID');
-        @*$('#UTempName').val('@Model.TempName');
-        $('#UTempDescrip').val('@Model.TempDescrip');*@
+        $('#USFPic').val('@Model.SFPic');
+        $('#UExamplePic').val('@Model.ExamplePic');
         $('#UContractDescrip').val('@Model.ContractDescrip');
         $('#UBuyBegin').val('@Model.BuyBegin');
         $('#UBuyTime').val('@Model.BuyTime');
@@ -201,9 +211,9 @@
         //数据清空
         $('#UploadedSFPic').val('');
         $('#UploadedExamplePic').val('');
-        $("#FileProgress").css("width",
-              '0%');
-        $('#FileProgress span').text("0%");
+        //$("#FileProgress").css("width",
+        //      '0%');
+        //$('#FileProgress span').text("0%");
     }
 
     //新增盈亏结构图
@@ -216,7 +226,7 @@
             headers["__RequestVerificationToken"] = token;
             //dataString.append('ProductID', $("#ProductGrid").datagrid("getSelections")[0].ProductID);
             $.ajax({
-                url: '/Home/UploadSFPicAction',  //Server script to process data
+                url: '/Brochure/UploadPicAction',  //Server script to process data
                 type: 'POST',
                 xhr: function () {  // Custom XMLHttpRequest
                     var myXhr = $.ajaxSettings.xhr();
@@ -228,7 +238,7 @@
                     return myXhr;
                 },
                 //Ajax events
-                success: successHandler,
+                success: successHandlerSFPic,
                 error: errorHandler,
                 complete: completeHandler,
                 headers: headers,
@@ -241,30 +251,66 @@
             });
         });
     }
-    function successHandler(data) {
+    //新增示例图
+    function BindUploadedExamplePicClickEvent() {
+        $("#btnUploadedExamplePic").click(function () {
+            var form = $('#UploadExamplePicForm')[0];
+            var dataString = new FormData(form);
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //dataString.append('ProductID', $("#ProductGrid").datagrid("getSelections")[0].ProductID);
+            $.ajax({
+                url: '/Brochure/UploadPicAction',  //Server script to process data
+                type: 'POST',
+                xhr: function () {  // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) { // Check if upload property exists
+                        //myXhr.upload.onprogress = progressHandlingFunction
+                        myXhr.upload.addEventListener('progress', progressHandlingFunction,
+                        false); // For handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                //Ajax events
+                success: successHandlerExamplePic,
+                error: errorHandler,
+                complete: completeHandler,
+                headers: headers,
+                // Form data
+                data: dataString,
+                //Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    }
+    function successHandlerSFPic(data) {
         if (data.statusCode == 400) {
             $.messager.alert('错误', data.status);
         } else if (data.statusCode == 200) {
             $.messager.alert('成功', data.status);
+            $('#USFPic').val('~/FileUpLoad/' + ($("#UploadedSFPic"))[0].files[0].name);
+        }
+    }
+    function successHandlerExamplePic(data) {
+        if (data.statusCode == 400) {
+            $.messager.alert('错误', data.status);
+        } else if (data.statusCode == 200) {
+            $.messager.alert('成功', data.status);
+            $('#UExamplePic').val('~/FileUpLoad/' + ($("#UploadedExamplePic"))[0].files[0].name);
         }
     }
     function errorHandler(e) {
-        alert(e.status);
+        $.messager.alert('错误', e.status + e.statusText);
+
     }
     function completeHandler(data) {
-        $("#UploadOptionsProductDialog").dialog("close");
-        $('#OptionsProductGrid').datagrid('reload');
+
     }
     function progressHandlingFunction(e) {
-        if (e.lengthComputable) {
-            var percentComplete = Math.round(e.loaded * 100 / e.total);
-            $("#FileProgress").css("width",
-              percentComplete + '%').attr('aria-valuenow', percentComplete);
-            $('#FileProgress span').text(percentComplete + "%");
-        }
-        else {
-            $('#FileProgress span').text('unable to compute');
-        }
+
     }
     function singleFileSelected1(evt) {
         //var selectedFile = evt.target.files can use this  or select input file element
@@ -273,7 +319,7 @@
         if (selectedFile) {
             if (selectedFile.name.split('.').length >= 2) {
                 var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
-                if (FileType != "png" && FileType != "jpg" && FileType != "gif") {
+                if (FileType.toLowerCase() != "png" && FileType.toLowerCase() != "jpg" && FileType.toLowerCase() != "gif") {
                     $.messager.alert('友情提示', '上传文件必须为图片文件格式，请重新选择');
                     return false;
                 }
@@ -287,7 +333,7 @@
         if (selectedFile) {
             if (selectedFile.name.split('.').length >= 2) {
                 var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
-                if (FileType != "png" && FileType != "jpg" && FileType != "gif") {
+                if (FileType.toLowerCase() != "png" && FileType.toLowerCase() != "jpg" && FileType.toLowerCase() != "gif") {
                     $.messager.alert('友情提示', '上传文件必须为图片文件格式，请重新选择');
                     return false;
                 }
@@ -300,27 +346,37 @@
     }
 </script>
 
-<div id="BrochureDiv">
+<div id="TempDiv">
     <form id="UpdateBrochureForm" method="post" novalidate="novalidate">
         <table id="BrochureTable">
             <thead>
                 <tr>
-                    <th colspan="2" style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
+                    <th style="text-align:center;">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure" iconcls="icon-ok">保存</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="CloseUpdateBrochurePage()">关闭</a>
+                    </th>
+                    <th style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
+                    
                 </tr>
             </thead>
-
-            @*<tr>
-                <td class="td-info"><label for="TempName">模板名称：</label></td>
+            <tr>
+                <td class="td-info"><label for="btnUpdatePic">上传图片：</label></td>
                 <td>
-                    <input class="easyui-validatebox form-control" type="text" id="UTempName" name="TempName" data-options="required:true,validType:'length[1,32]'" style="width:400px;" />
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdatePic" iconcls="icon-up" onclick="UploadBrochureImageDialog()" style="float:left">上传图片</a>
                 </td>
             </tr>
             <tr>
-                <td class="td-info"><label for="TempDescrip">模板描述：</label></td>
+                <td class="td-info"><label for="USFPic">盈亏结构图：</label></td>
                 <td>
-                    <input class="easyui-validatebox form-control" type="text" id="UTempDescrip" name="TempDescrip" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                    <input class="easyui-validatebox form-control" type="text" id="USFPic" name="SFPic" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
                 </td>
-            </tr>*@
+            </tr>
+            <tr>
+                <td class="td-info"><label for="UExamplePic">示例图：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UExamplePic" name="ExamplePic" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
             <tr>
                 <td class="td-info"><label for="ContractDescrip">标的合约描述：</label></td>
                 <td>
@@ -419,7 +475,7 @@
     <div id="UploadBrochureImageDialog" class="easyui-dialog" style="width:560px;height:500px;padding:10px 20px;display:block;"
          closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
         <div class="alert alert-danger" role="alert">
-            <strong>提醒!</strong><br />上传的数据必须符合数据模板的规格.
+            <strong>提醒!</strong><br />上传的数据必须符合图片格式规格。<br />上传的文件名将不会改变，文件名请注意与其他文件名的区分！
         </div>
 
         <form id="UploadSFPicForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
@@ -430,15 +486,15 @@
                         <input type="file" name="UploadedFile" id="UploadedSFPic" onchange="singleFileSelected1()" />
                     </td>
                 </tr>
-
                 <tr>
                     <td colspan="2" style="text-align:center; padding-top:10px">
                         <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedSFPic" iconcls="icon-ok">确定</a>
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
+                        
                     </td>
                 </tr>
             </table>
         </form>
+        <div>-------------------------------------------------------------------------------------------------</div>
         <form id="UploadExamplePicForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
             <table id="tblAdd">
                 <tr>
@@ -447,22 +503,23 @@
                         <input type="file" name="UploadedFile" id="UploadedExamplePic" onchange="singleFileSelected2()" />
                     </td>
                 </tr>
-
                 <tr>
                     <td colspan="2" style="text-align:center; padding-top:10px">
                         <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedExamplePic" iconcls="icon-ok">确定</a>
-                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
+                       
                     </td>
                 </tr>
             </table>
         </form>
-        <div class="progress">
+        <div>-------------------------------------------------------------------------------------------------</div>
+        @*<div class="progress">
             <div id="FileProgress"
                  class="progress-bar progress-bar-striped" role="progressbar"
                  aria-valuenow="0" aria-valuemin="0"
                  aria-valuemax="100" style="width: 0%;">
                 <span></span>
             </div>
-        </div>
+        </div>*@
+        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
     </div>
 </div>
