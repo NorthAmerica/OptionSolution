@@ -175,7 +175,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BrochureViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Ninject\NinjectControllerFactory.cs" />

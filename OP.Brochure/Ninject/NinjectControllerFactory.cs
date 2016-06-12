@@ -1,4 +1,6 @@
 ﻿using Ninject;
+using OP.Repository;
+using OP.Repository.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +29,9 @@ namespace OP.Brochure.Ninject
 
         private void AddBindings()
         {
-            //ninjectKernel.Bind<InterfaceUserRepository>().To<UserRepository>();
+            ninjectKernel.Bind<InterfaceOptionsProductRepository>().To<OptionsProductRepository>();
+            ninjectKernel.Bind<InterfaceBrochureRepository>().To<BrochureRepository>();
+            ninjectKernel.Bind<InterfaceGuestBookRepository>().To<GuestBookRepository>();
             //put bindings here
         }
     }

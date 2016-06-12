@@ -40,13 +40,15 @@ namespace OP.Web.Controllers
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
             var find = BrochureRepository.FindAll().Where(b => b.IsTemp == true);
-            var returntemp = find.OrderByDescending(b => b.TempDate).Select(b => new {
+            var returntemp = find.OrderByDescending(b => b.TempDate).Select(b => new
+            {
                 b.BrochureID,
                 b.TempName,
                 b.TempDescrip,
                 TempDate = b.TempDate.ToString("yyyy-MM-dd")
             }).ToList();
-            return Json(new {
+            return Json(new
+            {
                 total = returntemp.Count(),
                 rows = returntemp.Skip((ppage - 1) * prows).Take(prows)
             });
@@ -61,7 +63,7 @@ namespace OP.Web.Controllers
             {
                 Guid gid = new Guid(id);
                 Brochure bro = BrochureRepository.Find(b => b.BrochureID == gid);
-                if (bro!=null)
+                if (bro != null)
                 {
                     return View(bro);
                 }
@@ -84,7 +86,7 @@ namespace OP.Web.Controllers
                 {
                     model.TempDate = DateTime.Now.ToLocalTime();
                     model.IsTemp = true;
-                    if(BrochureRepository.Add(model)!=null)
+                    if (BrochureRepository.Add(model) != null)
                     {
                         return Json(new
                         {
@@ -92,13 +94,15 @@ namespace OP.Web.Controllers
                         });
                     }
                 }
-                return Json(new {
+                return Json(new
+                {
                     Success = false
                 });
             }
             catch (Exception)
             {
-                return Json(new {
+                return Json(new
+                {
                     Success = false
                 });
             }
@@ -115,7 +119,7 @@ namespace OP.Web.Controllers
         {
             try
             {
-                if (model!=null)
+                if (model != null)
                 {
                     model.IsTemp = true;
                     model.TempDate = DateTime.Now.ToLocalTime();
@@ -140,7 +144,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除宣传册模板事件
@@ -157,7 +161,7 @@ namespace OP.Web.Controllers
                 {
                     Guid gid = new Guid(ID);
                     Brochure find = BrochureRepository.Find(b => b.BrochureID == gid);
-                    if (find!=null)
+                    if (find != null)
                     {
                         if (BrochureRepository.Delete(find))
                         {
@@ -189,7 +193,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult SelectBrochureTemp(string OptionsProductID,string BrochureID)
+        public ActionResult SelectBrochureTemp(string OptionsProductID, string BrochureID)
         {
             try
             {
@@ -202,7 +206,7 @@ namespace OP.Web.Controllers
                     find.AddDate = DateTime.Now.ToLocalTime();
                     find.OptionsProductID = opid;
                     Brochure addBro = BrochureRepository.Add(find);
-                    if (addBro!=null)
+                    if (addBro != null)
                     {
                         if (BrochureRepository.Exist(b => b.OptionsProductID == opid))
                         {
@@ -237,8 +241,8 @@ namespace OP.Web.Controllers
             if (!string.IsNullOrEmpty(id))
             {
                 Guid OptionsProductID = new Guid(id);
-                Brochure findBro = BrochureRepository.Find(b => b.OptionsProductID == OptionsProductID&&b.IsTemp==false);
-                if (findBro!=null)
+                Brochure findBro = BrochureRepository.Find(b => b.OptionsProductID == OptionsProductID && b.IsTemp == false);
+                if (findBro != null)
                 {
                     return View(findBro);
                 }
@@ -301,29 +305,44 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UploadPicAction(HttpPostedFileBase uploadedFile)
+        public ActionResult UploadPicAction(string Type,string BrochureID, HttpPostedFileBase uploadedFile)
         {
             try
             {
                 if (uploadedFile != null && uploadedFile.ContentLength > 0)
                 {
+
                     string fileExtenSion = Path.GetExtension(uploadedFile.FileName);
                     string path = System.IO.Path.Combine(Server.MapPath("~/FileUpLoad/"), System.IO.Path.GetFileName(uploadedFile.FileName));
                     uploadedFile.SaveAs(path);//将文件保存到本地
-                    return Json(new
+                    Guid gid = new Guid(BrochureID);
+                    Brochure find = BrochureRepository.Find(bro => bro.BrochureID == gid);
+                    if (Type== "SFPic")
                     {
-                        statusCode = 200,
-                        status = "已经上传了" + uploadedFile.FileName + "文件。"
-                    });
+                        find.SFPic = GetBytesFromImage(path);
+                    }
+                    else
+                    {
+                        find.ExamplePic = GetBytesFromImage(path);
+                    }
+                    
+                    find.IsTemp = false;
+                    if (BrochureRepository.Update(find))
+                    {
+                        return Json(new
+                        {
+                            statusCode = 200,
+                            status = "已经上传了" + uploadedFile.FileName + "文件。"
+                        });
+                    }
+
                 }
-                else
+                return Json(new
                 {
-                    return Json(new
-                    {
-                        statusCode = 400,
-                        status = "文件传输有误，请重新上传。"
-                    });
-                }
+                    statusCode = 400,
+                    status = "文件传输有误，请重新上传。"
+                });
+
             }
             catch (Exception ex)
             {
@@ -335,5 +354,26 @@ namespace OP.Web.Controllers
             }
         }
         
+        /// <summary>
+        /// 图片转换为二进制        
+        /// </summary
+        private byte[] GetBytesFromImage(string filename)
+
+        {
+
+            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
+
+            int length = (int)fs.Length;
+
+            byte[] image = new byte[length];
+
+            fs.Read(image, 0, length);
+
+            fs.Close();
+
+            return image;
+
+        }
+
     }
 }

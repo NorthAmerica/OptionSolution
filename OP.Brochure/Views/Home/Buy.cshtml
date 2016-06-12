@@ -1,10 +1,9 @@
-﻿
+﻿@model OP.Brochure.Models.BrochureViewModel
 @{
     ViewBag.Title = "购买须知";
 }
 
-
-<div class="product-a"><div class="Iron-Man"> 价格补偿服务-扛跌一号</div></div>
+<div class="product-a"><div class="Iron-Man"> 价格补偿服务-@Model.ProductName</div></div>
 <div class="product-b">
     <!--标题文字部分-->
     <div class="size">
@@ -13,16 +12,32 @@
             <p>产品期限：</p>
             <p>标的合约：</p>
             <p>购买起点：</p>
-            <p>服<em>务</em>费：</p>
+            @if (Model.AmountType == "保费")
+            {
+                <p>服<em>务</em>费：</p>
+            }
+            else if (Model.AmountType == "保证金")
+            {
+                <p>保<em>证</em>金：</p>
+            }
+
             <p>购买时间：</p>
         </div>
         <div>
             <!--  style="width:455px;" -->
-            <p>10天</p>
-            <p>RB1610(上海期货交易所螺纹钢期货合约)</p>
-            <p>10吨起售，超过购买起点份额的部分，应为10吨的整数倍。</p>
-            <p>20元/吨</p>
-            <p>每日除14:30至17:00时段皆可购买。</p>
+            <p>@Model.Deadline 天</p>
+            <p>@Model.Contract @Model.ContractDescrip</p>
+            <p>@Model.BuyBegin</p>
+            @if (Model.PriceType == "单位值")
+            {
+                <p>@Model.Price 元/吨</p>
+            }
+            else if (Model.PriceType == "固定值")
+            {
+                <p>@Model.Price 元</p>
+            }
+
+            <p>@Model.BuyTime</p>
         </div>
     </div>
 </div>
@@ -30,7 +45,6 @@
 <div class="product-c"></div>
 
 <div id="contant">
-
     <div class="img-a"><img src="~/images/arrow.jpg" /></div>
     <div class="img-b"><img src="~/images/arrow1.jpg"></div>
     <div class="img-c"><img src="~/images/arrow3.jpg" style="transform:rotate(-180deg);"></div>
@@ -40,9 +54,9 @@
     <div class="nav-a">
         <img src="~/images/nav_02.png" usemap="#Map" border="0" />
         <map name="Map" id="Map">
-            <area shape="rect" coords="3,5,204,53" href="index" />
-            <area shape="rect" coords="206,7,407,53" href="buy" />
-            <area shape="rect" coords="410,6,605,51" href="example" />
+            <area shape="rect" coords="3,5,204,53" href="../index/@Model.OptionsProductID" />
+            <area shape="rect" coords="206,7,407,53" href="../buy/@Model.OptionsProductID" />
+            <area shape="rect" coords="410,6,605,51" href="../example/@Model.OptionsProductID" />
         </map>
     </div>
 
@@ -59,36 +73,7 @@
     <!--常见问题-->
     <div class="FAQ"><img src="~/images/solid.jpg" /></div>
     <div class="Questions" style="margin-bottom:10px;">
-        <h5>Q：不购买现货，可以购买本产品吗？</h5>
-        <p> Answer:本服务专为套期保值客户设计，所以在未购买现货的情况下，不支持购买本产品。</p>
-        <h5>Q：我购买了300吨现货，可以购买500吨的价格补偿服务产品么？</h5>
-        <p>Answer:不可以，单笔订单内价格补偿服务的购买数量不可以超过现货购买的数量。</p>
-        <h5>Q：我的现货订单已经付款完毕，但是我想再购买价格补偿服务产品可以么？</h5>
-        <p>Answer:不可以，已经付款完毕的订单无法再购买价格补偿服务产品，只有在购买现货提交订单时可以同时购买价格补偿服务产品。</p>
-        <h5>Q：产品期限内产生了补偿款，可以马上进行结算么？</h5>
-        <p>Answer：不可以，价格补偿服务所有的产品只支持到期结算，并且结算价格为到期日期货合约收盘价/均价。如果到期日为非交易日（周末、法定节假日等），则按照到期日前推第一个交易日为到期日，结算价以到期日前推第一个交易日的收盘价为准进行结算。</p>
-        <h5>Q：交易日是指？ </h5>
-        <p> Answer：交易日指股票、期货市场交易的日期，通常指除国家法定节假日外的周一至周五。</p>
-        <h5>Q：周末或者节假日可以购买本产品吗？</h5>
-        <p> Answer：周末与法定节假日可以购买本产品，但产品生效日期为周末、法定节假日后第一个交易日，基准价以周末、法定节假日后第一个交易日的标的期货合约收盘价为准</p>。
-        <h5>Q:我上午购买了价格补偿服务产品，下午想取消购买，可以退货么？</h5>
-        <p>Answer：不可以，只有未付款的价格补偿服务产品订单才可以取消，购买成功之后不可以取消。</p>
-        <h5>Q：怎么申请补偿款？</h5>
-        <p>Answer：产品到期产生补偿款的，无需买家提出申请，由我公司支付的补偿款将会自动划转到贵公司登记的银行账户。</p>
-        <h5>Q：如果产品到期结算时产生了反补费，需要额外转账支付么？</h5>
-        <p>Answer：不需要，如果价格补偿服务到期结算时产生了反补费，买方应付的反补费将在产品到期结算时从购买产品时冻结的保证金中扣除，剩余的保证金会解除冻结状态至绑定银行账户。</p>
-        <h5>Q：保证金是什么意思？</h5>
-        <p>Answer：买方按照产品条款在银行账户中冻结的资金，专门用于产品的结算和履行约定的保证。保证金仅在买方银行账户中冻结，产品到期结算后会解除资金冻结状态。</p>
-        <h5>Q：怎么查询是否购买成功? 怎么查询基准价和结算价？有没有获得补偿款？</h5>
-        <p>Answer：在"我的快诺"—"我是买方"—"保价保单"中可以查询价格补偿服务订单详情。在快诺首页将会显示每日螺纹钢期货合约收盘价、购买日上海期货交易所螺纹钢主力合约收盘价以及到期日上海期货交易所螺纹钢主力合约收盘价（以上海期货交易所网站公布的螺纹钢期货合约收盘价为准）。另外当您成功购买此产品，平台将向您在快诺注册的邮箱发送购买成功的信息。购买的价格补偿服务到期后会向您在快诺注册的邮箱发送产品结算信息，包括补偿款信息、服务费信息等，您可以及时在快诺平台邮箱中查看。</p>
-        <h5>Q：我想查询之前购买的已结算的价格补偿服务产品，应该到哪里查看？</h5>
-        <p>Answer：在"我的快诺"—"我是买方"—"保价保单"里可以查看历史成交和已结算的所有价格补偿服务产品，每个产品的详情页面会有产品具体的价格、补偿款、购买日、到期日等信息。</p>
-        <h5>Q：购买这个价格补偿服务就能完全避免购买钢铁现货之后价格下跌的风险么？</h5>
-        <p>Answer：本产品所有价格都是参考上海期货交易所螺纹钢期货价格，并不参考现货价格，现货价格与期货价格虽然有很高的相关性，但是现货价格与期货价格并不是完全同步变化，本产品并不保证一定规避现货价格风险。</p>
-
-
-
-
+        @Html.Raw(Model.FAQ)
     </div>
 
     <table width="670" class="message">

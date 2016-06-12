@@ -176,6 +176,7 @@
     }
     function BindBrochureData() {
         $('#UBrochureID').val('@Model.BrochureID');
+
         $('#USFPic').val('@Model.SFPic');
         $('#UExamplePic').val('@Model.ExamplePic');
         $('#UContractDescrip').val('@Model.ContractDescrip');
@@ -221,6 +222,8 @@
         $("#btnUploadedSFPic").click(function () {
             var form = $('#UploadSFPicForm')[0];
             var dataString = new FormData(form);
+            dataString.append('BrochureID', $('#UBrochureID').val());
+            dataString.append('Type', 'SFPic');
             var token = $('@Html.AntiForgeryToken()').val();
             var headers = {};
             headers["__RequestVerificationToken"] = token;
@@ -256,6 +259,8 @@
         $("#btnUploadedExamplePic").click(function () {
             var form = $('#UploadExamplePicForm')[0];
             var dataString = new FormData(form);
+            dataString.append('BrochureID', $('#UBrochureID').val());
+            dataString.append('Type', 'SFPic');
             var token = $('@Html.AntiForgeryToken()').val();
             var headers = {};
             headers["__RequestVerificationToken"] = token;
@@ -291,7 +296,7 @@
             $.messager.alert('错误', data.status);
         } else if (data.statusCode == 200) {
             $.messager.alert('成功', data.status);
-            $('#USFPic').val('~/FileUpLoad/' + ($("#UploadedSFPic"))[0].files[0].name);
+            
         }
     }
     function successHandlerExamplePic(data) {
@@ -299,7 +304,6 @@
             $.messager.alert('错误', data.status);
         } else if (data.statusCode == 200) {
             $.messager.alert('成功', data.status);
-            $('#UExamplePic').val('~/FileUpLoad/' + ($("#UploadedExamplePic"))[0].files[0].name);
         }
     }
     function errorHandler(e) {

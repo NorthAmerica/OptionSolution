@@ -50,7 +50,7 @@ namespace OP.Web.Ninject
             ninjectKernel.Bind<InterfaceONOFFSetRepository>().To<ONOFFSetRepository>();
             ninjectKernel.Bind<InterfaceONTimeRepository>().To<ONTimeRepository>();
             ninjectKernel.Bind<InterfaceBrochureRepository>().To<BrochureRepository>();
-            ninjectKernel.Bind<InterfaceGuestBookRepository>().To<GuestBookRepository>();
+            
             //put bindings here
         }
     }

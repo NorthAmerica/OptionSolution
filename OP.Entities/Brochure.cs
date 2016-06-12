@@ -37,7 +37,7 @@ namespace OP.Entities
         [DisplayName("结算公式")]
         public string SettlementFormula { get; set; }
         [DisplayName("结算公式图(盈亏结构图)")]
-        public string SFPic { get; set; }
+        public byte[] SFPic { get; set; }
         [DisplayName("购买日")]
         public string StartDateDescrip { get; set; }
         [DisplayName("到期日")]
@@ -45,7 +45,7 @@ namespace OP.Entities
         [DisplayName("交易日")]
         public string TradeDateDescrip { get; set; }
         [DisplayName("示例图")]
-        public string ExamplePic { get; set; }
+        public byte[] ExamplePic { get; set; }
         [DisplayName("风险揭示书链接")]
         public string RiskAnnouncementURL { get; set; }
         [DisplayName("价格补偿服务购买协议")]
