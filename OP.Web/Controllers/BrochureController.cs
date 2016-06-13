@@ -3,6 +3,7 @@ using OP.Repository;
 using OP.Web.Attribute;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -16,9 +17,11 @@ namespace OP.Web.Controllers
     public class BrochureController : Controller
     {
         private InterfaceBrochureRepository BrochureRepository;
-        public BrochureController(InterfaceBrochureRepository br)
+        private InterfaceOptionsProductRepository OptionsProductRepository;
+        public BrochureController(InterfaceBrochureRepository br, InterfaceOptionsProductRepository opr )
         {
             BrochureRepository = br;
+            OptionsProductRepository = opr;
         }
         // GET: Brochure
         public ActionResult Index()
@@ -208,11 +211,16 @@ namespace OP.Web.Controllers
                     Brochure addBro = BrochureRepository.Add(find);
                     if (addBro != null)
                     {
-                        if (BrochureRepository.Exist(b => b.OptionsProductID == opid))
+                        if (BrochureRepository.Exist(b => b.OptionsProductID == opid && b.BrochureID!= addBro.BrochureID))
                         {
                             //删除原有的正式宣传册
-                            BrochureRepository.Delete(BrochureRepository.Find(b => b.OptionsProductID == opid));
+                            BrochureRepository.Delete(BrochureRepository.Find(b => b.OptionsProductID == opid && b.BrochureID != addBro.BrochureID));
                         }
+                        //更新产品说明链接
+                        string BrochureURL = ConfigurationManager.AppSettings["BrochureURL"].ToString()+opid.ToString();
+                        OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == opid);
+                        findop.ProductUrl = BrochureURL;
+                        OptionsProductRepository.Update(findop);
                         return Json(new
                         {
                             Success = true
@@ -264,8 +272,7 @@ namespace OP.Web.Controllers
                 if (model != null)
                 {
                     Brochure find = BrochureRepository.Find(b => b.BrochureID == model.BrochureID);
-                    find.ExamplePic = model.ExamplePic;
-                    find.SFPic = model.SFPic;
+
                     find.AddDate = DateTime.Now.ToLocalTime();
                     find.BuyBegin = model.BuyBegin;
                     find.BuyTime = model.BuyTime;

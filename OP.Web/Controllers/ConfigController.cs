@@ -21,12 +21,14 @@ namespace OP.Web.Controllers
         private InterfaceUserRepository UserRepository;
         private InterfaceUserRoleRepository UserRoleRepository;
         private InterfaceEventLogRepository LogRepository;
+        private InterfaceGuestBookRepository GuestBookRepository;
         public ConfigController(InterfaceMenuRepository menu, 
             InterfaceRoleMenuRepository rolemenu, 
             InterfaceRoleRepository role, 
             InterfaceUserRepository user, 
             InterfaceUserRoleRepository userrole,
-            InterfaceEventLogRepository eventlog)
+            InterfaceEventLogRepository eventlog,
+            InterfaceGuestBookRepository guestbook)
         {
             MenuRepository = menu;
             RoleMenuRepository = rolemenu;
@@ -34,6 +36,7 @@ namespace OP.Web.Controllers
             UserRepository = user;
             UserRoleRepository = userrole;
             LogRepository = eventlog;
+            GuestBookRepository = guestbook;
         }
         // GET: Config首页
         public ActionResult Index()
@@ -489,7 +492,7 @@ namespace OP.Web.Controllers
                     List<Menu> Ldelete = new List<Menu>();
                     Ldelete.Add(findmenu);
                     DeleteChild(Ldelete, menuid);
-                    if (MenuRepository.DeleteRange(Ldelete) != 0)
+                    if (MenuRepository.DeleteRange(Ldelete.AsEnumerable()) != 0)
                     {
                         return Json(new
                         {
@@ -827,6 +830,64 @@ namespace OP.Web.Controllers
                 total = iel.Count(),
                 rows = iel.Skip((ppage - 1) * prows).Take(prows)
             });
+        }
+        #endregion
+
+        #region 留言栏管理
+        public ActionResult GuestBookList()
+        {
+            return View();
+        }
+        public ActionResult GuestBookGrid_Read(int? page, int? rows)
+        {
+            int ppage = Convert.ToInt32(page == null ? 1 : page);
+            int prows = Convert.ToInt32(rows == null ? 1 : rows);
+            IEnumerable<GuestBook> igb= GuestBookRepository.FindAll().OrderByDescending(l => l.GuestDate);
+            var result = igb.Select(g => new
+            {
+                g.GuestBookID,
+                g.GuestContent,
+                g.GuestMobile,
+                g.GuestName,
+                GuestDate = g.GuestDate.ToString("yyyy-MM-dd")
+            }).ToList();
+            return Json(new
+            {
+                total = result.Count(),
+                rows = result.Skip((ppage - 1) * prows).Take(prows)
+            });
+        }
+        /// <summary>
+        /// 查询留言栏详情
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult GetGuestBookDetails(string ID)
+        {
+            if (!string.IsNullOrEmpty(ID))
+            {
+
+                int GuestBookID = Convert.ToInt32(ID);
+                GuestBook findGB = GuestBookRepository.Find(g => g.GuestBookID == GuestBookID);
+
+                if (findGB != null)
+                {
+                    return Json(new
+                    {
+                        Success = true,
+                        GuestBookID = findGB.GuestBookID,
+                        GuestContent = findGB.GuestContent,
+                        GuestDate = findGB.GuestDate.ToString("yyyy-MM-dd"),
+                        GuestMobile = findGB.GuestMobile,
+                        GuestName = findGB.GuestName
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json(new
+            {
+                Success = false
+            }, JsonRequestBehavior.AllowGet);
         }
         #endregion
     }

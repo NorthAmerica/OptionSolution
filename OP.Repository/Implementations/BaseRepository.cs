@@ -15,7 +15,7 @@ namespace OP.Repository.Implementations
     /// </summary>
     public class BaseRepository<T> : InterfaceBaseRepository<T> where T : class
     {
-        //protected EFDbContext nContext = ContextFactory.GetCurrentContext();
+        //protected EFDbContext FContext = ContextFactory.GetCurrentContext();
         public T Add(T entity, bool isSave = true)
         {
             using (EFDbContext nContext = new EFDbContext())
@@ -59,11 +59,21 @@ namespace OP.Repository.Implementations
         {
             using (EFDbContext nContext = new EFDbContext())
             {
+                //先得到实体才能删除
+                foreach (var entitie in entities)
+                {
+                    nContext.Set<T>().Attach(entitie);
+                }
+                
                 nContext.Set<T>().RemoveRange(entities);
                 return isSave ? nContext.SaveChanges() : 0;
             }
         }
-
+        /// <summary>
+        /// 查询满足条件的实体个数
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public int Count(Expression<Func<T, bool>> predicate)
         {
             using (EFDbContext nContext = new EFDbContext())
@@ -71,7 +81,11 @@ namespace OP.Repository.Implementations
                 return nContext.Set<T>().Count(predicate);
             }
         }
-
+        /// <summary>
+        /// 是否存在满足条件的实体
+        /// </summary>
+        /// <param name="anyLambda"></param>
+        /// <returns></returns>
         public bool Exist(Expression<Func<T, bool>> anyLambda)
         {
             using (EFDbContext nContext = new EFDbContext())
@@ -81,6 +95,7 @@ namespace OP.Repository.Implementations
         }
         /// <summary>
         /// 不进行缓存查询
+        /// 性能提高
         /// </summary>
         /// <param name="whereLambda"></param>
         /// <returns></returns>

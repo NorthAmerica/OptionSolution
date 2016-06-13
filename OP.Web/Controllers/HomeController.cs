@@ -2393,6 +2393,10 @@ namespace OP.Web.Controllers
         #endregion
 
         #region 总开关设置
+        public ActionResult ONOFFtest()
+        {
+            return View();
+        }
         public ActionResult ONOFFConfig()
         {
             return View();

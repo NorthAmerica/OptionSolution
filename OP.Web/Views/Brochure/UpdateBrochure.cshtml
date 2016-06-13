@@ -44,9 +44,9 @@
         text-align: center;
     }
 
-    #TempDiv td.td-info {
-        width: 120px;
-    }
+        #TempDiv td.td-info {
+            width: 120px;
+        }
     /* tablecloth styles */
     #TempDiv tr.even td {
         background: #e5f1f4;
@@ -118,8 +118,9 @@
         </text>
         }
     })
+    //更新事件
     function BindUpdateBrochureClickEvent() {
-        $('#btnUpdateBrochure').click(function () {
+        $('#btnUpdateBrochure1,#btnUpdateBrochure2').click(function () {
             var valid = $('#UpdateBrochureForm').form('validate');
             if (valid == false) {
                 return false;
@@ -129,8 +130,8 @@
             headers["__RequestVerificationToken"] = token;
             var postdata = {
                 BrochureID: $('#UBrochureID').val(),
-                SFPic: $("#USFPic").val(),
-                ExamplePic: $("#UExamplePic").val(),
+                //SFPic: $("#USFPic").val(),
+                //ExamplePic: $("#UExamplePic").val(),
                 ContractDescrip: $("#UContractDescrip").val(),
                 BuyBegin: $("#UBuyBegin").val(),
                 BuyTime: $("#UBuyTime").val(),
@@ -177,8 +178,16 @@
     function BindBrochureData() {
         $('#UBrochureID').val('@Model.BrochureID');
 
-        $('#USFPic').val('@Model.SFPic');
-        $('#UExamplePic').val('@Model.ExamplePic');
+        if ('@Model.SFPic' == '' || '@Model.SFPic' == null) {
+            $('#USFPic').val('未上传图片');
+        } else {
+            $('#USFPic').val('已上传图片');
+        }
+        if ('@Model.ExamplePic' == '' || '@Model.ExamplePic' == null) {
+            $('#UExamplePic').val('未上传图片');
+        } else {
+            $('#UExamplePic').val('已上传图片');
+        }
         $('#UContractDescrip').val('@Model.ContractDescrip');
         $('#UBuyBegin').val('@Model.BuyBegin');
         $('#UBuyTime').val('@Model.BuyTime');
@@ -260,7 +269,7 @@
             var form = $('#UploadExamplePicForm')[0];
             var dataString = new FormData(form);
             dataString.append('BrochureID', $('#UBrochureID').val());
-            dataString.append('Type', 'SFPic');
+            dataString.append('Type', 'ExamplePic');
             var token = $('@Html.AntiForgeryToken()').val();
             var headers = {};
             headers["__RequestVerificationToken"] = token;
@@ -296,7 +305,7 @@
             $.messager.alert('错误', data.status);
         } else if (data.statusCode == 200) {
             $.messager.alert('成功', data.status);
-            
+            $('#USFPic').val('已上传图片');
         }
     }
     function successHandlerExamplePic(data) {
@@ -304,6 +313,7 @@
             $.messager.alert('错误', data.status);
         } else if (data.statusCode == 200) {
             $.messager.alert('成功', data.status);
+            $('#UExamplePic').val('已上传图片');
         }
     }
     function errorHandler(e) {
@@ -356,11 +366,11 @@
             <thead>
                 <tr>
                     <th style="text-align:center;">
-                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure" iconcls="icon-ok">保存</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure1" iconcls="icon-ok">保存</a>
                         <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="CloseUpdateBrochurePage()">关闭</a>
                     </th>
                     <th style="text-align:left;font-size:large;padding-left:20px;">添加宣传册模板</th>
-                    
+
                 </tr>
             </thead>
             <tr>
@@ -468,7 +478,7 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:left; padding-top:10px;padding-left:150px;">
-                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure" iconcls="icon-ok">保存</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateBrochure2" iconcls="icon-ok">保存</a>
                     <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="CloseUpdateBrochurePage()">关闭</a>
                 </td>
             </tr>
@@ -479,9 +489,8 @@
     <div id="UploadBrochureImageDialog" class="easyui-dialog" style="width:560px;height:500px;padding:10px 20px;display:block;"
          closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
         <div class="alert alert-danger" role="alert">
-            <strong>提醒!</strong><br />上传的数据必须符合图片格式规格。<br />上传的文件名将不会改变，文件名请注意与其他文件名的区分！
+            <strong>提醒!</strong><br />上传的数据必须符合图片格式规格(png,jpg,gif)。
         </div>
-
         <form id="UploadSFPicForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
             <table id="tblAdd">
                 <tr>
@@ -493,7 +502,7 @@
                 <tr>
                     <td colspan="2" style="text-align:center; padding-top:10px">
                         <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedSFPic" iconcls="icon-ok">确定</a>
-                        
+
                     </td>
                 </tr>
             </table>
@@ -510,20 +519,20 @@
                 <tr>
                     <td colspan="2" style="text-align:center; padding-top:10px">
                         <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadedExamplePic" iconcls="icon-ok">确定</a>
-                       
+
                     </td>
                 </tr>
             </table>
         </form>
         <div>-------------------------------------------------------------------------------------------------</div>
         @*<div class="progress">
-            <div id="FileProgress"
-                 class="progress-bar progress-bar-striped" role="progressbar"
-                 aria-valuenow="0" aria-valuemin="0"
-                 aria-valuemax="100" style="width: 0%;">
-                <span></span>
-            </div>
-        </div>*@
+                <div id="FileProgress"
+                     class="progress-bar progress-bar-striped" role="progressbar"
+                     aria-valuenow="0" aria-valuemin="0"
+                     aria-valuemax="100" style="width: 0%;">
+                    <span></span>
+                </div>
+            </div>*@
         <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadBrochureImageDialog').dialog('close')">关闭</a>
     </div>
 </div>

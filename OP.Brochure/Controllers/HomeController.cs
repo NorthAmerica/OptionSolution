@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using OP.Entities;
 using OP.Brochure.Models;
+using OP.Brochure.Attribute;
 
 namespace OP.Brochure.Controllers
 {
@@ -21,6 +22,42 @@ namespace OP.Brochure.Controllers
             BrochureRepository = br;
             GuestBookRepository = gbr;
             OptionsProductRepository = opr;
+        }
+        /// <summary>
+        /// 发送留言
+        /// </summary>
+        /// <param name="gb"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult SendGuestBook(GuestBook gb)
+        {
+            try
+            {
+                if (gb!=null)
+                {
+                    gb.GuestDate = DateTime.Now.ToLocalTime();
+                    GuestBook addGB = GuestBookRepository.Add(gb);
+                    if (addGB!=null)
+                    {
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new
+                {
+                    Success = false
+                });
+            }
         }
         /// <summary>
         /// 显示盈亏结构图
