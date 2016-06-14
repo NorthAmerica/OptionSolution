@@ -300,7 +300,6 @@
     <Content Include="Scripts\UEditor\net\Web.config" />
     <Content Include="Views\Brochure\UpdateBrochure.cshtml" />
     <Content Include="Views\Config\GuestBookList.cshtml" />
-    <Content Include="Views\Home\ONOFFtest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

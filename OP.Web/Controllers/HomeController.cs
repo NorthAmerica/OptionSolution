@@ -282,23 +282,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddPartner(Partner partner)
         {
-            if (partner != null)
+            try
             {
-                if (PartnerRepository.Add(partner) != null)
+                if (partner != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者添加成功" });
-                    return Json(new
+                    if (PartnerRepository.Add(partner) != null)
                     {
-                        Success = true,
-                        Msg = "合作者添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者添加成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "合作者添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者添加失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 得到Partner信息
@@ -337,44 +350,68 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdatePartner(Partner partner)
         {
-            if (partner != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (PartnerRepository.Update(partner))
+                if (partner != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者更新成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (PartnerRepository.Update(partner))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者更新成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者更新失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeletePartner(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int partnerid = Convert.ToInt32(ID);
-                Partner findpartner = PartnerRepository.Find(u => u.PartnerID == partnerid);
-                if (PartnerRepository.Delete(findpartner))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者删除成功" });
-                    return Json(new
+                    int partnerid = Convert.ToInt32(ID);
+                    Partner findpartner = PartnerRepository.Find(u => u.PartnerID == partnerid);
+                    if (PartnerRepository.Delete(findpartner))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者删除成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者删除失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 数字配置
@@ -403,23 +440,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddNumberType(NumberType numtype)
         {
-            if (numtype != null)
+            try
             {
-                if (NumberTypeRepository.Add(numtype) != null)
+                if (numtype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增数字类型成功" });
-                    return Json(new
+                    if (NumberTypeRepository.Add(numtype) != null)
                     {
-                        Success = true,
-                        Msg = "数字类型添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增数字类型成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "数字类型添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增数字类型失败"+ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，"+ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 得到数字类型明细
@@ -458,22 +508,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateNumberType(NumberType numtype)
         {
-            if (numtype != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (NumberTypeRepository.Update(numtype))
+                if (numtype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新数字类型成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (NumberTypeRepository.Update(numtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新数字类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新数字类型失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除数字类型
@@ -484,23 +546,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteNumberType(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int typeid = Convert.ToInt32(ID);
-                NumberType findtype = NumberTypeRepository.Find(u => u.NumberTypeID == typeid);
-                if (NumberTypeRepository.Delete(findtype))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除数字类型成功" });
-                    return Json(new
+                    int typeid = Convert.ToInt32(ID);
+                    NumberType findtype = NumberTypeRepository.Find(u => u.NumberTypeID == typeid);
+                    if (NumberTypeRepository.Delete(findtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除数字类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除数字类型失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 期权类型配置
@@ -521,23 +595,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddOptionType(OptionType optype)
         {
-            if (optype != null)
+            try
             {
-                if (OptionTypeRepository.Add(optype) != null)
+                if (optype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权类型成功" });
-                    return Json(new
+                    if (OptionTypeRepository.Add(optype) != null)
                     {
-                        Success = true,
-                        Msg = "期权类型添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权类型成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "期权类型添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权类型失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg= "添加失败，"+ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 得到OptionType详情
@@ -576,22 +663,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateOptionType(OptionType type)
         {
-            if (type != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (OptionTypeRepository.Update(type))
+                if (type != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新期权类型成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (OptionTypeRepository.Update(type))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新期权类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新期权类型失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除OptionType
@@ -602,23 +701,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteOptionType(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int typeid = Convert.ToInt32(ID);
-                OptionType findtype = OptionTypeRepository.Find(u => u.OptionTypeID == typeid);
-                if (OptionTypeRepository.Delete(findtype))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除期权类型成功" });
-                    return Json(new
+                    int typeid = Convert.ToInt32(ID);
+                    OptionType findtype = OptionTypeRepository.Find(u => u.OptionTypeID == typeid);
+                    if (OptionTypeRepository.Delete(findtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除期权类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除期权类型失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 期权产品配置
@@ -654,7 +765,7 @@ namespace OP.Web.Controllers
             {
                 iop = iop.Where(o => Convert.ToDateTime(o.BeginDate).ToString("yyyy-MM-dd") == BeginDate);
             }
-            var riop = iop.OrderByDescending(p=>p.AddDate).Select(
+            var riop = iop.OrderByDescending(p => p.AddDate).Select(
                 p => new
                 {
                     AddDate = Convert.ToDateTime(p.AddDate).ToString("yyyy-MM-dd"),
@@ -821,6 +932,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期权产品数据失败，" + ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
@@ -862,24 +974,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddOptionsProduct(OptionsProduct product)
         {
-            if (product != null)
+            try
             {
-                product.AddDate = DateTime.Now.ToLocalTime();
-                product.Status = 0;
-                product.IsUpLoad = false;
-                if (OptionsProductRepository.Add(product) != null)
+                if (product != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权产品成功" });
-                    return Json(new
+                    product.AddDate = DateTime.Now.ToLocalTime();
+                    product.Status = 0;
+                    product.IsUpLoad = false;
+                    if (OptionsProductRepository.Add(product) != null)
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权产品成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增期权产品失败，"+ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 得到期权产品详细信息
@@ -1035,7 +1159,7 @@ namespace OP.Web.Controllers
                 {
                     throw new Exception("合作方名称或者选择产品为空");
                 }
-                OPM sendList = GetAllProducts(PartnerName,id);
+                OPM sendList = GetAllProducts(PartnerName, id);
                 string jsonstring = DESEncrypt.DesEncrypt(JsonConvert.SerializeObject(sendList));
                 //byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonstring);
                 //ByteArrayContent bac = new ByteArrayContent(postData);
@@ -1055,14 +1179,14 @@ namespace OP.Web.Controllers
                 }
                 else
                 {
-                    LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，第三方返回" + rm.Message });
-                    return Json(new { Success = false, Message = "第三方返回"+rm.Message });
+                    LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，第三方返回信息：" + rm.Message });
+                    return Json(new { Success = false, Message = "第三方返回" + rm.Message });
                 }
 
             }
             catch (Exception ex)
             {
-                LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，" + ex.Message });
+                LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，内部异常：" + ex.Message });
                 return Json(new { Success = false, Message = ex.Message });
             }
 
@@ -1253,22 +1377,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddFallRole(FallRole fallrole)
         {
-            if (fallrole != null)
+            try
             {
-                fallrole.CreateDate = DateTime.Now.ToLocalTime().ToString();
-                if (FallRoleRepository.Add(fallrole) != null)
+                if (fallrole != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增下跌规则成功" });
-                    return Json(new
+                    fallrole.CreateDate = DateTime.Now.ToLocalTime().ToString();
+                    if (FallRoleRepository.Add(fallrole) != null)
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增下跌规则成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增下跌规则失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 获取上涨规则
@@ -1296,22 +1432,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddRiseRole(RiseRole riserole)
         {
-            if (riserole != null)
+            try
             {
-                riserole.CreateDate = DateTime.Now.ToLocalTime().ToString();
-                if (RiseRoleRepository.Add(riserole) != null)
+                if (riserole != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增上涨规则成功" });
-                    return Json(new
+                    riserole.CreateDate = DateTime.Now.ToLocalTime().ToString();
+                    if (RiseRoleRepository.Add(riserole) != null)
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增上涨规则成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增上涨规则失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 启动期权产品
@@ -1335,7 +1483,7 @@ namespace OP.Web.Controllers
                         op.BeginDate = DateTime.Now.ToLocalTime();
                         if (OptionsProductRepository.Update(op))
                         {
-                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "启动期权产品成功" });
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "启动期权产品"+ op.ProductName+ "成功" });
                         }
                         else
                         {
@@ -1379,13 +1527,13 @@ namespace OP.Web.Controllers
                         op.EndDate = DateTime.Now.ToLocalTime();
                         if (OptionsProductRepository.Update(op))
                         {
-                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "停用期权产品成功" });
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "停用期权产品" + op.ProductName + "成功" });
                         }
                         else
                         {
                             return Json(new
                             {
-                                Success = true
+                                Success = false
                             });
                         }
                     }
@@ -1451,23 +1599,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddPartType(PartType parttype)
         {
-            if (parttype != null)
+            try
             {
-                if (PartTypeRepository.Add(parttype) != null)
+                if (parttype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增部分类型成功" });
-                    return Json(new
+                    if (PartTypeRepository.Add(parttype) != null)
                     {
-                        Success = true,
-                        Msg = "部分类型添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增部分类型成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "部分类型添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "部分类型添加失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 得到部分类型明细
@@ -1506,22 +1667,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdatePartType(PartType parttype)
         {
-            if (parttype != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (PartTypeRepository.Update(parttype))
+                if (parttype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新部分类型成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (PartTypeRepository.Update(parttype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新部分类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新部分类型失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除部分类型
@@ -1532,23 +1705,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeletePartType(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int typeid = Convert.ToInt32(ID);
-                PartType findtype = PartTypeRepository.Find(u => u.PartTypeID == typeid);
-                if (PartTypeRepository.Delete(findtype))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除部分类型成功" });
-                    return Json(new
+                    int typeid = Convert.ToInt32(ID);
+                    PartType findtype = PartTypeRepository.Find(u => u.PartTypeID == typeid);
+                    if (PartTypeRepository.Delete(findtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除部分类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除部分类型失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 处理状态配置
@@ -1573,23 +1758,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddManageStatus(ManageStatus ms)
         {
-            if (ms != null)
+            try
             {
-                if (ManageStatusRepository.Add(ms) != null)
+                if (ms != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增处理状态成功" });
-                    return Json(new
+                    if (ManageStatusRepository.Add(ms) != null)
                     {
-                        Success = true,
-                        Msg = "处理状态添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增处理状态成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "处理状态添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增处理状态失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 得到处理状态明细
@@ -1628,22 +1826,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateManageStatus(ManageStatus parttype)
         {
-            if (parttype != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (ManageStatusRepository.Update(parttype))
+                if (parttype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新处理状态成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (ManageStatusRepository.Update(parttype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新处理状态成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新处理状态失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除处理状态
@@ -1654,23 +1864,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteManageStatus(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int typeid = Convert.ToInt32(ID);
-                ManageStatus findtype = ManageStatusRepository.Find(u => u.ManageStatusID == typeid);
-                if (ManageStatusRepository.Delete(findtype))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除处理状态成功" });
-                    return Json(new
+                    int typeid = Convert.ToInt32(ID);
+                    ManageStatus findtype = ManageStatusRepository.Find(u => u.ManageStatusID == typeid);
+                    if (ManageStatusRepository.Delete(findtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除处理状态成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除处理状态失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 资金状态配置
@@ -1695,23 +1917,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddFundStatus(FundStatus ms)
         {
-            if (ms != null)
+            try
             {
-                if (FundStatusRepository.Add(ms) != null)
+                if (ms != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增资金状态成功" });
-                    return Json(new
+                    if (FundStatusRepository.Add(ms) != null)
                     {
-                        Success = true,
-                        Msg = "资金状态添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增资金状态成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "资金状态添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增资金状态失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，"+ex.Message
+                });
+            }
         }
         /// <summary>
         /// 得到资金状态明细
@@ -1750,22 +1984,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateFundStatus(FundStatus parttype)
         {
-            if (parttype != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (FundStatusRepository.Update(parttype))
+                if (parttype != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新资金状态成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (FundStatusRepository.Update(parttype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新资金状态成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新资金状态失败，" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除资金状态
@@ -1798,13 +2044,14 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除资金状态失败，" + ex.Message });
                 return Json(new
                 {
                     Success = false,
                     Message = ex.Message
                 });
             }
-            
+
         }
         #endregion
         #region 期货成交情况
@@ -1859,7 +2106,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据数量为空，请重新检查文件。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     if (dt.Columns.Count < 2)
                     {
@@ -1867,7 +2114,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据列数量有误，请重新检查数据是否合格。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     int count = 0;
                     foreach (DataRow item in dt.Rows)
@@ -1902,7 +2149,7 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 200,
                         status = "已经上传" + count.ToString() + "条数据。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
                 else
                 {
@@ -1910,16 +2157,17 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 400,
                         status = "文件传输有误，请重新上传。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货成交数据失败，"+ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
                     status = "文件上传发生异常," + ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                });
             }
         }
         #endregion
@@ -1974,7 +2222,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据数量为空，请重新检查文件。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     if (dt.Columns.Count < 2)
                     {
@@ -1982,7 +2230,7 @@ namespace OP.Web.Controllers
                         {
                             statusCode = 400,
                             status = "数据列数量有误，请重新检查数据是否合格。"
-                        }, JsonRequestBehavior.AllowGet);
+                        });
                     }
                     int count = 0;
                     foreach (DataRow item in dt.Rows)
@@ -2014,7 +2262,7 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 200,
                         status = "已经上传" + count.ToString() + "条数据。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
                 else
                 {
@@ -2022,16 +2270,17 @@ namespace OP.Web.Controllers
                     {
                         statusCode = 400,
                         status = "文件传输有误，请重新上传。"
-                    }, JsonRequestBehavior.AllowGet);
+                    });
                 }
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货资金数据失败，"+ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
                     status = "文件上传发生异常," + ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                });
             }
         }
         #endregion
@@ -2291,23 +2540,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddCallPriceType(CallPriceType callprice)
         {
-            if (callprice != null)
+            try
             {
-                if (CallPriceTypeRepository.Add(callprice) != null)
+                if (callprice != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增结算价类型" });
-                    return Json(new
+                    if (CallPriceTypeRepository.Add(callprice) != null)
                     {
-                        Success = true,
-                        Msg = "新增结算价类型添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增结算价类型成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "新增结算价类型添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增结算价类型失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 得到结算价类型明细
@@ -2346,22 +2607,34 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateCallPriceType(CallPriceType callprice)
         {
-            if (callprice != null)
+            try
             {
-                //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (CallPriceTypeRepository.Update(callprice))
+                if (callprice != null)
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新结算价类型成功" });
-                    return Json(new
+                    //user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (CallPriceTypeRepository.Update(callprice))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新结算价类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新结算价类型失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除结算价类型
@@ -2372,31 +2645,40 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteCallPriceType(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int typeid = Convert.ToInt32(ID);
-                CallPriceType findtype = CallPriceTypeRepository.Find(u => u.CallPriceTypeID == typeid);
-                if (CallPriceTypeRepository.Delete(findtype))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除结算价类型" });
-                    return Json(new
+                    int typeid = Convert.ToInt32(ID);
+                    CallPriceType findtype = CallPriceTypeRepository.Find(u => u.CallPriceTypeID == typeid);
+                    if (CallPriceTypeRepository.Delete(findtype))
                     {
-                        Success = true
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除结算价类型成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除结算价类型失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
 
         #region 总开关设置
-        public ActionResult ONOFFtest()
-        {
-            return View();
-        }
+
         public ActionResult ONOFFConfig()
         {
             return View();
@@ -2444,6 +2726,7 @@ namespace OP.Web.Controllers
                 findset.ONOFFMode = ONOFFMode ? 0 : 1;
                 if (ONOFFSetRepository.Update(findset))
                 {
+                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "进行开关设置成功" });
                     return Json(new { Success = true });
                 }
                 else
@@ -2452,8 +2735,9 @@ namespace OP.Web.Controllers
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "进行开关设置失败" + ex.Message });
                 return Json(new { Success = false });
             }
         }
@@ -2469,37 +2753,40 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult AddONTime(DateTime BeginTime,DateTime EndTime)
+        public ActionResult AddONTime(DateTime BeginTime, DateTime EndTime)
         {
             try
             {
-                if (!string.IsNullOrEmpty(BeginTime.ToString())&& !string.IsNullOrEmpty(EndTime.ToString()))
+                if (!string.IsNullOrEmpty(BeginTime.ToString()) && !string.IsNullOrEmpty(EndTime.ToString()))
                 {
-                    if (BeginTime< EndTime)
+                    if (BeginTime < EndTime)
                     {
 
-                        ONTimeRepository.Add(new ONTime {
-                             BeginTime= BeginTime,
-                             EndTime=EndTime
+                        ONTimeRepository.Add(new ONTime
+                        {
+                            BeginTime = BeginTime,
+                            EndTime = EndTime
                         });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增启动时间成功" });
                         return Json(new { Success = true });
                     }
                     else
                     {
                         return Json(new { Success = false, Message = "开始时间必须小于结束时间，请重新设置。" });
                     }
-                    
+
                 }
                 else
                 {
-                    return Json(new { Success = false, Message= "开始时间或结束时间不能为空，请重新设置。" });
+                    return Json(new { Success = false, Message = "开始时间或结束时间不能为空，请重新设置。" });
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { Success = false, Message= ex.Message });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增启动时间失败" + ex.Message });
+                return Json(new { Success = false, Message = ex.Message });
             }
-            
+
         }
         /// <summary>
         /// 获取开启时间数据源
@@ -2515,16 +2802,18 @@ namespace OP.Web.Controllers
                 {
                     int id = Convert.ToInt32(ID);
                     ONTime ontime = await ONTimeRepository.FindAsync(time => time.ONTimeID == id);
-                    return Json(new { Success = true,
+                    return Json(new
+                    {
+                        Success = true,
                         BeginTime = ontime.BeginTime.ToString("HH:mm:ss"),
                         EndTime = ontime.EndTime.ToString("HH:mm:ss")
                     }, JsonRequestBehavior.AllowGet);
                 }
                 else
                 {
-                    return Json(new { Success = false },JsonRequestBehavior.AllowGet);
+                    return Json(new { Success = false }, JsonRequestBehavior.AllowGet);
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -2549,6 +2838,7 @@ namespace OP.Web.Controllers
                     {
                         if (ONTimeRepository.Update(time))
                         {
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新开启时间成功" });
                             return Json(new { Success = true });
                         }
                     }
@@ -2562,6 +2852,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新开启时间失败" + ex.Message });
                 return Json(new { Success = false, Message = ex.Message });
             }
         }
@@ -2580,15 +2871,17 @@ namespace OP.Web.Controllers
                 {
                     int id = Convert.ToInt32(ID);
                     ONTime time = ONTimeRepository.Find(on => on.ONTimeID == id);
-                    if (time!=null)
+                    if (time != null)
                     {
-                        ONTimeRepository.Delete(time);
-                        return Json(new { Success = true });
+                        if (ONTimeRepository.Delete(time))
+                        {
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除启动时间成功" });
+                            return Json(new { Success = true });
+                        }
                     }
-                    else
-                    {
-                        return Json(new { Success = false, Message = "没有这条记录" });
-                    }
+
+                    return Json(new { Success = false, Message = "没有这条记录" });
+
                 }
                 else
                 {
@@ -2597,10 +2890,11 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除启动时间失败" + ex.Message });
                 return Json(new { Success = false, Message = ex.Message });
             }
-            
-            
+
+
         }
         #endregion
     }

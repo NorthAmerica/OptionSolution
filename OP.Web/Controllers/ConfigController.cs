@@ -89,25 +89,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddUser(User user)
         {
-            if (user != null)
+            try
             {
-                user.Date = DateTime.Now.ToLocalTime().ToString();
-                user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (UserRepository.Add(user) != null)
+                if (user != null)
                 {
-                    return Json(new
+                    user.Date = DateTime.Now.ToLocalTime().ToString();
+                    user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (UserRepository.Add(user) != null)
                     {
-                        Success = true,
-                        Msg = "用户添加成功。"
-                    });
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增用户成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "用户添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
-
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增用户失败" + ex.Message });
+                return Json(new { Success = false,
+                    Msg = "添加失败，"+ex.Message
+                });
+            }
         }
         /// <summary>
         /// 根据UserID得到User信息
@@ -149,21 +159,33 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateUser(User user)
         {
-            if (user != null)
+            try
             {
-                user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
-                if (UserRepository.Update(user))
+                if (user != null)
                 {
-                    return Json(new
+                    user.UserPassword = EncryptUtils.Base64Encrypt(user.UserPassword);
+                    if (UserRepository.Update(user))
                     {
-                        Success = true
-                    });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "修改用户资料失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除用户
@@ -173,23 +195,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteUser(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                //Guid userid = new Guid(ID);
-                int userid = Convert.ToInt32(ID);
-                User finduser = UserRepository.Find(u => u.UserID == userid);
-                if (UserRepository.Delete(finduser))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    return Json(new
+                    //Guid userid = new Guid(ID);
+                    int userid = Convert.ToInt32(ID);
+                    User finduser = UserRepository.Find(u => u.UserID == userid);
+                    if (UserRepository.Delete(finduser))
                     {
-                        Success = true
-                    });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除用户失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 角色管理
@@ -214,24 +248,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddRole(Role role)
         {
-            if (role != null)
+            try
             {
-                Role addRole = RoleRepository.Add(role);
-                if (addRole != null)
+                if (role != null)
                 {
-                    return Json(new
+                    Role addRole = RoleRepository.Add(role);
+                    if (addRole != null)
                     {
-                        Success = true,
-                        Msg = "角色添加成功。"
-                    });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "角色添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
-
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增角色失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，"+ex.Message
+                });
+            }
         }
         /// <summary>
         /// 获取ROLE详细信息
@@ -270,20 +315,32 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateRole(Role role)
         {
-            if (role != null)
+            try
             {
-                if (RoleRepository.Update(role))
+                if (role != null)
                 {
-                    return Json(new
+                    if (RoleRepository.Update(role))
                     {
-                        Success = true
-                    });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新权限失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除Role
@@ -294,23 +351,35 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteRole(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                //Guid roleid = new Guid(ID);
-                int roleid = Convert.ToInt32(ID);
-                Role findrole = RoleRepository.Find(u => u.RoleID == roleid);
-                if (RoleRepository.Delete(findrole))
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    return Json(new
+                    
+                    int roleid = Convert.ToInt32(ID);
+                    Role findrole = RoleRepository.Find(u => u.RoleID == roleid);
+                    if (RoleRepository.Delete(findrole))
                     {
-                        Success = true
-                    });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除权限失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 菜单维护
@@ -376,24 +445,37 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddMainMenu(Menu menu)
         {
-            if (menu != null)
+            try
             {
-                menu.FMenuID = 0;
-                Menu addMenu = MenuRepository.Add(menu);
-                if (addMenu != null)
+                if (menu != null)
                 {
-                    return Json(new
+                    menu.FMenuID = 0;
+                    Menu addMenu = MenuRepository.Add(menu);
+                    if (addMenu != null)
                     {
-                        Success = true,
-                        Msg = "主菜单添加成功。"
-                    });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "主菜单添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "添加主菜单失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，"+ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 添加子菜单
@@ -404,23 +486,36 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddMenu(Menu menu)
         {
-            if (menu != null)
+            try
             {
-                Menu addMenu = MenuRepository.Add(menu);
-                if (addMenu != null)
+                if (menu != null)
                 {
-                    return Json(new
+                    Menu addMenu = MenuRepository.Add(menu);
+                    if (addMenu != null)
                     {
-                        Success = true,
-                        Msg = "主菜单添加成功。"
-                    });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "主菜单添加成功。"
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false,
-                Msg = "添加失败，请重新提交。"
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "添加子菜单失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
+                });
+            }
+            
         }
         /// <summary>
         /// 获取菜单详细信息
@@ -459,20 +554,32 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateMenu(Menu menu)
         {
-            if (menu != null)
+            try
             {
-                if (MenuRepository.Update(menu))
+                if (menu != null)
                 {
-                    return Json(new
+                    if (MenuRepository.Update(menu))
                     {
-                        Success = true
-                    });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新菜单失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除菜单
@@ -483,28 +590,40 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteMenu(string ID)
         {
-            if (!string.IsNullOrEmpty(ID))
+            try
             {
-                int menuid = Convert.ToInt32(ID);
-                Menu findmenu = MenuRepository.Find(u => u.MenuID == menuid);
-                if (findmenu != null)
+                if (!string.IsNullOrEmpty(ID))
                 {
-                    List<Menu> Ldelete = new List<Menu>();
-                    Ldelete.Add(findmenu);
-                    DeleteChild(Ldelete, menuid);
-                    if (MenuRepository.DeleteRange(Ldelete.AsEnumerable()) != 0)
+                    int menuid = Convert.ToInt32(ID);
+                    Menu findmenu = MenuRepository.Find(u => u.MenuID == menuid);
+                    if (findmenu != null)
                     {
-                        return Json(new
+                        List<Menu> Ldelete = new List<Menu>();
+                        Ldelete.Add(findmenu);
+                        DeleteChild(Ldelete, menuid);
+                        if (MenuRepository.DeleteRange(Ldelete.AsEnumerable()) != 0)
                         {
-                            Success = true
-                        });
+                            return Json(new
+                            {
+                                Success = true
+                            });
+                        }
                     }
                 }
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除菜单失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除子菜单
@@ -530,6 +649,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除子菜单失败" + ex.Message });
                 throw;
             }
         }
@@ -596,33 +716,45 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateUserRole(string RoleID, string UserIDs)
         {
-            if (RoleID != null && UserIDs != null)
+            try
             {
-                string[] userid = UserIDs.Split(',');
-                //Guid groleid = new Guid(RoleID);
-                int intRoleID = Convert.ToInt32(RoleID);
-                foreach (var item in userid)
+                if (RoleID != null && UserIDs != null)
                 {
-                    //Guid gUserID = new Guid(item);
-                    int intUserID = Convert.ToInt32(item);
-                    if (!UserRoleRepository.Exist(ur => ur.RoleID == intRoleID && ur.UserID == intUserID))
+                    string[] userid = UserIDs.Split(',');
+                    //Guid groleid = new Guid(RoleID);
+                    int intRoleID = Convert.ToInt32(RoleID);
+                    foreach (var item in userid)
                     {
-                        UserRole ur = new UserRole();
-                        ur.RoleID = intRoleID;
-                        ur.UserID = intUserID;
-                        UserRoleRepository.Add(ur);
-                    }
+                        //Guid gUserID = new Guid(item);
+                        int intUserID = Convert.ToInt32(item);
+                        if (!UserRoleRepository.Exist(ur => ur.RoleID == intRoleID && ur.UserID == intUserID))
+                        {
+                            UserRole ur = new UserRole();
+                            ur.RoleID = intRoleID;
+                            ur.UserID = intUserID;
+                            UserRoleRepository.Add(ur);
+                        }
 
+                    }
+                    return Json(new
+                    {
+                        Success = true
+                    });
                 }
                 return Json(new
                 {
-                    Success = true
+                    Success = false
                 });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新用户角色失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除用户角色
@@ -632,28 +764,40 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteUserRole(string RoleID, string UserIDs)
         {
-            if (RoleID != null && UserIDs != null)
+            try
             {
-                string[] userid = UserIDs.Split(',');
-                int intRoleID = Convert.ToInt32(RoleID);
-                foreach (var item in userid)
+                if (RoleID != null && UserIDs != null)
                 {
-                    int intUserID = Convert.ToInt32(item);
-                    UserRole ur = UserRoleRepository.Find(u => u.RoleID == intRoleID && u.UserID == intUserID);
-                    if (ur != null)
+                    string[] userid = UserIDs.Split(',');
+                    int intRoleID = Convert.ToInt32(RoleID);
+                    foreach (var item in userid)
                     {
-                        UserRoleRepository.Delete(ur);
+                        int intUserID = Convert.ToInt32(item);
+                        UserRole ur = UserRoleRepository.Find(u => u.RoleID == intRoleID && u.UserID == intUserID);
+                        if (ur != null)
+                        {
+                            UserRoleRepository.Delete(ur);
+                        }
                     }
+                    return Json(new
+                    {
+                        Success = true
+                    });
                 }
                 return Json(new
                 {
-                    Success = true
+                    Success = false
                 });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除用户角色失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         #endregion
         #region 角色菜单维护
@@ -685,7 +829,7 @@ namespace OP.Web.Controllers
             return Json(new { });
         }
         /// <summary>
-        /// 更新添加RoleMenu
+        /// 更新RoleMenu
         /// </summary>
         /// <param name="MenuID"></param>
         /// <param name="RoleIDs"></param>
@@ -694,30 +838,42 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateRoleMenu(string MenuID, string RoleIDs)
         {
-            if (MenuID != null && RoleIDs != null)
+            try
             {
-                string[] roleid = RoleIDs.Split(',');
-                int intMenuID = Convert.ToInt32(MenuID);
-                List<RoleMenu> lrm = new List<RoleMenu>();
-                foreach (var item in roleid)
+                if (MenuID != null && RoleIDs != null)
                 {
-                    int intRoleID = Convert.ToInt32(item);
-                    if (!RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                    string[] roleid = RoleIDs.Split(',');
+                    int intMenuID = Convert.ToInt32(MenuID);
+                    List<RoleMenu> lrm = new List<RoleMenu>();
+                    foreach (var item in roleid)
                     {
-                        RoleMenu rm = new RoleMenu();
-                        rm.RoleID = intRoleID;
-                        rm.MenuID = intMenuID;
-                        lrm.Add(rm);
+                        int intRoleID = Convert.ToInt32(item);
+                        if (!RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                        {
+                            RoleMenu rm = new RoleMenu();
+                            rm.RoleID = intRoleID;
+                            rm.MenuID = intMenuID;
+                            lrm.Add(rm);
+                        }
+                        UpdateChild(lrm, intMenuID, intRoleID);
                     }
-                    UpdateChild(lrm, intMenuID, intRoleID);
+                    RoleMenuRepository.AddRange(lrm);
+                    return Json(new { Success = true });
                 }
-                RoleMenuRepository.AddRange(lrm);
-                return Json(new { Success = true });
+                return Json(new
+                {
+                    Success = false
+                });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新RoleMenu失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 更新添加子菜单
@@ -755,30 +911,42 @@ namespace OP.Web.Controllers
         [CSRFValidateAntiForgeryToken]
         public ActionResult DeleteRoleMenu(string MenuID,string RoleIDs)
         {
-            if (MenuID != null && RoleIDs != null)
+            try
             {
-                string[] roleid = RoleIDs.Split(',');
-                int intMenuID = Convert.ToInt32(MenuID);
-                List<RoleMenu> lrm = new List<RoleMenu>();
-                foreach (var item in roleid)
+                if (MenuID != null && RoleIDs != null)
                 {
-                    int intRoleID = Convert.ToInt32(item);
-                    if (RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                    string[] roleid = RoleIDs.Split(',');
+                    int intMenuID = Convert.ToInt32(MenuID);
+                    List<RoleMenu> lrm = new List<RoleMenu>();
+                    foreach (var item in roleid)
                     {
-                        lrm.Add(RoleMenuRepository.Find(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID));
+                        int intRoleID = Convert.ToInt32(item);
+                        if (RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                        {
+                            lrm.Add(RoleMenuRepository.Find(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID));
+                        }
+                        DeleteChild(lrm, intMenuID, intRoleID);
                     }
-                    DeleteChild(lrm, intMenuID, intRoleID);
+                    RoleMenuRepository.DeleteRange(lrm);
+                    return Json(new
+                    {
+                        Success = true
+                    });
                 }
-                RoleMenuRepository.DeleteRange(lrm);
                 return Json(new
                 {
-                    Success = true
+                    Success = false
                 });
             }
-            return Json(new
+            catch (Exception ex)
             {
-                Success = false
-            });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除RoleMenu失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            
         }
         /// <summary>
         /// 删除子菜单角色

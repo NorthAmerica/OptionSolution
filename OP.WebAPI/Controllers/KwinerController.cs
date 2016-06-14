@@ -28,101 +28,102 @@ namespace OP.WebAPI.Controllers
         public static readonly InterfaceTdaysRepository TdaysRepository = new TdaysRepository();
         public static readonly InterfaceONOFFSetRepository ONOFFSetRepository = new ONOFFSetRepository();
         public static readonly InterfaceONTimeRepository ONTimeRepository = new ONTimeRepository();
+        public static readonly InterfaceEventLogRepository LogRepository = new EventLogRepository();
         //public static readonly InterfaceEventLogRepository LogRepository = new EventLogRepository();
 
         /// <summary>
         /// 得到正在发行的产品
         /// </summary>
         /// <returns></returns>
-        public OPM GetAllProducts()
-        {
-            OPM opm111 = new OPM();
-            List<OptionsProductModel> lopm = new List<OptionsProductModel>();
+        //public OPM GetAllProducts()
+        //{
+        //    OPM opm111 = new OPM();
+        //    List<OptionsProductModel> lopm = new List<OptionsProductModel>();
 
-            IEnumerable<OptionsProduct> iop = OptionsProductRepository.FindAll().Where(p => p.Status == 1);
-            if (iop != null && iop.Count() != 0)
-            {
-                foreach (var item in iop)
-                {
-                    OptionsProductModel opm = new OptionsProductModel();
-                    opm.addDate = Convert.ToDateTime(item.AddDate).ToString("yyyy-MM-dd HH:mm:ss");
-                    opm.beginDate = Convert.ToDateTime(item.BeginDate).ToString("yyyy-MM-dd HH:mm:ss");
-                    opm.charge = item.Charge;
-                    opm.chargeType = item.ChargeType;
-                    opm.deadline = item.Deadline;
-                    opm.endDate = string.Empty;
-                    opm.callPriceType = item.CallPriceType;
-                    //opm.Margin = item.Margin;
-                    //opm.MarginType = item.MarginType;
-                    opm.maxNum = item.MaxNum;
-                    opm.optionsProductID = item.OptionsProductID;
-                    opm.optionType = item.OptionType;
-                    opm.partnerName = item.PartnerName;
-                    opm.price = item.Price;
-                    opm.priceType = item.PriceType;
-                    opm.amountType = item.AmountType;
-                    opm.productName = item.ProductName;
-                    opm.status = item.Status;
-                    opm.unit = item.Unit;
-                    opm.productDesc = item.ProductDesc;
-                    opm.productDtlDesc = item.ProductDtlDesc;
-                    opm.formula = item.Formula;
-                    opm.productUrl = item.ProductUrl;
-                    opm.contract = item.Contract;
-                    opm.contractChs = item.ContractChs;
-                    List<FallRoleModel> lfrm = new List<FallRoleModel>();
-                    List<FallRole> lfr = FallRoleRepository.FindList(f => f.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
-                    if (lfr != null && lfr.Count() != 0)
-                    {
-                        foreach (var fall in lfr)
-                        {
-                            FallRoleModel frm = new FallRoleModel();
-                            frm.compensateNum = fall.CompensateNum;
-                            frm.compensateType = fall.CompensateType;
-                            frm.createDate = Convert.ToDateTime(fall.CreateDate).ToString("yyyy-MM-dd HH:mm:ss");
-                            frm.down = fall.Down;
-                            frm.fallRoleID = fall.FallRoleID;
-                            frm.fallRoleName = fall.FallRoleName;
-                            frm.optionsProductID = fall.OptionsProductID;
-                            frm.partType = fall.PartType;
-                            frm.topCompensateNum = fall.TopCompensateNum;
-                            frm.topCompensateType = fall.TopCompensateType;
-                            frm.up = fall.Up;
-                            frm.upDownType = fall.UpDownType;
-                            lfrm.Add(frm);
-                        }
-                    }
-                    opm.fallRole = lfrm;
-                    List<RiseRoleModel> lrrm = new List<RiseRoleModel>();
-                    List<RiseRole> lrr = RiseRoleRepository.FindList(r => r.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
-                    if (lrr != null && lrr.Count() != 0)
-                    {
-                        foreach (var rise in lrr)
-                        {
-                            RiseRoleModel rrm = new RiseRoleModel();
-                            rrm.createDate = Convert.ToDateTime(rise.CreateDate).ToString("yyyy-MM-dd HH:mm:ss");
-                            rrm.dividendNum = rise.DividendNum;
-                            rrm.dividendType = rise.DividendType;
-                            rrm.down = rise.Down;
-                            rrm.optionsProductID = rise.OptionsProductID;
-                            rrm.partType = rise.PartType;
-                            rrm.riseRoleID = rise.RiseRoleID;
-                            rrm.riseRoleName = rise.RiseRoleName;
-                            rrm.topDividendNum = rise.TopDividendNum;
-                            rrm.topDividendType = rise.TopDividendType;
-                            rrm.up = rise.Up;
-                            rrm.upDownType = rise.UpDownType;
-                            lrrm.Add(rrm);
-                        }
-                    }
-                    opm.riseRole = lrrm;
-                    lopm.Add(opm);
-                }
-                opm111.products = lopm;
-            }
+        //    IEnumerable<OptionsProduct> iop = OptionsProductRepository.FindAll().Where(p => p.Status == 1);
+        //    if (iop != null && iop.Count() != 0)
+        //    {
+        //        foreach (var item in iop)
+        //        {
+        //            OptionsProductModel opm = new OptionsProductModel();
+        //            opm.addDate = Convert.ToDateTime(item.AddDate).ToString("yyyy-MM-dd HH:mm:ss");
+        //            opm.beginDate = Convert.ToDateTime(item.BeginDate).ToString("yyyy-MM-dd HH:mm:ss");
+        //            opm.charge = item.Charge;
+        //            opm.chargeType = item.ChargeType;
+        //            opm.deadline = item.Deadline;
+        //            opm.endDate = string.Empty;
+        //            opm.callPriceType = item.CallPriceType;
+        //            //opm.Margin = item.Margin;
+        //            //opm.MarginType = item.MarginType;
+        //            opm.maxNum = item.MaxNum;
+        //            opm.optionsProductID = item.OptionsProductID;
+        //            opm.optionType = item.OptionType;
+        //            opm.partnerName = item.PartnerName;
+        //            opm.price = item.Price;
+        //            opm.priceType = item.PriceType;
+        //            opm.amountType = item.AmountType;
+        //            opm.productName = item.ProductName;
+        //            opm.status = item.Status;
+        //            opm.unit = item.Unit;
+        //            opm.productDesc = item.ProductDesc;
+        //            opm.productDtlDesc = item.ProductDtlDesc;
+        //            opm.formula = item.Formula;
+        //            opm.productUrl = item.ProductUrl;
+        //            opm.contract = item.Contract;
+        //            opm.contractChs = item.ContractChs;
+        //            List<FallRoleModel> lfrm = new List<FallRoleModel>();
+        //            List<FallRole> lfr = FallRoleRepository.FindList(f => f.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
+        //            if (lfr != null && lfr.Count() != 0)
+        //            {
+        //                foreach (var fall in lfr)
+        //                {
+        //                    FallRoleModel frm = new FallRoleModel();
+        //                    frm.compensateNum = fall.CompensateNum;
+        //                    frm.compensateType = fall.CompensateType;
+        //                    frm.createDate = Convert.ToDateTime(fall.CreateDate).ToString("yyyy-MM-dd HH:mm:ss");
+        //                    frm.down = fall.Down;
+        //                    frm.fallRoleID = fall.FallRoleID;
+        //                    frm.fallRoleName = fall.FallRoleName;
+        //                    frm.optionsProductID = fall.OptionsProductID;
+        //                    frm.partType = fall.PartType;
+        //                    frm.topCompensateNum = fall.TopCompensateNum;
+        //                    frm.topCompensateType = fall.TopCompensateType;
+        //                    frm.up = fall.Up;
+        //                    frm.upDownType = fall.UpDownType;
+        //                    lfrm.Add(frm);
+        //                }
+        //            }
+        //            opm.fallRole = lfrm;
+        //            List<RiseRoleModel> lrrm = new List<RiseRoleModel>();
+        //            List<RiseRole> lrr = RiseRoleRepository.FindList(r => r.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
+        //            if (lrr != null && lrr.Count() != 0)
+        //            {
+        //                foreach (var rise in lrr)
+        //                {
+        //                    RiseRoleModel rrm = new RiseRoleModel();
+        //                    rrm.createDate = Convert.ToDateTime(rise.CreateDate).ToString("yyyy-MM-dd HH:mm:ss");
+        //                    rrm.dividendNum = rise.DividendNum;
+        //                    rrm.dividendType = rise.DividendType;
+        //                    rrm.down = rise.Down;
+        //                    rrm.optionsProductID = rise.OptionsProductID;
+        //                    rrm.partType = rise.PartType;
+        //                    rrm.riseRoleID = rise.RiseRoleID;
+        //                    rrm.riseRoleName = rise.RiseRoleName;
+        //                    rrm.topDividendNum = rise.TopDividendNum;
+        //                    rrm.topDividendType = rise.TopDividendType;
+        //                    rrm.up = rise.Up;
+        //                    rrm.upDownType = rise.UpDownType;
+        //                    lrrm.Add(rrm);
+        //                }
+        //            }
+        //            opm.riseRole = lrrm;
+        //            lopm.Add(opm);
+        //        }
+        //        opm111.products = lopm;
+        //    }
 
-            return opm111;
-        }
+        //    return opm111;
+        //}
         //private static object o = new object();
         /// <summary>
         /// 第三方取得期货价格
@@ -173,6 +174,7 @@ namespace OP.WebAPI.Controllers
             {
                 string str = DESEncrypt.DesEncrypt("{\"result\":\"0\",\"message\":\"" + ex.Message + "\"}");
                 HttpResponseMessage result = new HttpResponseMessage { Content = new StringContent(str, Encoding.GetEncoding("UTF-8"), "application/json") };
+                LogRepository.Add(new EventLog() { Name = "第三方", Date = DateTime.Now.ToLocalTime(), Event = "取得期货价格失败" + ex.Message });
                 return result;
             }
 
@@ -246,6 +248,7 @@ namespace OP.WebAPI.Controllers
             {
                 string str = DESEncrypt.DesEncrypt("{\"result\":\"0\",\"message\":\"" + ex.Message + "\"}");
                 HttpResponseMessage result = new HttpResponseMessage { Content = new StringContent(str, Encoding.GetEncoding("UTF-8"), "application/json") };
+                LogRepository.Add(new EventLog() { Name = "第三方", Date = DateTime.Now.ToLocalTime(), Event = "获取全局是否可购买设置失败" + ex.Message });
                 return result;
             }
         }
@@ -359,6 +362,7 @@ namespace OP.WebAPI.Controllers
             {
                 string str = DESEncrypt.DesEncrypt("{\"result\":\"0\",\"message\":\"" + ex.Message + "\"}");
                 HttpResponseMessage result = new HttpResponseMessage { Content = new StringContent(str, Encoding.GetEncoding("UTF-8"), "application/json") };
+                LogRepository.Add(new EventLog() { Name = "第三方", Date = DateTime.Now.ToLocalTime(), Event = "获取到期日期失败" + ex.Message });
                 return result;
             }
         }

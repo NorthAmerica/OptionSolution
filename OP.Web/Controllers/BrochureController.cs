@@ -18,10 +18,12 @@ namespace OP.Web.Controllers
     {
         private InterfaceBrochureRepository BrochureRepository;
         private InterfaceOptionsProductRepository OptionsProductRepository;
-        public BrochureController(InterfaceBrochureRepository br, InterfaceOptionsProductRepository opr )
+        private InterfaceEventLogRepository LogRepository;
+        public BrochureController(InterfaceBrochureRepository br, InterfaceOptionsProductRepository opr,InterfaceEventLogRepository elr )
         {
             BrochureRepository = br;
             OptionsProductRepository = opr;
+            LogRepository = elr;
         }
         // GET: Brochure
         public ActionResult Index()
@@ -91,6 +93,7 @@ namespace OP.Web.Controllers
                     model.IsTemp = true;
                     if (BrochureRepository.Add(model) != null)
                     {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增宣传册模板事件成功" });
                         return Json(new
                         {
                             Success = true
@@ -102,8 +105,9 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增宣传册模板事件失败"+ex.Message });
                 return Json(new
                 {
                     Success = false
@@ -128,6 +132,7 @@ namespace OP.Web.Controllers
                     model.TempDate = DateTime.Now.ToLocalTime();
                     if (BrochureRepository.Update(model))
                     {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "修改宣传册模板事件成功" });
                         return Json(new
                         {
                             Success = true
@@ -140,8 +145,9 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "修改宣传册模板事件失败"+ex.Message });
                 return Json(new
                 {
                     Success = false
@@ -168,6 +174,7 @@ namespace OP.Web.Controllers
                     {
                         if (BrochureRepository.Delete(find))
                         {
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除宣传册模板事件成功" });
                             return Json(new
                             {
                                 Success = true
@@ -180,8 +187,9 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除宣传册模板事件失败" + ex.Message });
                 return Json(new
                 {
                     Success = false
@@ -221,6 +229,7 @@ namespace OP.Web.Controllers
                         OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == opid);
                         findop.ProductUrl = BrochureURL;
                         OptionsProductRepository.Update(findop);
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "选择宣传册模板作为正式宣传册成功" });
                         return Json(new
                         {
                             Success = true
@@ -232,8 +241,9 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "选择宣传册模板作为正式宣传册失败" + ex.Message });
                 return Json(new
                 {
                     Success = false
@@ -288,6 +298,7 @@ namespace OP.Web.Controllers
                     find.IsTemp = false;
                     if (BrochureRepository.Update(find))
                     {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新正式宣传册事件成功" });
                         return Json(new
                         {
                             Success = true
@@ -299,8 +310,9 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "更新正式宣传册事件失败" + ex.Message });
                 return Json(new
                 {
                     Success = false
@@ -336,6 +348,7 @@ namespace OP.Web.Controllers
                     find.IsTemp = false;
                     if (BrochureRepository.Update(find))
                     {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传盈亏结构图和示例图成功" });
                         return Json(new
                         {
                             statusCode = 200,
@@ -353,6 +366,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传盈亏结构图和示例图失败" + ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
