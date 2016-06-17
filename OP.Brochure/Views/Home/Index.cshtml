@@ -68,9 +68,12 @@
         <p><font>结算公式：</p>
         <p></font>@Html.Raw(Model.SettlementFormula)</p>
         <div class="explain">
-            <div style="margin-left:250px; border:15px solid #5c0d01; width:630px;">
-                <img src="/Home/ShowSFPic/@Model.BrochureID" width="630" height="327" />
-            </div>
+                @if (!string.IsNullOrEmpty(@Model.SFPic))
+                {
+                    <div style="margin-left:250px; border:15px solid #5c0d01; width:630px;">
+                        <img src="/Home/ShowSFPic/@Model.BrochureID" width="630" height="327" />
+                    </div>
+                }
             <!--日期说明-->
             <div class="date"><img src="~/images/solid.jpg" /></div>
             <div class="buy">
@@ -82,13 +85,15 @@
                 <p></font>@Html.Raw(Model.TradeDateDescrip)</p>
             </div>
             <!--示例图-->
+            @if (!string.IsNullOrEmpty(@Model.ExamplePic))
+            { 
             <div class="buy-c"><img src="~/images/solid.jpg" /></div>
             <div class="explain">
                 <div style="margin-left:250px; border:15px solid #5c0d01; width:630px;">
                     <img src="/Home/ShowExamplePic/@Model.BrochureID" width="630" height="327" />
                 </div>
             </div>
-
+            }
             <div class="curson">
                 <p><a href="@Model.RiskAnnouncementURL">《价格补偿服务风险揭示书》</a></p>
                 <p><a href="@Model.PurchaseAgreementURL">《价格补偿服务购买协议》</a></p>

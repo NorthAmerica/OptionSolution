@@ -77,7 +77,7 @@ namespace OP.Brochure.Controllers
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
             
         }
@@ -99,7 +99,7 @@ namespace OP.Brochure.Controllers
             }
             catch (Exception)
             {
-                throw;
+                return null;
             }
         }
         /// <summary>
@@ -126,7 +126,7 @@ namespace OP.Brochure.Controllers
                     bvm.Deadline = findop.Deadline;
                     bvm.EndDateDescrip = findbr.EndDateDescrip;
                     bvm.ExampleDescrip = findbr.ExampleDescrip;
-                    //bvm.ExamplePic = findbr.ExamplePic;
+                    bvm.ExamplePic = findbr.ExamplePic?.ToString();
                     bvm.FAQ = findbr.FAQ;
                     bvm.OptionsProductID = OPID;
                     bvm.PayDescrip = findbr.PayDescrip;
@@ -136,7 +136,7 @@ namespace OP.Brochure.Controllers
                     bvm.PurchaseAgreementURL = findbr.PurchaseAgreementURL;
                     bvm.RiskAnnouncementURL = findbr.RiskAnnouncementURL;
                     bvm.SettlementFormula = findbr.SettlementFormula;
-                    //bvm.SFPic = findbr.SFPic;
+                    bvm.SFPic = findbr.SFPic?.ToString();
                     bvm.StartDateDescrip = findbr.StartDateDescrip;
                     bvm.TradeDateDescrip = findbr.TradeDateDescrip;
                     return View(bvm);
