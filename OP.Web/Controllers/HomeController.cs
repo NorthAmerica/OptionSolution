@@ -867,6 +867,7 @@ namespace OP.Web.Controllers
                         op.AmountType = item[17].ToString();
                         op.MaxNum = string.IsNullOrEmpty(item[18].ToString()) ? 0 : Convert.ToInt32(item[18].ToString());
                         op.CallPriceType = item[19].ToString();
+                        op.ClosingPriceDesc = item[20].ToString();
                         op.Status = 0;
                         op.IsUpLoad = false;
                         op.AddDate = DateTime.Now.ToLocalTime();
@@ -1059,94 +1060,94 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="ID"></param>
         /// <returns></returns>
-        public ActionResult CopyOptionsProduct(string ID)
-        {
-            if (!string.IsNullOrEmpty(ID))
-            {
-                OptionsProduct NewProduct = new OptionsProduct();
-                //int id = Convert.ToInt32(ID);
-                Guid gid = new Guid(ID);
-                OptionsProduct old = OptionsProductRepository.Find(p => p.OptionsProductID == gid);
-                if (old != null)
-                {
-                    NewProduct.AddDate = DateTime.Now.ToLocalTime();
-                    //NewProduct.BeginDate = old.BeginDate;
-                    NewProduct.Charge = old.Charge;
-                    NewProduct.ChargeType = old.ChargeType;
-                    NewProduct.Deadline = old.Deadline;
-                    NewProduct.EndDate = old.EndDate;
-                    //NewProduct.Margin = old.Margin;
-                    //NewProduct.MarginType = old.MarginType;
-                    NewProduct.MaxNum = old.MaxNum;
-                    NewProduct.OptionType = old.OptionType;
-                    NewProduct.CallPriceType = old.CallPriceType;
-                    NewProduct.PartnerName = old.PartnerName;
-                    NewProduct.Price = old.Price;
-                    NewProduct.PriceType = old.PriceType;
-                    NewProduct.AmountType = old.AmountType;
-                    NewProduct.ProductName = old.ProductName;
-                    NewProduct.Status = 0;
-                    NewProduct.Unit = old.Unit;
-                    NewProduct.ProductDesc = old.ProductDesc;
-                    NewProduct.ProductDtlDesc = old.ProductDtlDesc;
-                    NewProduct.Formula = old.Formula;
-                    NewProduct.ProductUrl = old.ProductUrl;
-                    NewProduct.Contract = old.Contract;
-                    NewProduct.ContractChs = old.ContractChs;
-                    Guid newid = OptionsProductRepository.Add(NewProduct).OptionsProductID;
-                    List<FallRole> lfr = FallRoleRepository.FindList(f => f.OptionsProductID == old.OptionsProductID, string.Empty, false).ToList();
-                    if (lfr != null && lfr.Count() != 0)
-                    {
-                        foreach (var fall in lfr)
-                        {
-                            FallRole NewFall = new FallRole();
-                            NewFall.CompensateNum = fall.CompensateNum;
-                            NewFall.CompensateType = fall.CompensateType;
-                            NewFall.CreateDate = DateTime.Now.ToString();
-                            NewFall.Down = fall.Down;
-                            NewFall.FallRoleName = fall.FallRoleName;
-                            NewFall.OptionsProductID = newid;
-                            NewFall.PartType = fall.PartType;
-                            NewFall.TopCompensateNum = fall.TopCompensateNum;
-                            NewFall.TopCompensateType = fall.TopCompensateType;
-                            NewFall.Up = fall.Up;
-                            NewFall.UpDownType = fall.UpDownType;
-                            FallRoleRepository.Add(NewFall);
-                        }
-                    }
-                    List<RiseRole> lrr = RiseRoleRepository.FindList(r => r.OptionsProductID == old.OptionsProductID, string.Empty, false).ToList();
-                    if (lrr != null && lrr.Count() != 0)
-                    {
-                        foreach (var rise in lrr)
-                        {
-                            RiseRole NewRise = new RiseRole();
-                            NewRise.CreateDate = DateTime.Now.ToString();
-                            NewRise.DividendNum = rise.DividendNum;
-                            NewRise.DividendType = rise.DividendType;
-                            NewRise.Down = rise.Down;
-                            NewRise.OptionsProductID = newid;
-                            NewRise.PartType = rise.PartType;
-                            NewRise.RiseRoleName = rise.RiseRoleName;
-                            NewRise.TopDividendNum = rise.TopDividendNum;
-                            NewRise.TopDividendType = rise.TopDividendType;
-                            NewRise.Up = rise.Up;
-                            NewRise.UpDownType = rise.UpDownType;
-                            RiseRoleRepository.Add(NewRise);
-                        }
-                    }
-                    LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "拷贝期权产品成功" });
-                    return Json(new
-                    {
-                        Success = true
-                    });
-                }
+        //public ActionResult CopyOptionsProduct(string ID)
+        //{
+        //    if (!string.IsNullOrEmpty(ID))
+        //    {
+        //        OptionsProduct NewProduct = new OptionsProduct();
+        //        //int id = Convert.ToInt32(ID);
+        //        Guid gid = new Guid(ID);
+        //        OptionsProduct old = OptionsProductRepository.Find(p => p.OptionsProductID == gid);
+        //        if (old != null)
+        //        {
+        //            NewProduct.AddDate = DateTime.Now.ToLocalTime();
+        //            //NewProduct.BeginDate = old.BeginDate;
+        //            NewProduct.Charge = old.Charge;
+        //            NewProduct.ChargeType = old.ChargeType;
+        //            NewProduct.Deadline = old.Deadline;
+        //            NewProduct.EndDate = old.EndDate;
+        //            //NewProduct.Margin = old.Margin;
+        //            //NewProduct.MarginType = old.MarginType;
+        //            NewProduct.MaxNum = old.MaxNum;
+        //            NewProduct.OptionType = old.OptionType;
+        //            NewProduct.CallPriceType = old.CallPriceType;
+        //            NewProduct.PartnerName = old.PartnerName;
+        //            NewProduct.Price = old.Price;
+        //            NewProduct.PriceType = old.PriceType;
+        //            NewProduct.AmountType = old.AmountType;
+        //            NewProduct.ProductName = old.ProductName;
+        //            NewProduct.Status = 0;
+        //            NewProduct.Unit = old.Unit;
+        //            NewProduct.ProductDesc = old.ProductDesc;
+        //            NewProduct.ProductDtlDesc = old.ProductDtlDesc;
+        //            NewProduct.Formula = old.Formula;
+        //            NewProduct.ProductUrl = old.ProductUrl;
+        //            NewProduct.Contract = old.Contract;
+        //            NewProduct.ContractChs = old.ContractChs;
+        //            Guid newid = OptionsProductRepository.Add(NewProduct).OptionsProductID;
+        //            List<FallRole> lfr = FallRoleRepository.FindList(f => f.OptionsProductID == old.OptionsProductID, string.Empty, false).ToList();
+        //            if (lfr != null && lfr.Count() != 0)
+        //            {
+        //                foreach (var fall in lfr)
+        //                {
+        //                    FallRole NewFall = new FallRole();
+        //                    NewFall.CompensateNum = fall.CompensateNum;
+        //                    NewFall.CompensateType = fall.CompensateType;
+        //                    NewFall.CreateDate = DateTime.Now.ToString();
+        //                    NewFall.Down = fall.Down;
+        //                    NewFall.FallRoleName = fall.FallRoleName;
+        //                    NewFall.OptionsProductID = newid;
+        //                    NewFall.PartType = fall.PartType;
+        //                    NewFall.TopCompensateNum = fall.TopCompensateNum;
+        //                    NewFall.TopCompensateType = fall.TopCompensateType;
+        //                    NewFall.Up = fall.Up;
+        //                    NewFall.UpDownType = fall.UpDownType;
+        //                    FallRoleRepository.Add(NewFall);
+        //                }
+        //            }
+        //            List<RiseRole> lrr = RiseRoleRepository.FindList(r => r.OptionsProductID == old.OptionsProductID, string.Empty, false).ToList();
+        //            if (lrr != null && lrr.Count() != 0)
+        //            {
+        //                foreach (var rise in lrr)
+        //                {
+        //                    RiseRole NewRise = new RiseRole();
+        //                    NewRise.CreateDate = DateTime.Now.ToString();
+        //                    NewRise.DividendNum = rise.DividendNum;
+        //                    NewRise.DividendType = rise.DividendType;
+        //                    NewRise.Down = rise.Down;
+        //                    NewRise.OptionsProductID = newid;
+        //                    NewRise.PartType = rise.PartType;
+        //                    NewRise.RiseRoleName = rise.RiseRoleName;
+        //                    NewRise.TopDividendNum = rise.TopDividendNum;
+        //                    NewRise.TopDividendType = rise.TopDividendType;
+        //                    NewRise.Up = rise.Up;
+        //                    NewRise.UpDownType = rise.UpDownType;
+        //                    RiseRoleRepository.Add(NewRise);
+        //                }
+        //            }
+        //            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "拷贝期权产品成功" });
+        //            return Json(new
+        //            {
+        //                Success = true
+        //            });
+        //        }
 
-            }
-            return Json(new
-            {
-                Success = false
-            });
-        }
+        //    }
+        //    return Json(new
+        //    {
+        //        Success = false
+        //    });
+        //}
         /// <summary>
         /// 上传产品到第三方系统
         /// </summary>
@@ -1279,6 +1280,7 @@ namespace OP.Web.Controllers
                     opm.callPriceType = item.CallPriceType;
                     opm.contract = item.Contract;
                     opm.contractChs = item.ContractChs;
+                    opm.closingPriceDesc = item.ClosingPriceDesc;
                     //opm.Margin = item.Margin;
                     //opm.MarginType = item.MarginType;
                     opm.maxNum = item.MaxNum;

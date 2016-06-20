@@ -32,5 +32,9 @@ namespace OP.Entities
         public decimal TradePrice { get; set; }
         [DisplayName("是否通过查询WIND数据后成交入库")]
         public bool IsWindInsert { get; set; }
+        [DisplayName("成交回报发送到第三方是否成功")]
+        public bool IsReturnOK { get; set; }
+        [DisplayName("创建时间")]
+        public DateTime? CreateDate { get; set; }
     }
 }

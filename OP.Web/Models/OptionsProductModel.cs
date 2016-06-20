@@ -24,6 +24,7 @@ namespace OP.Web.Models
         public string productName { get; set; }
         public string productDesc { get; set; }
         public string productDtlDesc { get; set; }
+        public string closingPriceDesc { get; set; }
         public string formula { get; set; }
         public string productUrl { get; set; }
         public string contract { get; set; }

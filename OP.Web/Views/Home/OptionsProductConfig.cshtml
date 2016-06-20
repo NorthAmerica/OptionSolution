@@ -679,6 +679,7 @@
                 ProductDtlDesc: $("#ProductDtlDesc").val(),
                 Formula: $("#Formula").val(),
                 ProductUrl: $("#ProductUrl").val(),
+                ClosingPriceDesc: $("#ClosingPriceDesc").val(),
                 Status: CBStatus
             };
 
@@ -1137,6 +1138,10 @@
                 <tr>
                     <td><label for="ProductDtlDesc">产品详细描述（显示在保单详情，用/n分行）：</label></td>
                     <td><input class="easyui-textbox" type="text" id="ProductDtlDesc" name="ProductDtlDesc" data-options="multiline:true" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="ClosingPriceDesc">收盘价描述：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="ClosingPriceDesc" name="ClosingPriceDesc" data-options="" style="width:350px;height:30px" /></td>
                 </tr>
                 <tr>
                     <td><label for="Formula">收益计算公式：</label></td>

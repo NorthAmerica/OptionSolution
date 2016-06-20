@@ -20,10 +20,12 @@ namespace OP.Entities
         public string ProductName { get; set; }
         [DisplayName("产品特征")]
         public string ProductDescription { get; set; }
-        [DisplayName("产品描述（显示在提交订单中）")]
+        [DisplayName("产品描述（显示在提交订单中一段产品简单描述）")]
         public string ProductDesc { get; set; }
         [DisplayName("产品详细描述（显示在保单详情，分行）")]
         public string ProductDtlDesc { get; set; }
+        [DisplayName("收盘价描述（显示在第三方收盘价行情走势图下面）")]
+        public string ClosingPriceDesc { get; set; }
         [DisplayName("（基准价-结算价）* 50% * 购买量,收益计算公式")]
         public string Formula { get; set; }
         [DisplayName("产品说明链接")]
