@@ -206,12 +206,12 @@ namespace OP.WebAPI.Controllers
         {
             try
             {
-                return await Task.Run(() =>
+                return await Task.Run(async () =>
                 {
                     //status=0 停用 不能购买
                     //status=1 启用 可以购买
                     int status = 0;
-                    ONOFFSet set = ONOFFSetRepository.FindAll().First();
+                    ONOFFSet set = await ONOFFSetRepository.FindFistAsync();
                     if (set.ONOFFMode == 0)
                     {
                         if (set.HandSwitch)
@@ -225,7 +225,7 @@ namespace OP.WebAPI.Controllers
                     }
                     else
                     {
-                        List<ONTime> lontime = ONTimeRepository.FindAll().ToList();
+                        List<ONTime> lontime = await ONTimeRepository.FindAllAsync();
                         foreach (var ontime in lontime)
                         {
                             DateTime BeginTime = Convert.ToDateTime(ontime.BeginTime.ToShortTimeString());

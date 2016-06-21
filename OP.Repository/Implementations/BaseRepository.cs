@@ -133,7 +133,18 @@ namespace OP.Repository.Implementations
                 return _entity;
             }
         }
-
+        /// <summary>
+        /// 异步查询第一个数据
+        /// </summary>
+        /// <returns></returns>
+        public async Task<T> FindFistAsync()
+        {
+            using (EFDbContext nContext = new EFDbContext())
+            {
+                T _entity = await nContext.Set<T>().FirstOrDefaultAsync();
+                return _entity;
+            }
+        }
         public IQueryable<T> FindAllIQueryable()
         {
             using (EFDbContext nContext = new EFDbContext())
@@ -148,6 +159,15 @@ namespace OP.Repository.Implementations
             {
                 var _list = nContext.Set<T>().AsEnumerable();
                 return _list.ToList<T>();
+            }
+        }
+
+        public async Task<List<T>> FindAllAsync()
+        {
+            using (EFDbContext nContext = new EFDbContext())
+            {
+                var _list = await nContext.Set<T>().ToListAsync<T>();
+                return _list;
             }
         }
 

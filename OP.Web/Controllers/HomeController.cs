@@ -1040,6 +1040,7 @@ namespace OP.Web.Controllers
                         PriceType = op.PriceType,
                         ProductDesc = op.ProductDesc,
                         ProductDtlDesc = op.ProductDtlDesc,
+                        ClosingPriceDesc = op.ClosingPriceDesc,
                         ProductName = op.ProductName,
                         ProductUrl = op.ProductUrl,
                         Status = op.Status,
@@ -1526,6 +1527,7 @@ namespace OP.Web.Controllers
                     {
                         OptionsProduct op = OptionsProductRepository.Find(o => o.OptionsProductID == gid);
                         op.Status = 2;
+                        op.IsUpLoad = false;
                         op.EndDate = DateTime.Now.ToLocalTime();
                         if (OptionsProductRepository.Update(op))
                         {

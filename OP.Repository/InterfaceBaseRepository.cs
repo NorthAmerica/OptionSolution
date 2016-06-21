@@ -65,17 +65,22 @@ namespace OP.Repository
         /// <returns></returns>
         T FindNoTracking(Expression<Func<T, bool>> whereLambda);
         /// <summary>
-        /// 查询数据
+        /// 按条件查询数据
         /// </summary>
         /// <param name="whereLambda">查询表达式</param>
         /// <returns>实体</returns>
         T Find(Expression<Func<T, bool>> whereLambda);
         /// <summary>
-        /// 异步查询<不一定是最新数据>
+        /// 按条件异步查询<不一定是最新数据>
         /// </summary>
         /// <param name="whereLambda"></param>
         /// <returns></returns>
         Task<T> FindAsync(Expression<Func<T, bool>> whereLambda);
+        /// <summary>
+        /// 异步查询第一条数据
+        /// </summary>
+        /// <returns></returns>
+        Task<T> FindFistAsync();
         /// <summary>
         /// 查找数据列表
         /// </summary>
@@ -90,7 +95,11 @@ namespace OP.Repository
         /// </summary>
         /// <returns></returns>
         IEnumerable<T> FindAll();
-
+        /// <summary>
+        /// 异步查询所有数据
+        /// </summary>
+        /// <returns></returns>
+        Task<List<T>> FindAllAsync();
         /// <summary>
         /// 查找分页数据列表
         /// </summary>

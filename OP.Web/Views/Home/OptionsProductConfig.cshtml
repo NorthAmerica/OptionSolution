@@ -48,7 +48,19 @@
                 { field: 'Deadline', title: '产品期限(天)', width: 300, sortable: true },
                 //{ field: 'Unit', title: '产品单位', width: 300, sortable: true },
                 { field: 'Charge', title: '产品手续费', width: 300, sortable: true },
-                { field: 'ChargeType', title: '手续费类型', width: 300, sortable: true },
+                {
+                    field: 'ChargeType', title: '手续费类型', width: 300, sortable: true,
+                    styler: function (value, row, index) {
+                        if (value == '单位值') {
+                            return 'color:green;';
+                        }
+                        else if (value == '固定值') {
+                            return 'color:red;';
+                        } else {
+                            return 'background-color:#ffee00;color:red;';
+                        }
+                    }
+                },
                 { field: 'Price', title: '产品费用', width: 300, sortable: true },
                 {
                     field: 'AmountType', title: '金额类型', width: 300, sortable: true,
@@ -606,6 +618,7 @@
                 $("#SPrice").val(data.Price),
                 $("#SPriceType").val(data.PriceType),
                 $("#SCallPriceType").val(data.CallPriceType),
+                $("#SClosingPriceDesc").val(data.ClosingPriceDesc),
                 //Margin: $("#Margin").numberbox('getValue'),
                 $("#SAmountType").val(data.AmountType),
                 $("#SMaxNum").val(data.MaxNum),
@@ -1326,6 +1339,10 @@
                 <tr>
                     <td><label for="SProductDtlDesc">产品详细描述（显示在保单详情，分行）：</label></td>
                     <td><input class="easyui-textbox" type="text" id="SProductDtlDesc" name="ProductDtlDesc" data-options="multiline:true" readonly="readonly" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SClosingPriceDesc">收盘价描述：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SClosingPriceDesc" name="ClosingPriceDesc" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
                 </tr>
                 <tr>
                     <td><label for="SFormula">收益计算公式：</label></td>
