@@ -80,7 +80,7 @@ namespace OP.Repository
         /// 异步查询第一条数据
         /// </summary>
         /// <returns></returns>
-        Task<T> FindFistAsync();
+        Task<T> FindFirstAsync();
         /// <summary>
         /// 查找数据列表
         /// </summary>

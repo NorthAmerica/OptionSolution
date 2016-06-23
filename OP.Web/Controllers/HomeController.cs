@@ -40,6 +40,7 @@ namespace OP.Web.Controllers
         private InterfaceUserRoleRepository UserRoleRepository;
         private InterfaceFuturesTradeVolumeRepository FuturesTradeVolumeRepository;
         private InterfaceFuturesFundRepository FuturesFundRepository;
+        private InterfaceFuturePriceRepository FuturePriceRepository;
         private InterfaceOptionTradeRepository OptionTradeRepository;
         //private InterfaceOptionTradeSumRepository OptionTradeSumRepository;
         private InterfaceFundStatusRepository FundStatusRepository;
@@ -62,6 +63,7 @@ namespace OP.Web.Controllers
             InterfaceUserRoleRepository userrolerep,
             InterfaceFuturesTradeVolumeRepository ftvrep,
             InterfaceFuturesFundRepository fundrep,
+            InterfaceFuturePriceRepository pricerep,
             InterfaceOptionTradeRepository traderep,
             InterfaceOptionTradeSumRepository tradesumrep,
             InterfaceFundStatusRepository fundstatusrep,
@@ -84,6 +86,7 @@ namespace OP.Web.Controllers
             UserRoleRepository = userrolerep;
             FuturesTradeVolumeRepository = ftvrep;
             FuturesFundRepository = fundrep;
+            FuturePriceRepository = pricerep;
             OptionTradeRepository = traderep;
             //OptionTradeSumRepository = tradesumrep;
             FundStatusRepository = fundstatusrep;
@@ -2286,6 +2289,42 @@ namespace OP.Web.Controllers
                     status = "文件上传发生异常," + ex.Message
                 });
             }
+        }
+        #endregion
+        #region 期货行情数据
+        public ActionResult FuturePriceList()
+        {
+            return View();
+        }
+        public ActionResult FuturesPriceGrid_Read(int? page, int? rows,string TradeCode,string StartDate,string EndDate)
+        {
+            int ppage = Convert.ToInt32(page == null ? 1 : page);
+            int prows = Convert.ToInt32(rows == null ? 1 : rows);
+            IEnumerable<FuturePrice> ifp = FuturePriceRepository.FindAll();
+            if (!string.IsNullOrEmpty(TradeCode))
+            {
+                ifp = ifp.Where(f => f.TradeCode.Contains(TradeCode.ToUpper()));
+            }
+            if (!string.IsNullOrEmpty(StartDate))
+            {
+                ifp = ifp.Where(f => f.Date>=Convert.ToDateTime(StartDate));
+            }
+            if (!string.IsNullOrEmpty(EndDate))
+            {
+                ifp = ifp.Where(f => f.Date<=Convert.ToDateTime(EndDate));
+            }
+            var rifp = ifp.OrderByDescending(f => f.Date).Select(f => new {
+                Date = f.Date.ToString("yyyy-MM-dd"),
+                f.FuturePriceID,
+                f.Price,
+                f.TradeCode,
+                f.Type
+            }).ToList();
+            return Json(new
+            {
+                total = rifp.Count(),
+                rows = rifp.Skip((ppage - 1) * prows).Take(prows)
+            });
         }
         #endregion
         #region 期权成交明细

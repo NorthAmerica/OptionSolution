@@ -21,6 +21,6 @@ namespace OP.Entities
         [DisplayName("合约名称")]
         public string TradeCode { get; set; }
         [DisplayName("时间")]
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

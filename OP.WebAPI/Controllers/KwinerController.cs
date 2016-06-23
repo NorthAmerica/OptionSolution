@@ -145,12 +145,12 @@ namespace OP.WebAPI.Controllers
                         List<DateTime> alldays = GetAllDays(Convert.ToDateTime(json.StartDate), Convert.ToDateTime(json.EndDate));
                         foreach (DateTime day in alldays)
                         {
-                            string sday = day.ToString("yyyy-MM-dd");
+                            //string sday = day.ToString("yyyy-MM-dd");
 
-                            FuturePrice price = await FuturePriceRepository.FindAsync(p => p.TradeCode == json.Contract && p.Date == sday);
+                            FuturePrice price = await FuturePriceRepository.FindAsync(p => p.TradeCode == json.Contract && p.Date == day);
                             if (price != null)
                             {
-                                LFP.Add(new RFuturePrice { date = sday, price = price.Price });
+                                LFP.Add(new RFuturePrice { date = day.ToString("yyyy-MM-dd"), price = price.Price });
                             }
                         }
                         RFPM.datas = LFP;
@@ -211,7 +211,7 @@ namespace OP.WebAPI.Controllers
                     //status=0 停用 不能购买
                     //status=1 启用 可以购买
                     int status = 0;
-                    ONOFFSet set = await ONOFFSetRepository.FindFistAsync();
+                    ONOFFSet set = await ONOFFSetRepository.FindFirstAsync();
                     if (set.ONOFFMode == 0)
                     {
                         if (set.HandSwitch)

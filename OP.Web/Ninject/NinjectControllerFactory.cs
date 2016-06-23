@@ -33,6 +33,7 @@ namespace OP.Web.Ninject
             ninjectKernel.Bind<InterfaceUserRoleRepository>().To<UserRoleRepository>();
             ninjectKernel.Bind<InterfaceFuturesFundRepository>().To<FuturesFundRepository>();
             ninjectKernel.Bind<InterfaceFuturesTradeVolumeRepository>().To<FuturesTradeVolumeRepository>();
+            ninjectKernel.Bind<InterfaceFuturePriceRepository>().To<FuturePriceRepository>();
             ninjectKernel.Bind<InterfaceFallRoleRepository>().To<FallRoleRepository>();
             ninjectKernel.Bind<InterfaceOptionsProductRepository>().To<OptionsProductRepository>();
             ninjectKernel.Bind<InterfacePartnerRepository>().To<PartnerRepository>();

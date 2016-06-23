@@ -137,7 +137,7 @@ namespace OP.Repository.Implementations
         /// 异步查询第一个数据
         /// </summary>
         /// <returns></returns>
-        public async Task<T> FindFistAsync()
+        public async Task<T> FindFirstAsync()
         {
             using (EFDbContext nContext = new EFDbContext())
             {
