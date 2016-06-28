@@ -204,6 +204,13 @@ namespace OP.Web.Controllers
                     User finduser = UserRepository.Find(u => u.UserID == userid);
                     if (UserRepository.Delete(finduser))
                     {
+                        //查询关联表 用户角色表
+                        IEnumerable<UserRole> IUR = UserRoleRepository.FindList(u => u.UserID == userid, string.Empty, false);
+                        if (IUR!=null&&IUR.Count()!=0)
+                        {
+                            //删除关联项
+                            UserRoleRepository.DeleteRange(IUR);
+                        }
                         return Json(new
                         {
                             Success = true
@@ -360,6 +367,20 @@ namespace OP.Web.Controllers
                     Role findrole = RoleRepository.Find(u => u.RoleID == roleid);
                     if (RoleRepository.Delete(findrole))
                     {
+                        //查询关联关系 菜单角色表
+                        IEnumerable<RoleMenu> IRM = RoleMenuRepository.FindList(r => r.RoleID == roleid,string.Empty,false);
+                        if (IRM!=null&&IRM.Count()!=0)
+                        {
+                            //删除已存在的菜单角色表
+                            RoleMenuRepository.DeleteRange(IRM);
+                        }
+                        //查询关联关系 用户角色表
+                        IEnumerable<UserRole> IUR = UserRoleRepository.FindList(u => u.RoleID == roleid, string.Empty, false);
+                        if (IUR!=null&& IUR.Count()!=0)
+                        {
+                            //删除已存在的用户角色表
+                            UserRoleRepository.DeleteRange(IUR);
+                        }
                         return Json(new
                         {
                             Success = true
@@ -603,6 +624,15 @@ namespace OP.Web.Controllers
                         DeleteChild(Ldelete, menuid);
                         if (MenuRepository.DeleteRange(Ldelete.AsEnumerable()) != 0)
                         {
+                            //查找并删除菜单角色表中的数据
+                            foreach (Menu item in Ldelete)
+                            {
+                                RoleMenu findrm = RoleMenuRepository.Find(r => r.MenuID == item.MenuID);
+                                if (findrm!=null)
+                                {
+                                    RoleMenuRepository.Delete(findrm);
+                                }
+                            }
                             return Json(new
                             {
                                 Success = true

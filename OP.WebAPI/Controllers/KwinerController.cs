@@ -285,7 +285,8 @@ namespace OP.WebAPI.Controllers
                                 string STradeDate = Convert.ToDateTime(TradeDate).ToString("yyyy-MM-dd");
                                 while (true)
                                 {
-                                    if (TdaysRepository.FindAsync(t => t.Tdays == STradeDate) == null)//没有查询到对应交易日，说明不是交易日,向后推一天
+                                    Tday dd = await TdaysRepository.FindAsync(t => t.Tdays == STradeDate);
+                                    if (dd == null)//没有查询到对应交易日，说明不是交易日,向后推一天
                                     {
                                         STradeDate = Convert.ToDateTime(STradeDate).AddDays(1).ToString("yyyy-MM-dd");
                                     }
@@ -303,8 +304,8 @@ namespace OP.WebAPI.Controllers
                                 string STradeDate = Convert.ToDateTime(TradeDate).AddDays(1).ToString("yyyy-MM-dd");
                                 while (true)
                                 {
-                                    //Tday t1 = TdaysRepository.FindNoTracking(t => t.Tdays == STradeDate);
-                                    if (TdaysRepository.FindAsync(t => t.Tdays == STradeDate) == null)//没有查询到对应交易日，说明不是交易日,向后推一天
+                                    Tday dd = await TdaysRepository.FindAsync(t => t.Tdays == STradeDate);
+                                    if (dd == null)//没有查询到对应交易日，说明不是交易日,向后推一天
                                     {
                                         STradeDate = Convert.ToDateTime(STradeDate).AddDays(1).ToString("yyyy-MM-dd");
                                     }
@@ -319,7 +320,8 @@ namespace OP.WebAPI.Controllers
                             string TryEndDate = Convert.ToDateTime(BeginDate).AddDays(Deadline).ToString("yyyy-MM-dd");
                             while (true)
                             {
-                                if (TdaysRepository.FindAsync(t => t.Tdays == TryEndDate) == null)//没有查询到对应交易日，说明不是交易日,向前推一天
+                                Tday dd = await TdaysRepository.FindAsync(t => t.Tdays == TryEndDate);
+                                if (dd == null)//没有查询到对应交易日，说明不是交易日,向前推一天
                                 {
                                     TryEndDate = Convert.ToDateTime(TryEndDate).AddDays(-1).ToString("yyyy-MM-dd");
                                 }
