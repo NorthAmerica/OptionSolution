@@ -176,6 +176,7 @@
         })
     }
     function BindBrochureData() {
+        $('#UTempName').val('@Model.TempName');
         $('#UBrochureID').val('@Model.BrochureID');
 
         if ('@Model.SFPic' == '' || '@Model.SFPic' == null) {
@@ -373,6 +374,12 @@
 
                 </tr>
             </thead>
+            <tr>
+                <td class="td-info"><label for="UTempName">模板名称：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="UTempName" name="TempName" readonly="readonly" data-options="required:false,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
             <tr>
                 <td class="td-info"><label for="btnUpdatePic">上传图片：</label></td>
                 <td>

@@ -747,7 +747,7 @@ namespace OP.Web.Controllers
         /// <param name="rows"></param>
         /// <returns></returns>
         //[CSRFValidateAntiForgeryToken]
-        public ActionResult OptionsProductConfig_Read(int? page, int? rows, string PartnerName, string ProductName, string OptionType, string BeginDate)
+        public ActionResult OptionsProductConfig_Read(int? page, int? rows, string PartnerName, string ProductName,string OptionsProductID, string OptionType, string BeginDate)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
@@ -759,6 +759,10 @@ namespace OP.Web.Controllers
             if (!string.IsNullOrEmpty(ProductName))
             {
                 iop = iop.Where(o => !string.IsNullOrEmpty(o.ProductName) && o.ProductName.Contains(ProductName));
+            }
+            if (!string.IsNullOrEmpty(OptionsProductID))
+            {
+                iop = iop.Where(o => !string.IsNullOrEmpty(o.OptionsProductID.ToString()) && o.OptionsProductID.ToString().Contains(OptionsProductID));
             }
             if (!string.IsNullOrEmpty(OptionType))
             {
@@ -1170,10 +1174,14 @@ namespace OP.Web.Controllers
                 //ByteArrayContent bac = new ByteArrayContent(postData);
 
                 string responsestring = await UpKwinerProduct.UpAction(jsonstring);
+                if (string.IsNullOrEmpty(responsestring))
+                {
+                    throw new Exception("第三方回报数据为空.");
+                }
                 ReturnModel rm = JsonConvert.DeserializeObject<ReturnModel>(DESEncrypt.DesDecrypt(responsestring));
                 if (rm.Result == "1")
                 {
-                    LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传成功" });
+                    LogRepository.Add(new EventLog { Name = Session["LoginedUser"].ToString()+"上传产品到第三方系统", Date = DateTime.Now, Event = "上传成功" });
                     foreach (var product in sendList.products)
                     {
                         OptionsProduct findop = await OptionsProductRepository.FindAsync(op => op.OptionsProductID == product.optionsProductID);
@@ -1184,15 +1192,15 @@ namespace OP.Web.Controllers
                 }
                 else
                 {
-                    LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，第三方返回信息：" + rm.Message });
+                    LogRepository.Add(new EventLog { Name = Session["LoginedUser"].ToString()+"上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，第三方返回信息：" + rm.Message });
                     return Json(new { Success = false, Message = "第三方返回" + rm.Message });
                 }
 
             }
             catch (Exception ex)
             {
-                LogRepository.Add(new EventLog { Name = "上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，内部异常：" + ex.Message });
-                return Json(new { Success = false, Message = ex.Message });
+                LogRepository.Add(new EventLog { Name = Session["LoginedUser"].ToString()+"上传产品到第三方系统", Date = DateTime.Now, Event = "上传失败，内部异常：" + ex.Message });
+                return Json(new { Success = false, Message = "内部异常：" + ex.Message });
             }
 
         }

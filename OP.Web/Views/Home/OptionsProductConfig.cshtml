@@ -1009,6 +1009,7 @@
         $('#OptionsProductGrid').datagrid('load', {
             PartnerName: $('#SearchPartnerName').combobox('getText'),
             ProductName: $('#SearchProductName').val(),
+            OptionsProductID: $('#SearchOptionsProductID').val(),
             OptionType: $('#SearchOptionType').combobox('getText'),
             BeginDate: $('#SearchBeginDate').datebox('getText')
         });
@@ -1033,6 +1034,9 @@
 
                     <td><label for="SearchProductName">产品名称:</label></td>
                     <td><input type="text" class="form-control input-sm" id="SearchProductName" name="ProductName" placeholder="产品名称"></td>
+
+                    <td><label for="SearchOptionsProductID">产品ID:</label></td>
+                    <td><input type="text" class="form-control input-sm" id="SearchOptionsProductID" name="OptionsProductID" placeholder="产品ID"></td>
 
                     <td><label for="SearchOptionType">期权类型:</label></td>
                     <td>
