@@ -762,7 +762,8 @@ namespace OP.Web.Controllers
             }
             if (!string.IsNullOrEmpty(OptionsProductID))
             {
-                iop = iop.Where(o => !string.IsNullOrEmpty(o.OptionsProductID.ToString()) && o.OptionsProductID.ToString().Contains(OptionsProductID));
+                Guid gid = new Guid(OptionsProductID);
+                iop = iop.Where(o => o.OptionsProductID== gid);
             }
             if (!string.IsNullOrEmpty(OptionType))
             {
