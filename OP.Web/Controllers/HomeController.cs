@@ -773,7 +773,7 @@ namespace OP.Web.Controllers
             {
                 iop = iop.Where(o => Convert.ToDateTime(o.BeginDate).ToString("yyyy-MM-dd") == BeginDate);
             }
-            var riop = iop.OrderByDescending(p => p.AddDate).Select(
+            var riop = iop.OrderByDescending(p => p.AddDate).ThenBy(p=>p.OrderID).Select(
                 p => new
                 {
                     AddDate = Convert.ToDateTime(p.AddDate).ToString("yyyy-MM-dd"),
@@ -856,6 +856,7 @@ namespace OP.Web.Controllers
                         }
                         //FuturesTradeVolume TradeVolume = new FuturesTradeVolume();
                         OptionsProduct op = new OptionsProduct();
+                        op.OrderID = Convert.ToInt32(item[0]);
                         op.PartnerName = item[1].ToString();
                         op.ProductName = item[2].ToString();
                         op.ProductDescription = item[3].ToString();
@@ -1281,6 +1282,7 @@ namespace OP.Web.Controllers
             //IEnumerable<OptionsProduct> iop = OptionsProductRepository.FindAll().Where(p => p.Status!= 0&&p.PartnerName== PartnerName);
             if (iop != null && iop.Count() != 0)
             {
+                iop = iop.OrderBy(p => p.OrderID).ToList();
                 foreach (var item in iop)
                 {
                     OptionsProductModel opm = new OptionsProductModel();

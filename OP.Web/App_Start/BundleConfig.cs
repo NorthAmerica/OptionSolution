@@ -20,16 +20,17 @@ namespace OP.Web
                         "~/Scripts/modernizr-*"));
 
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
-                      "~/Scripts/bootstrap.min.js",
+                      "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.min.css",
-                      "~/Content/dashboard.css",
-                      "~/Content/themes/bootstrap/easyui.css",
-                      "~/Content/themes/icon.css"));
+                      "~/Content/dashboard.css"));
+            bundles.Add(new StyleBundle("~/Content/themes/bootstrap/css").Include(
+                "~/Content/themes/bootstrap/easyui.css"));
+            bundles.Add(new StyleBundle("~/Content/themes/css").Include(
+                "~/Content/themes/icon.css"));
             bundles.Add(new ScriptBundle("~/bundles/easyui").Include(
-                "~/Scripts/jquery.easyui.min.js",
                 "~/Scripts/easyui-lang-zh_CN.js"
                 ));
         }

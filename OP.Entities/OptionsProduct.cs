@@ -87,5 +87,7 @@ namespace OP.Entities
         /// </summary>
         [DisplayName("结算价类型")]
         public string CallPriceType { get; set; }
+        [DisplayName("排序号")]
+        public int? OrderID { get; set; }
     }
 }
