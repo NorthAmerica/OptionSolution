@@ -180,6 +180,15 @@ namespace OP.Repository.Implementations
                 return _list.ToList<T>();
             }
         }
+        public async Task<List<T>> FindListAsync(Expression<Func<T, bool>> whereLamdba, string orderName, bool isAsc)
+        {
+            using (EFDbContext nContext = new EFDbContext())
+            {
+                var _list = nContext.Set<T>().Where(whereLamdba);
+                _list = OrderBy(_list, orderName, isAsc);
+                return await _list.ToListAsync<T>();
+            }
+        }
 
 
         public IEnumerable<T> FindPageList(int pageIndex, int pageSize, out int totalRecord, Expression<Func<T, bool>> whereLamdba, string orderName, bool isAsc)

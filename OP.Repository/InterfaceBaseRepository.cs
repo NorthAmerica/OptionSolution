@@ -91,6 +91,14 @@ namespace OP.Repository
         /// <returns></returns>
         IEnumerable<T> FindList(Expression<Func<T, bool>> whereLamdba, string orderName, bool isAsc);
         /// <summary>
+        /// 异步查询数据列表
+        /// </summary>
+        /// <param name="whereLamdba">查询表达式</param>
+        /// <param name="orderName">排序名称</param>
+        /// <param name="isAsc">是否升序</param>
+        /// <returns></returns>
+        Task<List<T>> FindListAsync(Expression<Func<T, bool>> whereLamdba, string orderName, bool isAsc);
+        /// <summary>
         /// 查询所有数据
         /// </summary>
         /// <returns></returns>
