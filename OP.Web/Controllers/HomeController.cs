@@ -25,7 +25,7 @@ namespace OP.Web.Controllers
 {
     [Authorization]
     //[CSRFValidateAntiForgeryToken]
-    public class HomeController : Controller
+    public class HomeController : AsyncController
     {
         private InterfaceUserRepository UserRepository;
         private InterfaceMenuRepository MenuRepository;

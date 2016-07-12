@@ -13,7 +13,7 @@ using OP.Web.Attribute;
 namespace OP.Web.Controllers
 {
     [Authorization]
-    public class ConfigController : Controller
+    public class ConfigController : AsyncController
     {
         private InterfaceMenuRepository MenuRepository;
         private InterfaceRoleMenuRepository RoleMenuRepository;

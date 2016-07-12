@@ -22,7 +22,7 @@ using System.Web.Script.Serialization;
 namespace OP.Web.Controllers
 {
     [Authorization]
-    public class ReportController : Controller
+    public class ReportController :AsyncController
     {
         private InterfaceOptionTradeRepository OptionTradeRepository;
         public ReportController(InterfaceOptionTradeRepository otr)

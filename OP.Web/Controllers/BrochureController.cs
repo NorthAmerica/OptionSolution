@@ -14,7 +14,7 @@ namespace OP.Web.Controllers
     /// <summary>
     /// 宣传册
     /// </summary>
-    public class BrochureController : Controller
+    public class BrochureController : AsyncController
     {
         private InterfaceBrochureRepository BrochureRepository;
         private InterfaceOptionsProductRepository OptionsProductRepository;
