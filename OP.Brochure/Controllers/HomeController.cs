@@ -10,7 +10,7 @@ using OP.Brochure.Attribute;
 
 namespace OP.Brochure.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : AsyncController
     {
         private InterfaceBrochureRepository BrochureRepository;
         private InterfaceGuestBookRepository GuestBookRepository;
@@ -144,6 +144,28 @@ namespace OP.Brochure.Controllers
                 
             }
             return View(new BrochureViewModel());
+        }
+        /// <summary>
+        /// 二级宣传页面
+        /// </summary>
+        /// <returns></returns>
+        public async System.Threading.Tasks.Task<ActionResult> SecondIndex()
+        {
+            List<OptionsProduct> findop = await OptionsProductRepository.FindListAsync(o => o.Status == 1,null,false);
+            List<BrochureViewModel> Lbvm = new List<BrochureViewModel>();
+            if (findop!=null&&findop.Count!=0)
+            {
+                foreach (var op in findop.OrderBy(f=>f.OrderID))
+                {
+                    BrochureViewModel bvm = new BrochureViewModel();
+                    bvm.ProductName = op.ProductName;
+                    bvm.OptionsProductID = op.OptionsProductID;
+                    bvm.Contract = op.ProductDtlDesc.Replace("\\n", "<br/><br/>");
+                    Lbvm.Add(bvm);
+                }
+                
+            }
+            return View(Lbvm);
         }
         /// <summary>
         /// 购买须知

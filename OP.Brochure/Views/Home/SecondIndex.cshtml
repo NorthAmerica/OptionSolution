@@ -1,0 +1,239 @@
+﻿@model List<OP.Brochure.Models.BrochureViewModel>
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <script type="application/x-javascript"> addEventListener("load", function() {setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <!meta charset utf="8">
+    <!--flexslider-css-->
+    <link href="~/Content/flexslider.css" rel='stylesheet' type='text/css' />
+    <!--bootstrap-->
+    <link href="~/Content/bootstrap.min.3.3.4.css" rel="stylesheet" type="text/css">
+    <!--coustom css-->
+    <link href="~/Content/style.css" rel="stylesheet" type="text/css" />
+    <!--fonts-->
+    <link href='http://fonts.useso.com/css?family=Coda:400,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.useso.com/css?family=Jockey+One' rel='stylesheet' type='text/css'>
+    <!--script-->
+    <script type="text/javascript" src="~/Scripts/move-top.js"></script>
+    <script type="text/javascript" src="~/Scripts/easing.js"></script>
+    <script src="~/Scripts/modernizr.custom.js"></script>
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.3.3.4.js"></script>
+    <!--script-->
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            $(".scroll").click(function (event) {
+                event.preventDefault();
+                $('html,body').animate({ scrollTop: $(this.hash).offset().top }, 900);
+            });
+        });
+    </script>
+    <!--fonts-->
+</head>
+<body>
+    <div class="header" id="home">
+        <div class="header-banner">
+            <!-- Top Navigation -->
+            <div class="container page-seperator">
+                <section class="color bgi">
+                    <h3>Lorem Ipsum Simply A Dummy Text To Format Fonts And Paragraphs.</h3>
+                    <p>lorem ipsum simply a dummy text to format fonts and paragraphs,consectetuer adipiscing elit, sed diam </p>
+                    <button type="button" class="btn btn-warning but1">Read more</button>
+                </section>
+                <section class="col-3 ss-style-doublediagonal our-features">
+                    <h1>产品特点</h1>
+                    <p></p>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-sort-by-attributes our-icons" aria-hidden="true"></span>
+                        <h3>价格下跌即可追补</h3>
+                        <p></p>
+                    </div>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-fullscreen our-icons" aria-hidden="true"></span>
+                        <h3>追补方式多样</h3>
+                        <p></p>
+                    </div>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-random our-icons" aria-hidden="true"></span>
+                        <h3>追补期限灵活</h3>
+                        <p></p>
+                    </div>
+                    <div class="clearfix"></div>
+                </section>
+            </div>
+        </div>
+        <div class="our-work" id="our-work">
+            <div class="container">
+                <h2>产品列表</h2>
+                <p></p>
+                <div class="gallery-bottom">
+                    @foreach (var bvm in Model)
+                    {
+                        <div class="col-md-4 bottom-gallery">
+                            <a href="/Home/Index/@bvm.OptionsProductID" rel="title" target="_blank" class="b-link-stripe b-animate-go  thickbox">
+                                <div style="width:320px;height:350px;background-image:url(../../images/IMG_3.jpg);background-size:auto">
+                                    <h3>
+                                        <span style="display:block;padding-top:150px;font-size:larger;color:white;" class="txt">@bvm.ProductName</span>
+                                    </h3>
+                                </div> @*<img class="img-responsive" src="~/images/IMG_3.jpg" />*@
+                                <div class="b-wrapper">
+                                    <h3 class="b-animate b-from-left b-delay03">
+                                        <span class="text-left" style="display:block;padding-top:30px;padding-left:20px;padding-right:20px;font-size:large">产品特征：<br/><br />@Html.Raw(bvm.Contract)</span>
+                                        <span class="glyphicon glyphicon-arrow-right gal-icn" aria-hidden="true"></span>
+                                    </h3>
+                                </div>
+                            </a>
+                        </div>
+                    }
+
+                    
+                    <div class="clearfix"></div>
+                    @*<script src="~/Scripts/jquery.chocolat.js"></script>*@
+                    @*<link rel="stylesheet" href="~/Content/chocolat.css" type="text/css" media="screen" charset="utf-8">*@
+                    <!--light-box-files -->
+                    @*<script type="text/javascript" charset="utf-8">
+                                $(function() {
+                                $('.bottom-gallery a').Chocolat();
+                                });
+                        </script>*@
+                </div>
+                @*<div class="testimonials">
+                    <h3>Testimonials</h3>
+                    <p>lorem ipsum simply a dummy text to format fonts and paragraphs</p>
+                    <div class="test-box">
+                        <q>Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry's standard dummy text </q>
+                        <a href="#" class="left">-Adam</a>
+                        <div class="clearfix"></div>
+                        <span><img src="~/images/half-arrow.png"></span>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+        @*<section class="slider">
+            <div class="container">
+                <div class="flexslider">
+                    <ul class="slides">
+                        <li>
+                            <div class="banner-info">
+                                <h3>Our latest feeds</h3>
+                                <h4><span class="m_2">"</span> lorem ipsum simply a dummy text to format fonts and paragraphs<span class="m_2"> "</span></h4>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent.</p>
+                                <h5><a href="#">Adam Chamler ,</a>Dateratr since 2014</h5>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="banner-info">
+                                <h3>Our latest feeds</h3>
+                                <h4><span class="m_2">"</span> lorem ipsum simply a dummy text to format fonts and paragraphs<span class="m_2"> "</span></h4>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent.</p>
+                                <h5><a href="#">Adam Chamler ,</a>Dateratr since 2014</h5>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="banner-info">
+                                <h3>Our latest feeds</h3>
+                                <h4><span class="m_2">"</span> lorem ipsum simply a dummy text to format fonts and paragraphs<span class="m_2"> "</span></h4>
+                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent.</p>
+                                <h5><a href="#">Adam Chamler ,</a>Dateratr since 2014</h5>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- FlexSlider -->
+            <script defer src="~/Scripts/jquery.flexslider.js"></script>
+            <script type="text/javascript">
+                $(function () {
+                    SyntaxHighlighter.all();
+                });
+                $(window).load(function () {
+                    $('.flexslider').flexslider({
+                        animation: "slide",
+                        start: function (slider) {
+                            $('body').removeClass('loading');
+                        }
+                    });
+                });
+            </script>
+            <!-- FlexSlider -->
+        </section>*@
+        @*<div class="copyrights">Collect from <a href="http://www.cssmoban.com/">企业网站模板</a></div>*@
+        @*<div class="subscribe-label">
+            <div class="container">
+                <div class="sub-cont">
+                    <div class="col-md-6">
+                        <h3>Subscribe to our newsletter</h3>
+                    </div>
+                    <div class="col-md-6">
+                        <form>
+                            <input class="mail" type="text" name="email" value="E mail" onFocus="this.value = '';" onBlur="if (this.value == '') {this.value = 'E mail';}">
+                            <button type="button" class="btn btn-warning sub-btn">Notify</button>
+                        </form>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>*@
+        @*<div class="social-feeds">
+            <div class="container">
+                <div class="wmuSlider example1 section" id="section-1">
+                    <article style="position: absolute; width: 100%; opacity: 0;">
+                        <div class="bottom-slide">
+                            <img src="~/images/twitter.png" alt="" />
+                            <p>Great pixel perfect template which suites any needs. Some subheader text goes here.<br>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, </p>
+                        </div>
+                    </article>
+                    <article style="position: absolute; width: 100%; opacity: 0;">
+                        <div class="bottom-slide">
+                            <img src="~/images/twitter.png" alt="" />
+                            <p>Suites any needs great pixel perfect template which . Some subheader text goes here.<br>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, </p>
+                        </div>
+                    </article>
+                    <article style="position: absolute; width: 100%; opacity: 0;">
+                        <div class="bottom-slide">
+                            <img src="~/images/twitter.png" alt="" />
+                            <p>Template which suites great pixel perfect  any needs. Some subheader text goes here.<br>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, </p>
+                        </div>
+                    </article>
+                    <ul class="wmuSliderPagination">
+                        <li><a href="#" class="">0</a></li>
+                        <li><a href="#" class="">1</a></li>
+                        <li><a href="#" class="">2</a></li>
+                    </ul>
+                </div>
+                <!-- script -->
+                <script src="~/Scripts/jquery.wmuSlider.js"></script>
+                <script>
+                    $('.example1').wmuSlider();
+                </script>
+                <!-- script -->
+            </div>
+        </div>*@
+        <div class="footer">
+            <div class="container">
+                @*<div class="social">
+                    <ul>
+                        <li><a href="#" class="face"></a></li>
+                        <li><a href="#" class="twit"></a></li>
+                        <li><a href="#" class="insta"></a></li>
+                        <li><a href="#" class="gplus"></a></li>
+                        <li><a href="#" class="dribl"></a></li>
+                    </ul>
+                </div>*@
+                <div class="copy-rt">
+                    <p>Copyright &copy; 2015.Company name All rights reserved.More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网站模板" target="_blank">网站模板</a></p>
+                </div>
+            </div>
+        </div>
+        <a href="#home" id="toTop" class="scroll" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+    </div>
+</body>
+</html>
