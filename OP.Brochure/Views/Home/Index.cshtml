@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "产品详情";
 }
-<div class="product-a"><div class="Iron-Man"> 价格补偿服务-@Model.ProductName</div></div>
+<div class="product-a"><div class="Iron-Man"> 价格追补服务-@Model.ProductName</div></div>
 <div class="product-b">
     <!--标题文字部分-->
     <div class="size">
@@ -63,7 +63,7 @@
     <!--结算说明-->
     <div class="date-b"><img src="~/images/solid.jpg" /></div>
     <div class="explain">
-        <p><font>补偿说明：</p>
+        <p><font>追补说明：</p>
         <p></font>@Html.Raw(Model.PayDescrip)</p>
         <p><font>结算公式：</p>
         <p></font>@Html.Raw(Model.SettlementFormula)</p>
@@ -96,8 +96,8 @@
             }
             <div class="curson">
                 <p><a href="http://www.shfe.com.cn/statements/dataview.html" target="_blank">上海期货交易所期货价格查询</a></p>
-                <p><a href="@Model.RiskAnnouncementURL" target="_blank">《价格补偿服务风险揭示书》</a></p>
-                <p><a href="@Model.PurchaseAgreementURL" target="_blank">《价格补偿服务购买协议》</a></p>
+                <p><a href="@Model.RiskAnnouncementURL" target="_blank">《价格追补服务风险揭示书》</a></p>
+                <p><a href="@Model.PurchaseAgreementURL" target="_blank">《价格追补服务购买协议》</a></p>
             </div>
             <div class="curson">
                 <p>产品设计：湖南迅财航商贸有限公司</p>
