@@ -30,7 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web.Mvc, Version=4.0.0.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -42,34 +51,65 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Brochure.cs" />
-    <Compile Include="CallPriceType.cs" />
-    <Compile Include="EventLog.cs" />
-    <Compile Include="FallRole.cs" />
-    <Compile Include="FundStatus.cs" />
-    <Compile Include="FuturePrice.cs" />
-    <Compile Include="FuturesFund.cs" />
-    <Compile Include="FuturesTradeVolume.cs" />
-    <Compile Include="GuestBook.cs" />
-    <Compile Include="ManageStatus.cs" />
-    <Compile Include="Menu.cs" />
-    <Compile Include="NumberType.cs" />
-    <Compile Include="ONOFFSet.cs" />
-    <Compile Include="ONTime.cs" />
-    <Compile Include="OptionsProduct.cs" />
-    <Compile Include="OptionTrade.cs" />
-    <Compile Include="OptionTradeSum.cs" />
-    <Compile Include="OptionType.cs" />
-    <Compile Include="Partner.cs" />
-    <Compile Include="PartType.cs" />
+    <Compile Include="Mappings\BrochureConfiguration.cs" />
+    <Compile Include="Mappings\CallPriceTypeConfiguration.cs" />
+    <Compile Include="Mappings\EventLogConfiguration.cs" />
+    <Compile Include="Mappings\FallRoleConfiguration.cs" />
+    <Compile Include="Mappings\FundStatuConfiguration.cs" />
+    <Compile Include="Mappings\FuturePriceConfiguration.cs" />
+    <Compile Include="Mappings\FuturesFundConfiguration.cs" />
+    <Compile Include="Mappings\FuturesTradeVolumeConfiguration.cs" />
+    <Compile Include="Mappings\GuestBookConfiguration.cs" />
+    <Compile Include="Mappings\ManageStatuConfiguration.cs" />
+    <Compile Include="Mappings\MenuConfiguration.cs" />
+    <Compile Include="Mappings\NumberTypeConfiguration.cs" />
+    <Compile Include="Mappings\OnoffSetConfiguration.cs" />
+    <Compile Include="Mappings\OnTimeConfiguration.cs" />
+    <Compile Include="Mappings\OptionsProductConfiguration.cs" />
+    <Compile Include="Mappings\OptionTradeConfiguration.cs" />
+    <Compile Include="Mappings\OptionTradeSumConfiguration.cs" />
+    <Compile Include="Mappings\OptionTypeConfiguration.cs" />
+    <Compile Include="Mappings\PartnerConfiguration.cs" />
+    <Compile Include="Mappings\PartTypeConfiguration.cs" />
+    <Compile Include="Mappings\RiseRoleConfiguration.cs" />
+    <Compile Include="Mappings\RoleConfiguration.cs" />
+    <Compile Include="Mappings\RoleMenuConfiguration.cs" />
+    <Compile Include="Mappings\TdayConfiguration.cs" />
+    <Compile Include="Mappings\TradeOrderConfiguration.cs" />
+    <Compile Include="Mappings\UserConfiguration.cs" />
+    <Compile Include="Mappings\UserRoleConfiguration.cs" />
+    <Compile Include="Models\Brochure.cs" />
+    <Compile Include="Models\CallPriceType.cs" />
+    <Compile Include="Models\EventLog.cs" />
+    <Compile Include="Models\FallRole.cs" />
+    <Compile Include="Models\FundStatus.cs" />
+    <Compile Include="Models\FuturePrice.cs" />
+    <Compile Include="Models\FuturesFund.cs" />
+    <Compile Include="Models\FuturesTradeVolume.cs" />
+    <Compile Include="Models\GuestBook.cs" />
+    <Compile Include="Models\ManageStatus.cs" />
+    <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\NumberType.cs" />
+    <Compile Include="Models\ONOFFSet.cs" />
+    <Compile Include="Models\ONTime.cs" />
+    <Compile Include="Models\OptionsProduct.cs" />
+    <Compile Include="Models\OptionTrade.cs" />
+    <Compile Include="Models\OptionTradeSum.cs" />
+    <Compile Include="Models\OptionType.cs" />
+    <Compile Include="Models\Partner.cs" />
+    <Compile Include="Models\PartType.cs" />
+    <Compile Include="Models\RiseRole.cs" />
+    <Compile Include="Models\Role.cs" />
+    <Compile Include="Models\RoleMenu.cs" />
+    <Compile Include="Models\Tday.cs" />
+    <Compile Include="Models\TradeOrder.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RiseRole.cs" />
-    <Compile Include="Role.cs" />
-    <Compile Include="RoleMenu.cs" />
-    <Compile Include="Tday.cs" />
-    <Compile Include="TradeOrder.cs" />
-    <Compile Include="User.cs" />
-    <Compile Include="UserRole.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

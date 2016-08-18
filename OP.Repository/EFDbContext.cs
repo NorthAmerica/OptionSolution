@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
-using OP.Entities;
+using OP.Entities.Models;
+using OP.Repository.Migrations;
 
 namespace OP.Repository
 {
@@ -38,10 +39,9 @@ namespace OP.Repository
         public EFDbContext()
             : base("name=EFDbContext")
         {
-            //Database.SetInitializer<DbContext>(null);
-            //Database.SetInitializer(new CreateDatabaseIfNotExists<EFDbContext>());
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<EFDbContext>());
-            //this.Database.Initialize(false);
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<EFDbContext, Configuration>());
+            //Database.SetInitializer(new DropCreateDatabaseIfModelChanges<EFDbContext>());
+
         }
         //自定义RiseCompensate小数点长度
         //protected override void OnModelCreating(DbModelBuilder modelBuilder)

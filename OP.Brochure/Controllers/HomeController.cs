@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OP.Entities;
+using OP.Entities.Models;
 using OP.Brochure.Models;
 using OP.Brochure.Attribute;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace OP.Brochure.Controllers
 {
@@ -63,14 +65,15 @@ namespace OP.Brochure.Controllers
         /// 显示盈亏结构图
         /// </summary>
         /// <returns></returns>
-        public FileResult ShowSFPic(string id)
+        public async Task<FileResult> ShowSFPic(string id)
         {
             try
             {
                 if (!string.IsNullOrEmpty(id))
                 {
                     Guid gid = new Guid(id);
-                    byte[] image = BrochureRepository.Find(b => b.BrochureID == gid).SFPic;
+                    Entities.Models.Brochure find = await BrochureRepository.FindAsync(b => b.BrochureID == gid);
+                    byte[] image = find.SFPic;
                     return new FileContentResult(image, "image/jpeg");
                 }
                 return null;
@@ -79,20 +82,21 @@ namespace OP.Brochure.Controllers
             {
                 return null;
             }
-            
+
         }
         /// <summary>
         /// 显示示例图
         /// </summary>
         /// <returns></returns>
-        public FileResult ShowExamplePic(string id)
+        public async Task<FileResult> ShowExamplePic(string id)
         {
             try
             {
                 if (!string.IsNullOrEmpty(id))
                 {
                     Guid gid = new Guid(id);
-                    byte[] image = BrochureRepository.Find(b => b.BrochureID == gid).ExamplePic;
+                    Entities.Models.Brochure find = await BrochureRepository.FindAsync(b => b.BrochureID == gid);
+                    byte[] image = find.ExamplePic;
                     return new FileContentResult(image, "image/jpeg");
                 }
                 return null;
@@ -107,14 +111,14 @@ namespace OP.Brochure.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Index(string id)
+        public async Task<ActionResult> Index(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 Guid OPID = new Guid(id);
-                Entities.Brochure findbr =  BrochureRepository.Find(b => b.OptionsProductID == OPID);
-                OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == OPID);
-                if (findbr!=null&&findop!=null)
+                Entities.Models.Brochure findbr = await BrochureRepository.FindAsync(b => b.OptionsProductID == OPID);
+                OptionsProduct findop = await OptionsProductRepository.FindAsync(op => op.OptionsProductID == OPID);
+                if (findbr != null && findop != null)
                 {
                     BrochureViewModel bvm = new BrochureViewModel();
                     bvm.AmountType = findop.AmountType;
@@ -141,7 +145,7 @@ namespace OP.Brochure.Controllers
                     bvm.TradeDateDescrip = findbr.TradeDateDescrip;
                     return View(bvm);
                 }
-                
+
             }
             return View(new BrochureViewModel());
         }
@@ -149,18 +153,37 @@ namespace OP.Brochure.Controllers
         /// 二级宣传页面
         /// </summary>
         /// <returns></returns>
-        public async System.Threading.Tasks.Task<ActionResult> SecondIndex()
+        public async Task<ActionResult> SecondIndex()
         {
-            List<OptionsProduct> findop = await OptionsProductRepository.FindListAsync(o => o.Status == 1,null,false);
+            List<OptionsProduct> findops = await OptionsProductRepository.FindListAsync(o => o.Status == 1,null,false);
             List<BrochureViewModel> Lbvm = new List<BrochureViewModel>();
-            if (findop!=null&&findop.Count!=0)
+            if (findops!=null&&findops.Count!=0)
             {
-                foreach (var op in findop.OrderBy(f=>f.OrderID))
+                foreach (var findop in findops.OrderBy(f=>f.OrderID))
                 {
+                    Entities.Models.Brochure findbr = await BrochureRepository.FindAsync(b => b.OptionsProductID == findop.OptionsProductID);
                     BrochureViewModel bvm = new BrochureViewModel();
-                    bvm.ProductName = op.ProductName;
-                    bvm.OptionsProductID = op.OptionsProductID;
-                    bvm.Contract = op.ProductDtlDesc.Replace("\\n", "<br/><br/>");
+                    bvm.OptionsProductID = findop.OptionsProductID;
+                    bvm.AmountType = findop.AmountType;
+                    bvm.BrochureID = findbr.BrochureID;
+                    bvm.BuyBegin = findbr.BuyBegin;
+                    bvm.BuyTime = findbr.BuyTime;
+                    bvm.Contract = findop.Contract;
+                    bvm.ContractDescrip = findbr.ContractDescrip;
+                    bvm.Deadline = findop.Deadline;
+                    bvm.EndDateDescrip = findbr.EndDateDescrip;
+                    bvm.ExampleDescrip = findbr.ExampleDescrip;
+                    bvm.FAQ = findbr.FAQ;
+                    bvm.PayDescrip = Regex.Replace(findbr.PayDescrip, @"<[^>]+>", string.Empty);
+                    bvm.Price = findop.Price;
+                    bvm.PriceType = findop.PriceType;
+                    bvm.ProductName = findop.ProductName;
+                    bvm.PurchaseAgreementURL = findbr.PurchaseAgreementURL;
+                    bvm.RiskAnnouncementURL = findbr.RiskAnnouncementURL;
+                    
+                    bvm.SettlementFormula = Regex.Replace(findbr.SettlementFormula, @"<[^>]+>", string.Empty);
+                    bvm.StartDateDescrip = findbr.StartDateDescrip;
+                    bvm.TradeDateDescrip = findbr.TradeDateDescrip;
                     Lbvm.Add(bvm);
                 }
                 
@@ -172,13 +195,13 @@ namespace OP.Brochure.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Buy(string id)
+        public async Task<ActionResult> Buy(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 Guid OPID = new Guid(id);
-                Entities.Brochure findbr = BrochureRepository.Find(b => b.OptionsProductID == OPID);
-                OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == OPID);
+                Entities.Models.Brochure findbr = await BrochureRepository.FindAsync(b => b.OptionsProductID == OPID);
+                OptionsProduct findop = await OptionsProductRepository.FindAsync(op => op.OptionsProductID == OPID);
                 if (findbr != null && findop != null)
                 {
                     BrochureViewModel bvm = new BrochureViewModel();
@@ -215,13 +238,13 @@ namespace OP.Brochure.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult Example(string id)
+        public async Task<ActionResult> Example(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 Guid OPID = new Guid(id);
-                Entities.Brochure findbr = BrochureRepository.Find(b => b.OptionsProductID == OPID);
-                OptionsProduct findop = OptionsProductRepository.Find(op => op.OptionsProductID == OPID);
+                Entities.Models.Brochure findbr = await BrochureRepository.FindAsync(b => b.OptionsProductID == OPID);
+                OptionsProduct findop = await OptionsProductRepository.FindAsync(op => op.OptionsProductID == OPID);
                 if (findbr != null && findop != null)
                 {
                     BrochureViewModel bvm = new BrochureViewModel();

@@ -1,4 +1,4 @@
-﻿using OP.Entities;
+﻿using OP.Entities.Models;
 
 
 namespace OP.Repository.Implementations

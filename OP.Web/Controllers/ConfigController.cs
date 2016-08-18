@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OP.Entities;
+using OP.Entities.Models;
 using OP.Repository;
 using OP.Web.Models;
 using OP.Web.Tools;
-using Op.Web.Attribute;
 using OP.Web.Attribute;
+using System.Threading.Tasks;
 
 namespace OP.Web.Controllers
 {
@@ -76,9 +76,10 @@ namespace OP.Web.Controllers
         /// 显示所有用户
         /// </summary>
         /// <returns></returns>
-        public ActionResult UserConfig_Read()
+        public async Task<ActionResult> UserConfig_Read()
         {
-            return Json(UserRepository.FindAll());
+            List<User> lu = await UserRepository.FindAllAsync();
+            return Json(lu);
         }
         /// <summary>
         /// 新增用户
@@ -726,7 +727,7 @@ namespace OP.Web.Controllers
                 IEnumerable<UserRole> iur = UserRoleRepository.FindAll().Where(u => u.RoleID == roleid);
                 if (iur != null && iur.Count() != 0)
                 {
-                    List<User> lUser = new List<Entities.User>();
+                    List<User> lUser = new List<Entities.Models.User>();
                     foreach (UserRole item in iur)
                     {
                         lUser.Add(UserRepository.Find(u => u.UserID == item.UserID));

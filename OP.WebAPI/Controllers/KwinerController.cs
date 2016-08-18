@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OP.Entities;
+using OP.Entities.Models;
 using OP.Repository;
 using OP.Repository.Implementations;
 using OP.WebAPI.Models;

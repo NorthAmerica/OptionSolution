@@ -50,6 +50,13 @@
                     UpdateTemplateDialog();
                 }
             }, '-', {
+                id: 'btncopy',
+                text: '复制宣传册模板',
+                iconCls: 'icon-temp',
+                handler: function () {
+                    CopyTemplateDialog();
+                }
+            }, '-', {
                 id: 'btncut',
                 text: '删除宣传册模板',
                 iconCls: 'icon-cut',
@@ -69,16 +76,54 @@
             }
         });
     }
+    //新增
     function AddTemplateDialog() {
         var tab = $('#main-tab').tabs('getSelected');
         tab.panel('refresh', '/Brochure/AddTemplate');
+    }
+    //拷贝
+    function CopyTemplateDialog() {
+        var CopeTypeID = $("#TemplateGrid").datagrid("getSelections");
+        if (CopeTypeID.length == 1) {
+            var BrochureID = CopeTypeID[0].BrochureID;
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            $.ajax({
+                type: 'POST',
+                url: '/Brochure/CopyTemplateAction',
+                cache: false,
+                headers: headers,
+                data: { ID: BrochureID },
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '拷贝模板成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $("#TemplateGrid").datagrid("reload");
+                        $("#TemplateGrid").datagrid("clearSelections");
+                    }
+                    else {
+                        $.messager.alert("友情提示", "拷贝失败:" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("拷贝失败，请您检查")
+                }
+            });
+        } else {
+            $.messager.alert("友情提示", "请您选择一条要拷贝的数据");
+        }
     }
     function UpdateTemplateDialog() {
         var UpdateTemplateID = $("#TemplateGrid").datagrid("getSelections");
         if (UpdateTemplateID.length == 1) {
             var BrochureID = $("#TemplateGrid").datagrid("getSelections")[0].BrochureID;
             var tab = $('#main-tab').tabs('getSelected');
-            tab.panel('refresh', '/Brochure/AddTemplate/'+BrochureID);
+            tab.panel('refresh', '/Brochure/AddTemplate/' + BrochureID);
         } else {
             $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateTemplateID.length + "</font>行");
         }

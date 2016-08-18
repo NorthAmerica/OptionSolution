@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Op.Web.Attribute;
-using OP.Entities;
-using OP.Repository;
 using OP.Web.Attribute;
+using OP.Entities.Models;
+using OP.Repository;
 using OP.Web.Component;
 using OP.Web.Models;
 using OP.Web.Tools;
@@ -272,9 +271,10 @@ namespace OP.Web.Controllers
         /// 合作者数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult PartnerConfig_Read()
+        public async Task<ActionResult> PartnerConfig_Read()
         {
-            return Json(PartnerRepository.FindAll());
+            List<Partner> lp = await PartnerRepository.FindAllAsync();
+            return Json(lp);
         }
         /// <summary>
         /// 新增合作者
@@ -322,12 +322,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetPartnerDetails(string ID)
+        public async Task<ActionResult> GetPartnerDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int partnerid = Convert.ToInt32(ID);
-                Partner findpartner = PartnerRepository.Find(u => u.PartnerID == partnerid);
+                Partner findpartner = await PartnerRepository.FindAsync(u => u.PartnerID == partnerid);
 
                 if (findpartner != null)
                 {
@@ -384,14 +384,14 @@ namespace OP.Web.Controllers
         }
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeletePartner(string ID)
+        public async Task<ActionResult> DeletePartner(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int partnerid = Convert.ToInt32(ID);
-                    Partner findpartner = PartnerRepository.Find(u => u.PartnerID == partnerid);
+                    Partner findpartner = await PartnerRepository.FindAsync(u => u.PartnerID == partnerid);
                     if (PartnerRepository.Delete(findpartner))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "合作者删除成功" });
@@ -414,7 +414,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 数字配置
@@ -430,9 +430,10 @@ namespace OP.Web.Controllers
         /// 数字类型数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult NumberTypeConfig_Read()
+        public async Task<ActionResult> NumberTypeConfig_Read()
         {
-            return Json(NumberTypeRepository.FindAll());
+            List<NumberType> lnt = await NumberTypeRepository.FindAllAsync();
+            return Json(lnt);
         }
         /// <summary>
         /// 新增数字类型
@@ -480,12 +481,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetNumberTypeDetails(string ID)
+        public async Task<ActionResult> GetNumberTypeDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                NumberType findtype = NumberTypeRepository.Find(u => u.NumberTypeID == typeid);
+                NumberType findtype = await NumberTypeRepository.FindAsync(u => u.NumberTypeID == typeid);
 
                 if (findtype != null)
                 {
@@ -547,14 +548,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteNumberType(string ID)
+        public async Task<ActionResult> DeleteNumberType(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    NumberType findtype = NumberTypeRepository.Find(u => u.NumberTypeID == typeid);
+                    NumberType findtype = await NumberTypeRepository.FindAsync(u => u.NumberTypeID == typeid);
                     if (NumberTypeRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除数字类型成功" });
@@ -577,7 +578,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 期权类型配置
@@ -585,9 +586,10 @@ namespace OP.Web.Controllers
         {
             return View();
         }
-        public ActionResult OptionTypeConfig_Read()
+        public async Task<ActionResult> OptionTypeConfig_Read()
         {
-            return Json(OptionTypeRepository.FindAll());
+            List<OptionType> lot = await OptionTypeRepository.FindAllAsync();
+            return Json(lot);
         }
         /// <summary>
         /// 新增期权类型
@@ -635,12 +637,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetOptionTypeDetails(string ID)
+        public async Task<ActionResult> GetOptionTypeDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                OptionType findtype = OptionTypeRepository.Find(u => u.OptionTypeID == typeid);
+                OptionType findtype = await OptionTypeRepository.FindAsync(u => u.OptionTypeID == typeid);
 
                 if (findtype != null)
                 {
@@ -702,14 +704,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteOptionType(string ID)
+        public async Task<ActionResult> DeleteOptionType(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    OptionType findtype = OptionTypeRepository.Find(u => u.OptionTypeID == typeid);
+                    OptionType findtype = await OptionTypeRepository.FindAsync(u => u.OptionTypeID == typeid);
                     if (OptionTypeRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除期权类型成功" });
@@ -732,7 +734,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 期权产品配置
@@ -747,11 +749,11 @@ namespace OP.Web.Controllers
         /// <param name="rows"></param>
         /// <returns></returns>
         //[CSRFValidateAntiForgeryToken]
-        public ActionResult OptionsProductConfig_Read(int? page, int? rows, string PartnerName, string ProductName,string OptionsProductID, string OptionType, string BeginDate)
+        public async Task<ActionResult> OptionsProductConfig_Read(int? page, int? rows, string PartnerName, string ProductName, string OptionsProductID, string OptionType, string BeginDate)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<OptionsProduct> iop = OptionsProductRepository.FindAll();
+            IEnumerable<OptionsProduct> iop = await OptionsProductRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(PartnerName))
             {
                 iop = iop.Where(o => !string.IsNullOrEmpty(o.PartnerName) && o.PartnerName.Contains(PartnerName));
@@ -763,7 +765,7 @@ namespace OP.Web.Controllers
             if (!string.IsNullOrEmpty(OptionsProductID))
             {
                 Guid gid = new Guid(OptionsProductID);
-                iop = iop.Where(o => o.OptionsProductID== gid);
+                iop = iop.Where(o => o.OptionsProductID == gid);
             }
             if (!string.IsNullOrEmpty(OptionType))
             {
@@ -773,7 +775,7 @@ namespace OP.Web.Controllers
             {
                 iop = iop.Where(o => Convert.ToDateTime(o.BeginDate).ToString("yyyy-MM-dd") == BeginDate);
             }
-            var riop = iop.OrderByDescending(p => p.AddDate).ThenBy(p=>p.OrderID).Select(
+            var riop = iop.OrderByDescending(p => p.AddDate).ThenBy(p => p.OrderID).Select(
                 p => new
                 {
                     AddDate = Convert.ToDateTime(p.AddDate).ToString("yyyy-MM-dd"),
@@ -813,7 +815,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UploadOptionsProduct(HttpPostedFileBase uploadedFile)
+        public async Task<ActionResult> UploadOptionsProduct(HttpPostedFileBase uploadedFile)
         {
             try
             {
@@ -822,7 +824,7 @@ namespace OP.Web.Controllers
                     string fileExtenSion = Path.GetExtension(uploadedFile.FileName);
                     string path = System.IO.Path.Combine(Server.MapPath("~/FileUpLoad/"), System.IO.Path.GetFileName(uploadedFile.FileName));
                     uploadedFile.SaveAs(path);//将文件保存到本地
-                    DataSet ds = ExcelReader.ReadOptionsProductExcel(fileExtenSion, path);
+                    DataSet ds = await ExcelReader.ReadOptionsProductExcel(fileExtenSion, path);
                     if (ds == null || ds.Tables["OptionsProduct"].Rows.Count == 0)
                     {
                         return Json(new
@@ -955,25 +957,28 @@ namespace OP.Web.Controllers
         /// 得到合作伙伴信息
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetPartner()
+        public async Task<ActionResult> GetPartner()
         {
-            return Json(PartnerRepository.FindAll());
+            List<Partner> lp = await PartnerRepository.FindAllAsync();
+            return Json(lp);
         }
         /// <summary>
         /// 得到处理状态
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetManageStatus()
+        public async Task<ActionResult> GetManageStatus()
         {
-            return Json(ManageStatusRepository.FindAll());
+            List<ManageStatus> lms = await ManageStatusRepository.FindAllAsync();
+            return Json(lms);
         }
         /// <summary>
         /// 得到期权类型信息
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetOptionType()
+        public async Task<ActionResult> GetOptionType()
         {
-            return Json(OptionTypeRepository.FindAll());
+            List<OptionType> lot = await OptionTypeRepository.FindAllAsync();
+            return Json(lot);
         }
         /// <summary>
         /// 新增期权产品
@@ -1021,12 +1026,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetOptionsProductDetails(string ID)
+        public async Task<ActionResult> GetOptionsProductDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 Guid gid = new Guid(ID);
-                OptionsProduct op = OptionsProductRepository.Find(p => p.OptionsProductID == gid);
+                OptionsProduct op = await OptionsProductRepository.FindAsync(p => p.OptionsProductID == gid);
                 if (op != null)
                 {
                     return Json(new
@@ -1170,7 +1175,7 @@ namespace OP.Web.Controllers
                 {
                     throw new Exception("合作方名称或者选择产品为空");
                 }
-                OPM sendList = GetAllProducts(PartnerName, id);
+                OPM sendList = await GetAllProducts(PartnerName, id);
                 string jsonstring = DESEncrypt.DesEncrypt(JsonConvert.SerializeObject(sendList));
                 //byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonstring);
                 //ByteArrayContent bac = new ByteArrayContent(postData);
@@ -1265,7 +1270,7 @@ namespace OP.Web.Controllers
         /// 得到正在发行的产品
         /// </summary>
         /// <returns></returns>
-        private OPM GetAllProducts(string PartnerName, string[] id)
+        private async Task<OPM> GetAllProducts(string PartnerName, string[] id)
         {
             OPM SendOPM = new OPM();
             List<OptionsProductModel> lopm = new List<OptionsProductModel>();
@@ -1273,7 +1278,7 @@ namespace OP.Web.Controllers
             foreach (var item in id)
             {
                 Guid gid = new Guid(item);
-                OptionsProduct findop = OptionsProductRepository.Find(p => p.Status != 0 && p.PartnerName == PartnerName && p.OptionsProductID == gid);
+                OptionsProduct findop = await OptionsProductRepository.FindAsync(p => p.Status != 0 && p.PartnerName == PartnerName && p.OptionsProductID == gid);
                 if (findop != null)
                 {
                     iop.Add(findop);
@@ -1313,7 +1318,7 @@ namespace OP.Web.Controllers
                     opm.productDtlDesc = item.ProductDtlDesc;
                     opm.productUrl = item.ProductUrl;
                     List<FallRoleModel> lfrm = new List<FallRoleModel>();
-                    List<FallRole> lfr = FallRoleRepository.FindList(f => f.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
+                    List<FallRole> lfr = await FallRoleRepository.FindListAsync(f => f.OptionsProductID == item.OptionsProductID, string.Empty, false);
                     if (lfr != null && lfr.Count() != 0)
                     {
                         foreach (var fall in lfr)
@@ -1336,7 +1341,7 @@ namespace OP.Web.Controllers
                     }
                     opm.fallRole = lfrm;
                     List<RiseRoleModel> lrrm = new List<RiseRoleModel>();
-                    List<RiseRole> lrr = RiseRoleRepository.FindList(r => r.OptionsProductID == item.OptionsProductID, string.Empty, false).ToList();
+                    List<RiseRole> lrr = await RiseRoleRepository.FindListAsync(r => r.OptionsProductID == item.OptionsProductID, string.Empty, false);
                     if (lrr != null && lrr.Count() != 0)
                     {
                         foreach (var rise in lrr)
@@ -1370,7 +1375,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult FallRoleGrid_Read(string id)
+        public async Task<ActionResult> FallRoleGrid_Read(string id)
         {
             //JavaScriptSerializer serializer = new JavaScriptSerializer();
 
@@ -1378,7 +1383,7 @@ namespace OP.Web.Controllers
             {
                 //int intid = Convert.ToInt32(id);
                 Guid gid = new Guid(id);
-                IEnumerable<FallRole> ifr = FallRoleRepository.FindList(f => f.OptionsProductID == gid, string.Empty, false).AsEnumerable<FallRole>();
+                IEnumerable<FallRole> ifr = await FallRoleRepository.FindListAsync(f => f.OptionsProductID == gid, string.Empty, false);
                 if (ifr != null && ifr.Count() != 0)
                 {
                     return Json(ifr);
@@ -1427,13 +1432,13 @@ namespace OP.Web.Controllers
         /// 获取上涨规则
         /// </summary>
         /// <returns></returns>
-        public ActionResult RiseRoleGrid_Read(string id)
+        public async Task<ActionResult> RiseRoleGrid_Read(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 //int intid = Convert.ToInt32(id);
                 Guid gid = new Guid(id);
-                IEnumerable<RiseRole> irr = RiseRoleRepository.FindList(f => f.OptionsProductID == gid, string.Empty, false).AsEnumerable<RiseRole>();
+                IEnumerable<RiseRole> irr = await RiseRoleRepository.FindListAsync(f => f.OptionsProductID == gid, string.Empty, false);
                 if (irr != null && irr.Count() != 0)
                 {
                     return Json(irr);
@@ -1485,7 +1490,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult BeginOptionsProduct(string[] id)
+        public async Task<ActionResult> BeginOptionsProduct(string[] id)
         {
             if (id.Length != 0)
             {
@@ -1493,14 +1498,15 @@ namespace OP.Web.Controllers
                 {
                     //int intid = Convert.ToInt32(id);
                     Guid gid = new Guid(itemid);
-                    if (OptionsProductRepository.Exist(o => o.OptionsProductID == gid))
+                    bool IsExist = await OptionsProductRepository.ExistAsync(o => o.OptionsProductID == gid);
+                    if (IsExist)
                     {
-                        OptionsProduct op = OptionsProductRepository.Find(o => o.OptionsProductID == gid);
+                        OptionsProduct op = await OptionsProductRepository.FindAsync(o => o.OptionsProductID == gid);
                         op.Status = 1;
                         op.BeginDate = DateTime.Now.ToLocalTime();
                         if (OptionsProductRepository.Update(op))
                         {
-                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "启动期权产品"+ op.ProductName+ "成功" });
+                            LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "启动期权产品" + op.ProductName + "成功" });
                         }
                         else
                         {
@@ -1529,7 +1535,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult EndOptionsProduct(string[] id)
+        public async Task<ActionResult> EndOptionsProduct(string[] id)
         {
             if (id.Length != 0)
             {
@@ -1537,9 +1543,10 @@ namespace OP.Web.Controllers
                 {
                     //int intid = Convert.ToInt32(id);
                     Guid gid = new Guid(itemid);
-                    if (OptionsProductRepository.Exist(o => o.OptionsProductID == gid))
+                    bool IsExist = await OptionsProductRepository.ExistAsync(o => o.OptionsProductID == gid);
+                    if (IsExist)
                     {
-                        OptionsProduct op = OptionsProductRepository.Find(o => o.OptionsProductID == gid);
+                        OptionsProduct op = await OptionsProductRepository.FindAsync(o => o.OptionsProductID == gid);
                         op.Status = 2;
                         op.IsUpLoad = false;
                         op.EndDate = DateTime.Now.ToLocalTime();
@@ -1570,25 +1577,28 @@ namespace OP.Web.Controllers
         /// 得到所有数字类型
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetNumberType()
+        public async Task<ActionResult> GetNumberType()
         {
-            return Json(NumberTypeRepository.FindAll());
+            List<NumberType> lnt = await NumberTypeRepository.FindAllAsync();
+            return Json(lnt);
         }
         /// <summary>
         /// 得到所有部分类型
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetPartType()
+        public async Task<ActionResult> GetPartType()
         {
-            return Json(PartTypeRepository.FindAll());
+            List<PartType> lpt = await PartTypeRepository.FindAllAsync();
+            return Json(lpt);
         }
         /// <summary>
         /// 得到所有结算价类型
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetCallPriceType()
+        public async Task<ActionResult> GetCallPriceType()
         {
-            return Json(CallPriceTypeRepository.FindAll());
+            List<CallPriceType> lcp = await CallPriceTypeRepository.FindAllAsync();
+            return Json(lcp);
         }
         #endregion
         #region 部分类型配置
@@ -1604,9 +1614,10 @@ namespace OP.Web.Controllers
         /// 部分类型数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult PartTypeConfig_Read()
+        public async Task<ActionResult> PartTypeConfig_Read()
         {
-            return Json(PartTypeRepository.FindAll());
+            List<PartType> lpt = await PartTypeRepository.FindAllAsync();
+            return Json(lpt);
         }
         /// <summary>
         /// 新增部分类型
@@ -1654,12 +1665,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetPartTypeDetails(string ID)
+        public async Task<ActionResult> GetPartTypeDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                PartType findtype = PartTypeRepository.Find(u => u.PartTypeID == typeid);
+                PartType findtype = await PartTypeRepository.FindAsync(u => u.PartTypeID == typeid);
 
                 if (findtype != null)
                 {
@@ -1721,14 +1732,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeletePartType(string ID)
+        public async Task<ActionResult> DeletePartType(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    PartType findtype = PartTypeRepository.Find(u => u.PartTypeID == typeid);
+                    PartType findtype = await PartTypeRepository.FindAsync(u => u.PartTypeID == typeid);
                     if (PartTypeRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除部分类型成功" });
@@ -1751,7 +1762,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 处理状态配置
@@ -1763,9 +1774,10 @@ namespace OP.Web.Controllers
         /// 处理状态数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult ManageStatusConfig_Read()
+        public async Task<ActionResult> ManageStatusConfig_Read()
         {
-            return Json(ManageStatusRepository.FindAll());
+            List<ManageStatus> lms = await ManageStatusRepository.FindAllAsync();
+            return Json(lms);
         }
         /// <summary>
         /// 新增处理状态
@@ -1813,12 +1825,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetManageStatusDetails(string ID)
+        public async Task<ActionResult> GetManageStatusDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                ManageStatus findtype = ManageStatusRepository.Find(u => u.ManageStatusID == typeid);
+                ManageStatus findtype = await ManageStatusRepository.FindAsync(u => u.ManageStatusID == typeid);
 
                 if (findtype != null)
                 {
@@ -1880,14 +1892,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteManageStatus(string ID)
+        public async Task<ActionResult> DeleteManageStatus(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    ManageStatus findtype = ManageStatusRepository.Find(u => u.ManageStatusID == typeid);
+                    ManageStatus findtype = await ManageStatusRepository.FindAsync(u => u.ManageStatusID == typeid);
                     if (ManageStatusRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除处理状态成功" });
@@ -1910,7 +1922,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 资金状态配置
@@ -1922,9 +1934,10 @@ namespace OP.Web.Controllers
         /// 资金状态数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult FundStatusConfig_Read()
+        public async Task<ActionResult> FundStatusConfig_Read()
         {
-            return Json(FundStatusRepository.FindAll());
+            List<FundStatus> lfs = await FundStatusRepository.FindAllAsync();
+            return Json(lfs);
         }
         /// <summary>
         /// 新增资金状态
@@ -1971,12 +1984,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetFundStatusDetails(string ID)
+        public async Task<ActionResult> GetFundStatusDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                FundStatus findtype = FundStatusRepository.Find(u => u.FundStatusID == typeid);
+                FundStatus findtype = await FundStatusRepository.FindAsync(u => u.FundStatusID == typeid);
 
                 if (findtype != null)
                 {
@@ -2038,14 +2051,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteFundStatus(string ID)
+        public async Task<ActionResult> DeleteFundStatus(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    FundStatus findtype = FundStatusRepository.Find(u => u.FundStatusID == typeid);
+                    FundStatus findtype = await FundStatusRepository.FindAsync(u => u.FundStatusID == typeid);
                     if (FundStatusRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除资金状态成功" });
@@ -2081,11 +2094,11 @@ namespace OP.Web.Controllers
         /// FuturesTradeGrid数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult FuturesTradeGrid_Read(int? page, int? rows, string ZH, string JYR)
+        public async Task<ActionResult> FuturesTradeGrid_Read(int? page, int? rows, string ZH, string JYR)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<FuturesTradeVolume> iftv = FuturesTradeVolumeRepository.FindAll();
+            IEnumerable<FuturesTradeVolume> iftv = await FuturesTradeVolumeRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(ZH))
             {
                 iftv = iftv.Where(f => f.ZH.Contains(ZH));
@@ -2093,7 +2106,7 @@ namespace OP.Web.Controllers
             if (!string.IsNullOrEmpty(JYR))
             {
                 string jyr = Convert.ToDateTime(JYR).ToString("yyyyMMdd");
-                iftv = iftv.Where(f => f.JYR.Contains(jyr));
+                iftv = iftv.Where(f => f.JYS.Contains(jyr));
             }
             return Json(new
             {
@@ -2108,7 +2121,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UpdateFuturesTradeData(HttpPostedFileBase uploadedFile)
+        public async Task<ActionResult> UpdateFuturesTradeData(HttpPostedFileBase uploadedFile)
         {
             try
             {
@@ -2117,7 +2130,7 @@ namespace OP.Web.Controllers
                     string fileExtenSion = Path.GetExtension(uploadedFile.FileName);
                     string path = System.IO.Path.Combine(Server.MapPath("~/FileUpLoad/"), System.IO.Path.GetFileName(uploadedFile.FileName));
                     uploadedFile.SaveAs(path);//将文件保存到本地
-                    DataTable dt = ExcelReader.ReadExcel(fileExtenSion, path);
+                    DataTable dt = await ExcelReader.ReadExcel(fileExtenSion, path);
                     if (dt == null || dt.Rows.Count == 0)
                     {
                         return Json(new
@@ -2139,7 +2152,7 @@ namespace OP.Web.Controllers
                     {
                         FuturesTradeVolume TradeVolume = new FuturesTradeVolume();
                         TradeVolume.ZH = item[0].ToString();
-                        TradeVolume.JYR = item[1].ToString();
+                        TradeVolume.JYS = item[1].ToString();
                         TradeVolume.WTH = item[2].ToString();
                         TradeVolume.CJH = item[3].ToString();
                         TradeVolume.QQH = item[4].ToString();
@@ -2180,7 +2193,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
-                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货成交数据失败，"+ex.Message });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货成交数据失败，" + ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
@@ -2194,11 +2207,11 @@ namespace OP.Web.Controllers
         {
             return View();
         }
-        public ActionResult FuturesFundGrid_Read(int? page, int? rows, string ZH, string KSRQ, string JSRQ)
+        public async Task<ActionResult> FuturesFundGrid_Read(int? page, int? rows, string ZH, string KSRQ, string JSRQ)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<FuturesFund> iff = FuturesFundRepository.FindAll();
+            IEnumerable<FuturesFund> iff = await FuturesFundRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(ZH))
             {
                 iff = iff.Where(f => f.ZH.Contains(ZH));
@@ -2224,7 +2237,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UpdateFuturesFundData(HttpPostedFileBase uploadedFile)
+        public async Task<ActionResult> UpdateFuturesFundData(HttpPostedFileBase uploadedFile)
         {
             try
             {
@@ -2233,7 +2246,7 @@ namespace OP.Web.Controllers
                     string fileExtenSion = Path.GetExtension(uploadedFile.FileName);
                     string path = System.IO.Path.Combine(Server.MapPath("~/FileUpLoad/"), System.IO.Path.GetFileName(uploadedFile.FileName));
                     uploadedFile.SaveAs(path);//将文件保存到本地
-                    DataTable dt = ExcelReader.ReadExcel(fileExtenSion, path);
+                    DataTable dt = await ExcelReader.ReadExcel(fileExtenSion, path);
                     if (dt == null || dt.Rows.Count == 0)
                     {
                         return Json(new
@@ -2293,7 +2306,7 @@ namespace OP.Web.Controllers
             }
             catch (Exception ex)
             {
-                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货资金数据失败，"+ex.Message });
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "上传期货资金数据失败，" + ex.Message });
                 return Json(new
                 {
                     statusCode = 400,
@@ -2307,24 +2320,25 @@ namespace OP.Web.Controllers
         {
             return View();
         }
-        public ActionResult FuturesPriceGrid_Read(int? page, int? rows,string TradeCode,string StartDate,string EndDate)
+        public async Task<ActionResult> FuturesPriceGrid_Read(int? page, int? rows, string TradeCode, string StartDate, string EndDate)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<FuturePrice> ifp = FuturePriceRepository.FindAll();
+            IEnumerable<FuturePrice> ifp = await FuturePriceRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(TradeCode))
             {
                 ifp = ifp.Where(f => f.TradeCode.Contains(TradeCode.ToUpper()));
             }
             if (!string.IsNullOrEmpty(StartDate))
             {
-                ifp = ifp.Where(f => f.Date>=Convert.ToDateTime(StartDate));
+                ifp = ifp.Where(f => f.Date >= Convert.ToDateTime(StartDate));
             }
             if (!string.IsNullOrEmpty(EndDate))
             {
-                ifp = ifp.Where(f => f.Date<=Convert.ToDateTime(EndDate));
+                ifp = ifp.Where(f => f.Date <= Convert.ToDateTime(EndDate));
             }
-            var rifp = ifp.OrderByDescending(f => f.Date).Select(f => new {
+            var rifp = ifp.OrderByDescending(f => f.Date).Select(f => new
+            {
                 Date = f.Date.ToString("yyyy-MM-dd"),
                 f.FuturePriceID,
                 f.Price,
@@ -2349,11 +2363,11 @@ namespace OP.Web.Controllers
         /// <param name="page"></param>
         /// <param name="rows"></param>
         /// <returns></returns>
-        public ActionResult OptionTradeGrid_Read(int? page, int? rows, string PartnerName, string ManageStatus, string OptionType, string BeginDate, string EndDate)
+        public async Task<ActionResult> OptionTradeGrid_Read(int? page, int? rows, string PartnerName, string ManageStatus, string OptionType, string BeginDate, string EndDate)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<OptionTrade> iot = OptionTradeRepository.FindAll();
+            IEnumerable<OptionTrade> iot = await OptionTradeRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(PartnerName))
             {
                 iot = iot.Where(o => o.PartnerName == PartnerName);
@@ -2419,7 +2433,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="Contract"></param>
         /// <returns></returns>
-        public ActionResult ConfigContract(string Contract, string OptionTradeID)
+        public async Task<ActionResult> ConfigContract(string Contract, string OptionTradeID)
         {
             try
             {
@@ -2427,8 +2441,8 @@ namespace OP.Web.Controllers
                 {
                     //int id = Convert.ToInt32(OptionTradeID);
                     Guid gid = new Guid(OptionTradeID);
-                    OptionTrade op = OptionTradeRepository.Find(o => o.OptionTradeID == gid);
-                    List<OptionTrade> iot = OptionTradeRepository.FindList(o => o.OptionsProductID == op.OptionsProductID && o.BeginDate == op.BeginDate, string.Empty, false).ToList();
+                    OptionTrade op = await OptionTradeRepository.FindAsync(o => o.OptionTradeID == gid);
+                    List<OptionTrade> iot = await OptionTradeRepository.FindListAsync(o => o.OptionsProductID == op.OptionsProductID && o.BeginDate == op.BeginDate, string.Empty, false);
                     foreach (var item in iot)
                     {
                         item.Contract = Contract.ToUpper();
@@ -2469,11 +2483,11 @@ namespace OP.Web.Controllers
         /// <param name="rows"></param>
         /// <param name="BeginDate"></param>
         /// <returns></returns>
-        public ActionResult OptionTradeSumGrid_Read(int? page, int? rows, string PartnerName, string ManageStatus, string OptionType, string BeginDate1, string BeginDate2, string EndDate1, string EndDate2)
+        public async Task<ActionResult> OptionTradeSumGrid_Read(int? page, int? rows, string PartnerName, string ManageStatus, string OptionType, string BeginDate1, string BeginDate2, string EndDate1, string EndDate2)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<OptionTrade> iot = OptionTradeRepository.FindAll();
+            IEnumerable<OptionTrade> iot = await OptionTradeRepository.FindAllAsync();
             if (!string.IsNullOrEmpty(PartnerName))
             {
                 iot = iot.Where(i => i.PartnerName == PartnerName);
@@ -2581,9 +2595,10 @@ namespace OP.Web.Controllers
         /// 部分类型数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult CallPriceTypeConfig_Read()
+        public async Task<ActionResult> CallPriceTypeConfig_Read()
         {
-            return Json(CallPriceTypeRepository.FindAll());
+            List<CallPriceType> lcp = await CallPriceTypeRepository.FindAllAsync();
+            return Json(lcp);
         }
         /// <summary>
         /// 新增结算价类型
@@ -2630,12 +2645,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetCallPriceTypeDetails(string ID)
+        public async Task<ActionResult> GetCallPriceTypeDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int typeid = Convert.ToInt32(ID);
-                CallPriceType findtype = CallPriceTypeRepository.Find(u => u.CallPriceTypeID == typeid);
+                CallPriceType findtype = await CallPriceTypeRepository.FindAsync(u => u.CallPriceTypeID == typeid);
 
                 if (findtype != null)
                 {
@@ -2697,14 +2712,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteCallPriceType(string ID)
+        public async Task<ActionResult> DeleteCallPriceType(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int typeid = Convert.ToInt32(ID);
-                    CallPriceType findtype = CallPriceTypeRepository.Find(u => u.CallPriceTypeID == typeid);
+                    CallPriceType findtype = await CallPriceTypeRepository.FindAsync(u => u.CallPriceTypeID == typeid);
                     if (CallPriceTypeRepository.Delete(findtype))
                     {
                         LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除结算价类型成功" });
@@ -2727,7 +2742,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
 
@@ -2795,9 +2810,10 @@ namespace OP.Web.Controllers
                 return Json(new { Success = false });
             }
         }
-        public ActionResult ONTimeGrid_Read()
+        public async Task<ActionResult> ONTimeGrid_Read()
         {
-            return Json(ONTimeRepository.FindAll());
+            List<ONTime> lont = await ONTimeRepository.FindAllAsync();
+            return Json(lont);
         }
         /// <summary>
         /// 新增启动时间
@@ -2917,14 +2933,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteONTime(string ID)
+        public async Task<ActionResult> DeleteONTime(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int id = Convert.ToInt32(ID);
-                    ONTime time = ONTimeRepository.Find(on => on.ONTimeID == id);
+                    ONTime time = await ONTimeRepository.FindAsync(on => on.ONTimeID == id);
                     if (time != null)
                     {
                         if (ONTimeRepository.Delete(time))

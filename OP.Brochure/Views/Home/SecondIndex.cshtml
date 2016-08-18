@@ -19,8 +19,8 @@
     <!--coustom css-->
     <link href="~/Content/style.css" rel="stylesheet" type="text/css" />
     <!--fonts-->
-    <link href='http://fonts.useso.com/css?family=Coda:400,800' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.useso.com/css?family=Jockey+One' rel='stylesheet' type='text/css'>
+    @*<link href='http://fonts.useso.com/css?family=Coda:400,800' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.useso.com/css?family=Jockey+One' rel='stylesheet' type='text/css'>*@
     <!--script-->
     <script type="text/javascript" src="~/Scripts/move-top.js"></script>
     <script type="text/javascript" src="~/Scripts/easing.js"></script>
@@ -77,24 +77,74 @@
                 <div class="gallery-bottom">
                     @foreach (var bvm in Model)
                     {
-                        <div class="col-md-4 bottom-gallery">
-                            <a href="/Home/Index/@bvm.OptionsProductID" rel="title" target="_blank" class="b-link-stripe b-animate-go  thickbox">
-                                <div style="width:320px;height:350px;background-image:url(../../images/IMG_3.jpg);background-size:auto">
-                                    <h3>
-                                        <span style="display:block;padding-top:150px;font-size:larger;color:white;font-weight:bolder;" class="txt">@bvm.ProductName</span>
-                                    </h3>
-                                </div> @*<img class="img-responsive" src="~/images/IMG_3.jpg" />*@
-                                <div class="b-wrapper">
-                                    <h3 class="b-animate b-from-left b-delay03">
-                                        <span class="text-left" style="display:block;padding-top:30px;padding-left:20px;padding-right:20px;font-size:large">产品特征：<br/><br />@Html.Raw(bvm.Contract)</span>
-                                        <span class="glyphicon glyphicon-arrow-right gal-icn" aria-hidden="true"></span>
-                                    </h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="/Home/Index/@bvm.OptionsProductID" rel="title" target="_blank" class="b-link-stripe b-animate-go  thickbox" style="width:320px;">
+                                    <div style="width:320px;height:350px;background-image:url(../../images/IMG_3.jpg);background-size:auto;">
+                                        <h3>
+                                            <span style="display:block;padding-top:150px;font-size:larger;color:white;font-weight:bolder;" class="txt">@bvm.ProductName</span>
+                                        </h3>
+                                    </div> @*<img class="img-responsive" src="~/images/IMG_3.jpg" />*@
+
+                                    @*<div class="b-wrapper">
+                                            <h3 class="b-animate b-from-left b-delay03">
+                                                <span class="text-left" style="display:block;padding-top:30px;padding-left:20px;padding-right:20px;font-size:large">产品特征：<br/><br />@Html.Raw(bvm.Contract)</span>
+                                                <span class="glyphicon glyphicon-arrow-right gal-icn" aria-hidden="true"></span>
+                                            </h3>
+                                        </div>*@
+                                </a>
+                            </div>
+                            <div class="col-md-8 alert-info" style="height:350px;width:780px;display:table;">
+                                <div style="display: table-cell;vertical-align: middle;">
+                                    <h1 style="font-weight:bolder">产品特征</h1>
+                                    <div class="row" style="padding-left:20px;">
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">产品期限：<span style="font-weight:normal">@bvm.Deadline </span></span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">标的合约：<span style="font-weight:normal">@bvm.Contract @bvm.ContractDescrip</span></span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">
+                                                @if (bvm.AmountType == "保费")
+                                                {
+                                                    <span>服&ensp;务&ensp;费：</span>
+                                                }
+                                                else if (bvm.AmountType == "保证金")
+                                                {
+                                                    <span>保&ensp;证&ensp;金：</span>
+                                                }
+                                                @if (bvm.PriceType == "单位值")
+                                                {
+                                                    <span style="font-weight:normal">@bvm.Price 元/吨</span>
+                                                }
+                                                else if (bvm.PriceType == "固定值")
+                                                {
+                                                    <span style="font-weight:normal">@bvm.Price 元</span>
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left;text-align:left">
+                                                追补说明：<span style="font-weight:normal;line-height:150%">@bvm.PayDescrip</span>
+                                            </span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left;text-align:left">
+                                                结算公式：<span style="font-weight:normal;line-height:150%">
+                                                    @Html.Raw(bvm.SettlementFormula)
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </a>
+                            </div>
                         </div>
+                        <div class="row">&emsp;</div>
                     }
 
-                    
+
                     <div class="clearfix"></div>
                     @*<script src="~/Scripts/jquery.chocolat.js"></script>*@
                     @*<link rel="stylesheet" href="~/Content/chocolat.css" type="text/css" media="screen" charset="utf-8">*@
@@ -108,7 +158,7 @@
 
             </div>
         </div>
-        
+
         <div class="footer">
             <div class="container">
 

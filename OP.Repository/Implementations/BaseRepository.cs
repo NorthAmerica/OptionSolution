@@ -93,6 +93,20 @@ namespace OP.Repository.Implementations
                 return nContext.Set<T>().Any(anyLambda);
             }
         }
+
+        /// <summary>
+        /// 是否存在满足条件的实体（异步）
+        /// </summary>
+        /// <param name="anyLambda"></param>
+        /// <returns></returns>
+        public async Task<bool> ExistAsync(Expression<Func<T, bool>> anyLambda)
+        {
+            using (EFDbContext nContext = new EFDbContext())
+            {
+                bool exist = await nContext.Set<T>().AnyAsync(anyLambda);
+                return exist;
+            }
+        }
         /// <summary>
         /// 不进行缓存查询
         /// 性能提高

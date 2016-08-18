@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 
-namespace Op.Web.Attribute
+namespace OP.Web.Attribute
 {
     /// <summary>
     /// 表示需要用户登录才可以使用的特性

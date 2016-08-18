@@ -59,6 +59,12 @@ namespace OP.Repository
         /// <returns>布尔值</returns>
         bool Exist(Expression<Func<T, bool>> anyLambda);
         /// <summary>
+        /// 是否存在(异步)
+        /// </summary>
+        /// <param name="anyLambda">查询表达式</param>
+        /// <returns>布尔值</returns>
+        Task<bool> ExistAsync(Expression<Func<T, bool>> anyLambda);
+        /// <summary>
         /// 不进行缓存查询
         /// </summary>
         /// <param name="whereLambda"></param>
