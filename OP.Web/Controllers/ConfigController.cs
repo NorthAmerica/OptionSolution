@@ -126,13 +126,13 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetUserDetails(string ID)
+        public async Task<ActionResult> GetUserDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
-                
+
                 int userid = Convert.ToInt32(ID);
-                User finduser = UserRepository.Find(u => u.UserID == userid);
+                User finduser = await UserRepository.FindAsync(u => u.UserID == userid);
 
                 if (finduser != null)
                 {
@@ -194,7 +194,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteUser(string ID)
+        public async Task<ActionResult> DeleteUser(string ID)
         {
             try
             {
@@ -202,12 +202,12 @@ namespace OP.Web.Controllers
                 {
                     //Guid userid = new Guid(ID);
                     int userid = Convert.ToInt32(ID);
-                    User finduser = UserRepository.Find(u => u.UserID == userid);
+                    User finduser = await UserRepository.FindAsync(u => u.UserID == userid);
                     if (UserRepository.Delete(finduser))
                     {
                         //查询关联表 用户角色表
-                        IEnumerable<UserRole> IUR = UserRoleRepository.FindList(u => u.UserID == userid, string.Empty, false);
-                        if (IUR!=null&&IUR.Count()!=0)
+                        IEnumerable<UserRole> IUR = await UserRoleRepository.FindListAsync(u => u.UserID == userid, string.Empty, false);
+                        if (IUR != null && IUR.Count() != 0)
                         {
                             //删除关联项
                             UserRoleRepository.DeleteRange(IUR);
@@ -231,7 +231,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 角色管理
@@ -243,9 +243,10 @@ namespace OP.Web.Controllers
         /// Role数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult RoleConfig_Read()
+        public async Task<ActionResult> RoleConfig_Read()
         {
-            return Json(RoleRepository.FindAll());
+            List<Role> lr = await RoleRepository.FindAllAsync();
+            return Json(lr);
         }
         /// <summary>
         /// 新增角色
@@ -292,13 +293,13 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetRoleDetails(string ID)
+        public async Task<ActionResult> GetRoleDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 //Guid roleid = new Guid(ID);
                 int roleid = Convert.ToInt32(ID);
-                Role findrole = RoleRepository.Find(u => u.RoleID == roleid);
+                Role findrole = await RoleRepository.FindAsync(u => u.RoleID == roleid);
                 if (findrole != null)
                 {
                     return Json(new
@@ -357,27 +358,27 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteRole(string ID)
+        public async Task<ActionResult> DeleteRole(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
-                    
+
                     int roleid = Convert.ToInt32(ID);
-                    Role findrole = RoleRepository.Find(u => u.RoleID == roleid);
+                    Role findrole = await RoleRepository.FindAsync(u => u.RoleID == roleid);
                     if (RoleRepository.Delete(findrole))
                     {
                         //查询关联关系 菜单角色表
-                        IEnumerable<RoleMenu> IRM = RoleMenuRepository.FindList(r => r.RoleID == roleid,string.Empty,false);
-                        if (IRM!=null&&IRM.Count()!=0)
+                        IEnumerable<RoleMenu> IRM = await RoleMenuRepository.FindListAsync(r => r.RoleID == roleid, string.Empty, false);
+                        if (IRM != null && IRM.Count() != 0)
                         {
                             //删除已存在的菜单角色表
                             RoleMenuRepository.DeleteRange(IRM);
                         }
                         //查询关联关系 用户角色表
-                        IEnumerable<UserRole> IUR = UserRoleRepository.FindList(u => u.RoleID == roleid, string.Empty, false);
-                        if (IUR!=null&& IUR.Count()!=0)
+                        IEnumerable<UserRole> IUR = await UserRoleRepository.FindListAsync(u => u.RoleID == roleid, string.Empty, false);
+                        if (IUR != null && IUR.Count() != 0)
                         {
                             //删除已存在的用户角色表
                             UserRoleRepository.DeleteRange(IUR);
@@ -401,7 +402,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 菜单维护
@@ -413,9 +414,10 @@ namespace OP.Web.Controllers
         /// Menu数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult MenuConfig_Read()
+        public async Task<ActionResult> MenuConfig_Read()
         {
-            IEnumerable<Menu> topMenu = MenuRepository.FindAll().OrderBy(m=>m.OrderNum).Where(m => m.FMenuID == 0);
+            List<Menu> findall = await MenuRepository.FindAllAsync();
+            IEnumerable<Menu> topMenu = findall.OrderBy(m => m.OrderNum).Where(m => m.FMenuID == 0);
             List<MenuTreeModel> result = new List<MenuTreeModel>();
             foreach (Menu Menu in topMenu)
             {
@@ -424,7 +426,7 @@ namespace OP.Web.Controllers
                 toptree.MenuName = Menu.MenuName;
                 toptree.MenuURL = Menu.MenuURL;
                 toptree.OrderNum = Menu.OrderNum;
-                toptree.children = addchild(Menu.MenuID);
+                toptree.children = await addchild(Menu.MenuID);
                 result.Add(toptree);
             }
             return Json(result);
@@ -434,9 +436,10 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="FID">父ID</param>
         /// <returns></returns>
-        private List<MenuTreeModel> addchild(int FID)
+        private async Task<List<MenuTreeModel>> addchild(int FID)
         {
-            IEnumerable<Menu> childmenu = MenuRepository.FindAll().OrderBy(m => m.OrderNum).Where(m => m.FMenuID == FID);
+            List<Menu> findall = await MenuRepository.FindAllAsync();
+            IEnumerable<Menu> childmenu = findall.OrderBy(m => m.OrderNum).Where(m => m.FMenuID == FID);
             if (childmenu != null && childmenu.Count() != 0)
             {
                 List<MenuTreeModel> childtree = new List<MenuTreeModel>();
@@ -448,7 +451,7 @@ namespace OP.Web.Controllers
                         MenuName = child.MenuName,
                         MenuURL = child.MenuURL,
                         OrderNum = child.OrderNum,
-                        children = addchild(child.MenuID)
+                        children = await addchild(child.MenuID)
                     });
                 }
                 return childtree;
@@ -545,12 +548,12 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetMenuDetails(string ID)
+        public async Task<ActionResult> GetMenuDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
                 int menuid = Convert.ToInt32(ID);
-                Menu findmenu = MenuRepository.Find(u => u.MenuID == menuid);
+                Menu findmenu = await MenuRepository.FindAsync(u => u.MenuID == menuid);
                 if (findmenu != null)
                 {
                     return Json(new
@@ -610,14 +613,14 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteMenu(string ID)
+        public async Task<ActionResult> DeleteMenu(string ID)
         {
             try
             {
                 if (!string.IsNullOrEmpty(ID))
                 {
                     int menuid = Convert.ToInt32(ID);
-                    Menu findmenu = MenuRepository.Find(u => u.MenuID == menuid);
+                    Menu findmenu = await MenuRepository.FindAsync(u => u.MenuID == menuid);
                     if (findmenu != null)
                     {
                         List<Menu> Ldelete = new List<Menu>();
@@ -628,8 +631,8 @@ namespace OP.Web.Controllers
                             //查找并删除菜单角色表中的数据
                             foreach (Menu item in Ldelete)
                             {
-                                RoleMenu findrm = RoleMenuRepository.Find(r => r.MenuID == item.MenuID);
-                                if (findrm!=null)
+                                RoleMenu findrm = await RoleMenuRepository.FindAsync(r => r.MenuID == item.MenuID);
+                                if (findrm != null)
                                 {
                                     RoleMenuRepository.Delete(findrm);
                                 }
@@ -654,16 +657,17 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除子菜单
         /// </summary>
-        private void DeleteChild(List<Menu> Ldelete, int menuid)
+        private async void DeleteChild(List<Menu> Ldelete, int menuid)
         {
             try
             {
-                IEnumerable<Menu> findchilds = MenuRepository.FindAll().Where(m => m.FMenuID == menuid);
+                List<Menu> findall = await MenuRepository.FindAllAsync();
+                IEnumerable<Menu> findchilds = findall.Where(m => m.FMenuID == menuid);
 
                 if (findchilds != null && findchilds.Count() != 0)
                 {
@@ -694,9 +698,9 @@ namespace OP.Web.Controllers
         /// RoleTree数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult RoleTree_Read()
+        public async Task<ActionResult> RoleTree_Read()
         {
-            IEnumerable<Role> allRole = RoleRepository.FindAll();
+            IEnumerable<Role> allRole = await RoleRepository.FindAllAsync();
             TreeModel tm = new TreeModel();
             tm.id = "0";
             tm.text = "所有角色";
@@ -718,19 +722,21 @@ namespace OP.Web.Controllers
         /// 人员角色数据源
         /// </summary>
         /// <returns></returns>
-        public ActionResult UserRole_Read(string id)
+        public async Task<ActionResult> UserRole_Read(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 //Guid roleid = new Guid(id);
                 int roleid = Convert.ToInt32(id);
-                IEnumerable<UserRole> iur = UserRoleRepository.FindAll().Where(u => u.RoleID == roleid);
+                List<UserRole> findall = await UserRoleRepository.FindAllAsync();
+                IEnumerable<UserRole> iur = findall.Where(u => u.RoleID == roleid);
                 if (iur != null && iur.Count() != 0)
                 {
-                    List<User> lUser = new List<Entities.Models.User>();
+                    List<User> lUser = new List<User>();
                     foreach (UserRole item in iur)
                     {
-                        lUser.Add(UserRepository.Find(u => u.UserID == item.UserID));
+                        User findu = await UserRepository.FindAsync(u => u.UserID == item.UserID);
+                        lUser.Add(findu);
                     }
                     return Json(lUser);
                 }
@@ -745,7 +751,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UpdateUserRole(string RoleID, string UserIDs)
+        public async Task<ActionResult> UpdateUserRole(string RoleID, string UserIDs)
         {
             try
             {
@@ -758,7 +764,8 @@ namespace OP.Web.Controllers
                     {
                         //Guid gUserID = new Guid(item);
                         int intUserID = Convert.ToInt32(item);
-                        if (!UserRoleRepository.Exist(ur => ur.RoleID == intRoleID && ur.UserID == intUserID))
+                        bool IsExist = await UserRoleRepository.ExistAsync(ur => ur.RoleID == intRoleID && ur.UserID == intUserID);
+                        if (!IsExist)
                         {
                             UserRole ur = new UserRole();
                             ur.RoleID = intRoleID;
@@ -785,7 +792,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除用户角色
@@ -793,7 +800,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteUserRole(string RoleID, string UserIDs)
+        public async Task<ActionResult> DeleteUserRole(string RoleID, string UserIDs)
         {
             try
             {
@@ -804,7 +811,7 @@ namespace OP.Web.Controllers
                     foreach (var item in userid)
                     {
                         int intUserID = Convert.ToInt32(item);
-                        UserRole ur = UserRoleRepository.Find(u => u.RoleID == intRoleID && u.UserID == intUserID);
+                        UserRole ur = await UserRoleRepository.FindAsync(u => u.RoleID == intRoleID && u.UserID == intUserID);
                         if (ur != null)
                         {
                             UserRoleRepository.Delete(ur);
@@ -828,7 +835,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         #endregion
         #region 角色菜单维护
@@ -841,18 +848,20 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ActionResult RoleMenu_Read(string id)
+        public async Task<ActionResult> RoleMenu_Read(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
                 int menuid = Convert.ToInt32(id);
-                IEnumerable<RoleMenu> irm = RoleMenuRepository.FindAll().Where(u => u.MenuID == menuid);
+                List<RoleMenu> findall = await RoleMenuRepository.FindAllAsync();
+                IEnumerable<RoleMenu> irm = findall.Where(u => u.MenuID == menuid);
                 if (irm != null && irm.Count() != 0)
                 {
                     List<Role> lRole = new List<Role>();
                     foreach (RoleMenu item in irm)
                     {
-                        lRole.Add(RoleRepository.Find(u => u.RoleID == item.RoleID));
+                        Role role = await RoleRepository.FindAsync(u => u.RoleID == item.RoleID);
+                        lRole.Add(role);
                     }
                     return Json(lRole);
                 }
@@ -867,7 +876,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult UpdateRoleMenu(string MenuID, string RoleIDs)
+        public async Task<ActionResult> UpdateRoleMenu(string MenuID, string RoleIDs)
         {
             try
             {
@@ -879,7 +888,8 @@ namespace OP.Web.Controllers
                     foreach (var item in roleid)
                     {
                         int intRoleID = Convert.ToInt32(item);
-                        if (!RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                        bool IsExist = await RoleMenuRepository.ExistAsync(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID);
+                        if (!IsExist)
                         {
                             RoleMenu rm = new RoleMenu();
                             rm.RoleID = intRoleID;
@@ -904,28 +914,30 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 更新添加子菜单
         /// </summary>
         /// <param name="MenuID"></param>
         /// <param name="RoleID"></param>
-        private void UpdateChild(List<RoleMenu> lrm,int MenuID,int RoleID)
+        private async void UpdateChild(List<RoleMenu> lrm, int MenuID, int RoleID)
         {
-            IEnumerable<Menu> im = MenuRepository.FindAll().Where(m => m.FMenuID == MenuID);
-            if (im!=null&&im.Count()!=0)
+            List<Menu> findall = await MenuRepository.FindAllAsync();
+            IEnumerable<Menu> im = findall.Where(m => m.FMenuID == MenuID);
+            if (im != null && im.Count() != 0)
             {
                 foreach (Menu item in im)
                 {
-                    if (!RoleMenuRepository.Exist(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID))
+                    bool IsExist = await RoleMenuRepository.ExistAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
+                    if (!IsExist)
                     {
                         RoleMenu rm = new RoleMenu();
                         rm.RoleID = RoleID;
                         rm.MenuID = item.MenuID;
                         lrm.Add(rm);
                     }
-                    UpdateChild(lrm,item.MenuID, RoleID);
+                    UpdateChild(lrm, item.MenuID, RoleID);
                 }
 
             }
@@ -940,7 +952,7 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult DeleteRoleMenu(string MenuID,string RoleIDs)
+        public async Task<ActionResult> DeleteRoleMenu(string MenuID, string RoleIDs)
         {
             try
             {
@@ -952,9 +964,11 @@ namespace OP.Web.Controllers
                     foreach (var item in roleid)
                     {
                         int intRoleID = Convert.ToInt32(item);
-                        if (RoleMenuRepository.Exist(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID))
+                        bool IsExist = await RoleMenuRepository.ExistAsync(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID);
+                        if (IsExist)
                         {
-                            lrm.Add(RoleMenuRepository.Find(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID));
+                            RoleMenu rm = await RoleMenuRepository.FindAsync(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID);
+                            lrm.Add(rm);
                         }
                         DeleteChild(lrm, intMenuID, intRoleID);
                     }
@@ -977,7 +991,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除子菜单角色
@@ -985,16 +999,18 @@ namespace OP.Web.Controllers
         /// <param name="lrm"></param>
         /// <param name="MenuID"></param>
         /// <param name="RoleID"></param>
-        private void DeleteChild(List<RoleMenu> lrm, int MenuID, int RoleID)
+        private async void DeleteChild(List<RoleMenu> lrm, int MenuID, int RoleID)
         {
             IEnumerable<Menu> im = MenuRepository.FindAll().Where(m => m.FMenuID == MenuID);
             if (im != null && im.Count() != 0)
             {
                 foreach (Menu item in im)
                 {
-                    if (RoleMenuRepository.Exist(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID))
+                    bool IsExist = await RoleMenuRepository.ExistAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
+                    if (IsExist)
                     {
-                        lrm.Add(RoleMenuRepository.Find(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID));
+                        RoleMenu rm =await RoleMenuRepository.FindAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
+                        lrm.Add(rm);
                     }
                     DeleteChild(lrm, item.MenuID, RoleID);
                 }
@@ -1011,18 +1027,19 @@ namespace OP.Web.Controllers
             return View();
         }
 
-        public ActionResult EventLogGrid_Read(int? page, int? rows,string Name,string Date)
+        public async Task<ActionResult> EventLogGrid_Read(int? page, int? rows, string Name, string Date)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<EventLog> iel = LogRepository.FindAll().OrderByDescending(l=>l.Date);
+            List<EventLog> findall = await LogRepository.FindAllAsync();
+            IEnumerable<EventLog> iel = findall.OrderByDescending(l => l.Date);
             if (!string.IsNullOrEmpty(Name))
             {
-                iel = iel.Where(e=>e.Name.Contains(Name));
+                iel = iel.Where(e => e.Name.Contains(Name));
             }
             if (!string.IsNullOrEmpty(Date))
             {
-                iel = iel.Where(e=>e.Date.ToString("yyyy-MM-dd")==Date);
+                iel = iel.Where(e => e.Date.ToString("yyyy-MM-dd") == Date);
             }
             return Json(new
             {
@@ -1036,11 +1053,12 @@ namespace OP.Web.Controllers
         {
             return View();
         }
-        public ActionResult GuestBookGrid_Read(int? page, int? rows)
+        public async Task<ActionResult> GuestBookGrid_Read(int? page, int? rows)
         {
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
-            IEnumerable<GuestBook> igb= GuestBookRepository.FindAll().OrderByDescending(l => l.GuestDate);
+            List<GuestBook> findall = await GuestBookRepository.FindAllAsync();
+            IEnumerable<GuestBook> igb = findall.OrderByDescending(l => l.GuestDate);
             var result = igb.Select(g => new
             {
                 g.GuestBookID,
@@ -1061,13 +1079,13 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpGet]
-        public ActionResult GetGuestBookDetails(string ID)
+        public async Task<ActionResult> GetGuestBookDetails(string ID)
         {
             if (!string.IsNullOrEmpty(ID))
             {
 
                 int GuestBookID = Convert.ToInt32(ID);
-                GuestBook findGB = GuestBookRepository.Find(g => g.GuestBookID == GuestBookID);
+                GuestBook findGB = await GuestBookRepository.FindAsync(g => g.GuestBookID == GuestBookID);
 
                 if (findGB != null)
                 {
