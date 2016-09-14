@@ -1,0 +1,970 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initGoodsPurchaseList();
+        BindAddGoodsPurchaseClickEvent();
+        BindUpdateGoodsPurchaseClickEvent();
+        BindAddGoodsMarketingClickEvent();
+        BindAddGoodsFutureClickEvent();
+    });
+    function initGoodsPurchaseList() {
+        $('#GoodsPurchaseGrid').datagrid({
+            title: '现货采购合同列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsPurchaseList_Read',
+            sortName: 'SigningTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsPurchaseID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsPurchaseID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'CustomerName', title: '客户名称', width: 80, sortable: true },
+                { field: 'ContractNo', title: '合同号', width: 100, sortable: true },
+                { field: 'SigningTime', title: '签订时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'ContractType', title: '合同类型', width: 50, sortable: true },
+                { field: 'ContractObject', title: '合同标的', width: 80, sortable: true },
+                { field: 'UnitPrice', title: '合同单价(元/吨)', width: 50, sortable: true },
+                { field: 'ContractNum', title: '合同数量(吨)', width: 50, sortable: true },
+                { field: 'TotalPrice', title: '合同总金额(元)', width: 80, sortable: true },
+                { field: 'DeliveryTime', title: '交货时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'AlreadyPickingNum', title: '已提货数量(吨)', width: 50, sortable: true },
+                { field: 'AwaitPickdingNum', title: '待提货数量(吨)', width: 50, sortable: true },
+                { field: 'RealityPickdingNum', title: '实际提货数量(吨)', width: 50, sortable: true },
+                { field: 'LogisticsCost', title: '物流成本(元/吨)', width: 50, sortable: true },
+                { field: 'TonCost', title: '每顿成本(元)', width: 50, sortable: true },
+                { field: 'AllCost', title: '总成本(元)', width: 80, sortable: true },
+                { field: 'InvoiceStatus', title: '发票状态', width: 50, sortable: true },
+                { field: 'PaymentAmount', title: '付款金额', width: 50, sortable: true },
+                { field: 'PaymentTime', title: '付款时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'Remark', title: '备注', width: 50, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加现货采购合同',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddGoodsPurchaseDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改现货采购合同',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateGoodsPurchaseDialog();
+                }
+            },  '-', {
+                id: 'btncut',
+                text: '删除现货采购合同',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteGoodsPurchase();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initGoodsPurchaseList();
+                }
+            }, '-', {
+                id: 'btnadd2',
+                text: '添加现货销售合同',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddGoodsMarketingDialog();
+                }
+            }, '-', {
+                id: 'btnshow1',
+                text: '显示相关现货销售合同',
+                iconCls: 'icon-temp',
+                handler: function () {
+                    ShowGoodsMarketingList();
+                }
+            }, '-', {
+                id: 'btnadd3',
+                text: '添加盘面对冲',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddGoodsFutureDialog();
+                }
+            }, '-', {
+                id: 'btnshow2',
+                text: '显示相关盘面对冲',
+                iconCls: 'icon-temp',
+                handler: function () {
+                    ShowGoodsFutureList();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateGoodsPurchaseDialog();
+            }
+        });
+    }
+    //显示相关盘面对冲
+    function ShowGoodsFutureList() {
+        var GoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (GoodsPurchaseID.length == 1) {
+            initShowGoodsFutureGrid();
+            $('#ShowGoodsFutureGrid').datagrid('load', {
+                GoodsPurchaseID: GoodsPurchaseID[0].GoodsPurchaseID
+            });
+            $("#ShowGoodsFutureListDialog").dialog("open").dialog("setTitle", "显示关联现货销售合同");
+        }
+        else {
+            $.messager.alert("友情提示", "必须选择一条现货采购合同，你已经选择了<font color='red' size='6'>" + GoodsPurchaseID.length + "</font>行");
+        }
+    }
+    function initShowGoodsFutureGrid() {
+        $('#ShowGoodsFutureGrid').datagrid({
+            title: '现货盘面对冲列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsFutureList_Read',
+            sortName: 'GoodsFuturesID',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsFuturesID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsFuturesID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约代码', width: 80, sortable: true },
+                { field: 'FundAccount', title: '资金账号', width: 100, sortable: true },
+                { field: 'Positions', title: '持仓量', width: 60, sortable: true },
+                { field: 'ContractNo', title: '对应合同号', width: 50, sortable: true },
+                { field: 'BuyOpen', title: '买入开仓价格', width: 80, sortable: true },
+                { field: 'SellClose', title: '卖出平仓价格', width: 50, sortable: true },
+                { field: 'SellOpen', title: '卖出开仓价格', width: 50, sortable: true },
+                { field: 'BuyClose', title: '买入平仓价格', width: 80, sortable: true },
+                { field: 'PointCount', title: '盈亏点数', width: 60, sortable: true },
+                { field: 'Amount', title: '盈亏金额', width: 50, sortable: true },
+                { field: 'RecordTime', title: '记录时间', width: 60, sortable: true, formatter: formatDateBox }
+            ]]
+        });
+    }
+    //显示相关现货销售合同
+    function ShowGoodsMarketingList() {
+        var GoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (GoodsPurchaseID.length == 1) {
+            initShowGoodsMarketingGrid();
+            $('#ShowGoodsMarketingGrid').datagrid('load', {
+                GoodsPurchaseID: GoodsPurchaseID[0].GoodsPurchaseID
+            });
+            $("#ShowGoodsMarketingListDialog").dialog("open").dialog("setTitle", "显示关联现货销售合同");
+        }
+        else {
+            $.messager.alert("友情提示", "必须选择一条现货采购合同，你已经选择了<font color='red' size='6'>" + GoodsPurchaseID.length + "</font>行");
+        }
+    }
+    function initShowGoodsMarketingGrid() {
+        $('#ShowGoodsMarketingGrid').datagrid({
+            title: '现货销售合同列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsMarketingList_Read',
+            sortName: 'GoodsMarketingID',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsMarketingID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsMarketingID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'CustomerName', title: '客户名称', width: 80, sortable: true },
+                { field: 'ContractNo', title: '合同号', width: 100, sortable: true },
+                { field: 'SigningTime', title: '签订时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'PickingType', title: '提货方式', width: 50, sortable: true },
+                { field: 'ContractObject', title: '合同标的', width: 80, sortable: true },
+                { field: 'UnitPrice', title: '合同单价(元/吨)', width: 50, sortable: true },
+                { field: 'ContractNum', title: '合同数量(吨)', width: 50, sortable: true },
+                { field: 'TotalPrice', title: '合同总金额(元)', width: 80, sortable: true },
+                { field: 'DeliveryTime', title: '交货时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'AlreadyDeliveryNum', title: '已交货数量(吨)', width: 50, sortable: true },
+                { field: 'AwaitDeliveryNum', title: '待交货数量(吨)', width: 50, sortable: true },
+                { field: 'RealityDeliveryNum', title: '实际发货量(吨)', width: 50, sortable: true },
+                { field: 'LogisticsCost', title: '物流成本(元/吨)', width: 50, sortable: true },
+                { field: 'InvoiceStatus', title: '销项发票', width: 50, sortable: true },
+                { field: 'AlreadyPayment', title: '已收货款', width: 50, sortable: true },
+                { field: 'AwaitPayment', title: '待收货款', width: 50, sortable: true },
+                { field: 'RealityPayment', title: '应收货款', width: 50, sortable: true },
+                { field: 'Remark', title: '备注', width: 50, sortable: true }
+            ]]
+        });
+    }
+    //添加盘面对冲
+    function AddGoodsFutureDialog() {
+        var GoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (GoodsPurchaseID.length == 1) {
+            $("#AddGoodsFutureForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
+            $("#AddGoodsFutureDialog").dialog("open").dialog("setTitle", "添加盘面对冲");
+        }
+        else {
+            $.messager.alert("友情提示", "必须选择一条现货采购合同，你已经选择了<font color='red' size='6'>" + GoodsPurchaseID.length + "</font>行");
+        }
+    }
+    //添加盘面对冲事件
+    function BindAddGoodsFutureClickEvent() {
+        $("#btnAddGoodsFuture").click(function () {
+            var valid = $('#AddGoodsFutureForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                GoodsPurchaseID: $("#GoodsPurchaseGrid").datagrid("getSelections")[0].GoodsPurchaseID,
+                Contract: $("#Contract").val(),
+                FundAccount: $("#FundAccount").val(),
+                Positions: $('#Positions').numberbox('getValue'),
+                BuyOpen: $('#BuyOpen').numberbox('getValue'),
+                SellClose: $('#SellClose').numberbox('getValue'),
+                SellOpen: $('#SellOpen').numberbox('getValue'),
+                BuyClose: $('#BuyClose').numberbox('getValue'),
+                PointCount: $('#PointCount').numberbox('getValue'),
+                Amount: $('#Amount').numberbox('getValue')
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/AddGoodsFuture',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增盘面对冲。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddGoodsFutureDialog').dialog('close');
+                        $("#GoodsPurchaseGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+        });
+    }
+    //添加现货销售合同
+    function AddGoodsMarketingDialog() {
+        var GoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (GoodsPurchaseID.length == 1) {
+            $("#AddGoodsMarketingForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
+            $("#AddGoodsMarketingDialog").dialog("open").dialog("setTitle", "添加现货销售合同");
+        }
+        else {
+            $.messager.alert("友情提示", "必须选择一条现货采购合同，你已经选择了<font color='red' size='6'>" + GoodsPurchaseID.length + "</font>行");
+        }
+    }
+    //添加现货销售合同事件
+    function BindAddGoodsMarketingClickEvent() {
+        $("#btnAddGoodsMarketing").click(function () {
+            var valid = $('#AddGoodsMarketingForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                GoodsPurchaseID:$("#GoodsPurchaseGrid").datagrid("getSelections")[0].GoodsPurchaseID,
+                CustomerName: $("#CustomerNameM").combobox('getText'),
+                ContractNo: $("#ContractNoM").val(),
+                SigningTime: $('#SigningTimeM').datebox('getText'),
+                PickingType: $('#PickingTypeM').combobox('getText'),
+                ContractObject: $('#ContractObjectM').val(),
+                UnitPrice: $('#UnitPriceM').numberbox('getValue'),
+                ContractNum: $('#ContractNumM').numberbox('getValue'),
+                DeliveryTime: $('#DeliveryTimeM').datebox('getValue'),
+                AlreadyDeliveryNum: $('#AlreadyDeliveryNumM').numberbox('getValue'),
+                RealityDeliveryNum: $('#RealityDeliveryNumM').numberbox('getValue'),
+                LogisticsCost: $('#LogisticsCostM').numberbox('getValue'),
+                InvoiceStatus: $('#InvoiceStatusM').combobox('getText'),
+                AlreadyPayment: $('#AlreadyPaymentM').numberbox('getValue'),
+                Remark: $('#RemarkM').val()
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/AddGoodsMarketing',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增现货销售合同成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddGoodsMarketingDialog').dialog('close');
+                        $("#GoodsPurchaseGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+        });
+    }
+    //添加现货采购合同页面
+    function AddGoodsPurchaseDialog() {
+        $('#AddGoodsPurchaseDialog').dialog('open').dialog('setTitle', '添加现货采购合同');
+        ClearText();
+    }
+    //添加现货采购合同事件
+    function BindAddGoodsPurchaseClickEvent() {
+        $("#btnAddGoodsPurchase").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddGoodsPurchaseForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                CustomerName: $("#CustomerName").combobox('getText'),
+                ContractNo: $("#ContractNo").val(),
+                SigningTime: $('#SigningTime').datebox('getText'),
+                ContractType: $('#ContractType').combobox('getText'),
+                ContractObject: $('#ContractObject').val(),
+                UnitPrice: $('#UnitPrice').numberbox('getValue'),
+                ContractNum: $('#ContractNum').numberbox('getValue'),
+                DeliveryTime: $('#DeliveryTime').datebox('getValue'),
+                AlreadyPickingNum: $('#AlreadyPickingNum').numberbox('getValue'),
+                RealityPickdingNum: $('#RealityPickdingNum').numberbox('getValue'),
+                LogisticsCost: $('#LogisticsCost').numberbox('getValue'),
+                InvoiceStatus: $('#InvoiceStatus').combobox('getText'),
+                PaymentAmount: $('#PaymentAmount').numberbox('getValue'),
+                PaymentTime: $('#PaymentTime').datebox('getText'),
+                Remark: $('#Remark').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/AddGoodsPurchase',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增现货采购合同成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddGoodsPurchaseDialog').dialog('close');
+                        $("#GoodsPurchaseGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查"+data.Message);
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+        });
+    }
+    //修改现货采购合同
+    function UpdateGoodsPurchaseDialog() {
+        var UpdateGoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (UpdateGoodsPurchaseID.length == 1) {
+            $("#UpdateGoodsPurchaseDialog").dialog("open").dialog("setTitle", "修改现货采购合同");
+            //ClearText();
+            BingGoodsPurchaseDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateGoodsPurchaseID.length + "</font>行");
+        }
+    }
+    //绑定现货采购合同
+    function BingGoodsPurchaseDetails() {
+        var CheckID = $("#GoodsPurchaseGrid").datagrid("getSelections")[0].GoodsPurchaseID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Goods/GetGoodsPurchaseDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#ID").val(CheckID);
+                $("#CustomerName1").combobox('setText', data.CustomerName);
+                $("#ContractNo1").val(data.ContractNo);
+                $("#SigningTime1").datebox('setValue', data.SigningTime);
+                $("#ContractType1").combobox('setText', data.ContractType);
+                $("#ContractObject1").val(data.ContractObject);
+                $("#UnitPrice1").numberbox('setValue', data.UnitPrice);
+                $("#ContractNum1").numberbox('setValue', data.ContractNum);
+                $("#DeliveryTime1").datebox('setValue', data.DeliveryTime);
+                $("#AlreadyPickingNum1").numberbox('setValue', data.AlreadyPickingNum);
+                $("#RealityPickdingNum1").numberbox('setValue', data.RealityPickdingNum);
+                $("#LogisticsCost1").numberbox('setValue', data.LogisticsCost);
+                $("#InvoiceStatus1").combobox('setText', data.InvoiceStatus);
+                $("#PaymentAmount1").numberbox('setValue', data.PaymentAmount);
+
+                $("#PaymentTime1").datebox('setValue', data.PaymentTime);
+
+                $("#Remark1").textbox('setText', data.Remark);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败."+data.Message);
+            }
+
+        });
+    }
+    //更新现货采购合同事件
+    function BindUpdateGoodsPurchaseClickEvent() {
+        $("#btnUpdateGoodsPurchase").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#UpdateGoodsPurchaseForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                GoodsPurchaseID:$("#ID").val(),
+                CustomerName: $("#CustomerName1").combobox('getText'),
+                ContractNo: $("#ContractNo1").val(),
+                SigningTime: $('#SigningTime1').datebox('getText'),
+                ContractType: $('#ContractType1').combobox('getText'),
+                ContractObject: $('#ContractObject1').val(),
+                UnitPrice: $('#UnitPrice1').numberbox('getValue'),
+                ContractNum: $('#ContractNum1').numberbox('getValue'),
+                DeliveryTime: $('#DeliveryTime1').datebox('getValue'),
+                AlreadyPickingNum: $('#AlreadyPickingNum1').numberbox('getValue'),
+                RealityPickdingNum: $('#RealityPickdingNum1').numberbox('getValue'),
+                LogisticsCost: $('#LogisticsCost1').numberbox('getValue'),
+                InvoiceStatus: $('#InvoiceStatus1').combobox('getText'),
+                PaymentAmount: $('#PaymentAmount1').numberbox('getValue'),
+                PaymentTime: $('#PaymentTime1').datebox('getText'),
+                Remark: $('#Remark1').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/UpdateGoodsPurchase',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '更新现货采购合同成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#UpdateGoodsPurchaseDialog').dialog('close');
+                        $("#GoodsPurchaseGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "更新失败，请您检查" + data.Message);
+                    }
+                },
+                error: function () {
+                    alert("更新失败，请您检查")
+                }
+            });
+        });
+    }
+    //删除现货采购合同
+    function DeleteGoodsPurchase()
+    {
+        var deleteGoodsPurchase = $("#GoodsPurchaseGrid").datagrid("getSelections");
+        if (deleteGoodsPurchase.length == 1) {
+            var GoodsPurchaseID = deleteGoodsPurchase[0].GoodsPurchaseID;
+            var ContractNo = deleteGoodsPurchase[0].ContractNo;
+            $.messager.confirm("删除信息", "您确认删除<font color='Red' size='3'>" + ContractNo + "</font>合同吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Goods/DeleteGoodsPurchase',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: GoodsPurchaseID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除现货采购合同成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#GoodsPurchaseGrid").datagrid("reload");
+                                $("#GoodsPurchaseGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    function ClearText() {
+        $("#AddGoodsPurchaseForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
+        $("#UpdateGoodsPurchaseForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
+    }
+</script>
+<div>
+    <table id="GoodsPurchaseGrid"></table>
+    @*添加现货采购合同*@
+    <div id="AddGoodsPurchaseDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddGoodsPurchaseForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="CustomerName">客户名称：</label></td>
+                    <td>
+                        <input id="CustomerName" class="easyui-combobox" name="CustomerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNo">合同号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="ContractNo" name="ContractNo" data-options="required:true" style="width:350px;height:35px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SigningTime">签订时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="SigningTime" name="SigningTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractType">合同类型：</label></td>
+                    <td>
+                        <select id="ContractType" class="easyui-combobox" name="ContractType" style="width:200px;height:35px" data-options="required:true">
+                            <option value="一口价">一口价</option>
+                            <option value="基差">基差</option>
+                            <option value="远期一口价">远期一口价</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractObject">合同标的：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="ContractObject" name="ContractObject" data-options="required:false" style="width:350px;height:35px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="UnitPrice">合同单价(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="UnitPrice" name="UnitPrice" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNum">合同数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="ContractNum" name="ContractNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="DeliveryTime">交货时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="DeliveryTime" name="DeliveryTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="AlreadyPickingNum">已提货数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="AlreadyPickingNum" name="AlreadyPickingNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RealityPickdingNum">实际提货数量(吨)</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="RealityPickdingNum" name="RealityPickdingNum" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="LogisticsCost">物流成本(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="LogisticsCost" name="LogisticsCost" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="InvoiceStatus">发票状态：</label></td>
+                    <td>
+                        <select id="InvoiceStatus" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                            <option value="已收">已收</option>
+                            <option value="未收">未收</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PaymentAmount">付款金额(元)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="PaymentAmount" name="PaymentAmount" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PaymentTime">付款时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="PaymentTime" name="PaymentTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddGoodsPurchase" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddGoodsPurchaseDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改现货采购合同*@
+    <div id="UpdateGoodsPurchaseDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateGoodsPurchaseForm" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="ID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="CustomerName">客户名称：</label></td>
+                    <td>
+                        <input id="CustomerName1" class="easyui-combobox" name="CustomerName" readonly="readonly"
+                               data-options="editable:false,valueField:'PartnerName',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNo">合同号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" readonly="readonly" id="ContractNo1" name="ContractNo" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SigningTime">签订时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" readonly="readonly" id="SigningTime1" name="SigningTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractType">合同类型：</label></td>
+                    <td>
+                        <select id="ContractType1" class="easyui-combobox" disabled="disabled" name="ContractType" style="width:200px;" data-options="height:35,required:true">
+                            <option value="一口价">一口价</option>
+                            <option value="基差">基差</option>
+                            <option value="远期一口价">远期一口价</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractObject">合同标的：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" readonly="readonly" id="ContractObject1" name="ContractObject" data-options="required:false" style="width:350px;height:35px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="UnitPrice">合同单价(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="UnitPrice1" readonly="readonly" name="UnitPrice" data-options="required:true,height:30,precision:2" style="width:350px;height:35px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNum">合同数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="ContractNum1" readonly="readonly" name="ContractNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="DeliveryTime">交货时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="DeliveryTime1" readonly="readonly" name="DeliveryTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="AlreadyPickingNum">已提货数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="AlreadyPickingNum1" name="AlreadyPickingNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RealityPickdingNum">实际提货数量(吨)</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="RealityPickdingNum1" name="RealityPickdingNum" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="LogisticsCost">物流成本(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="LogisticsCost1" name="LogisticsCost" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="InvoiceStatus">发票状态：</label></td>
+                    <td>
+                        <select id="InvoiceStatus1" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                            <option value="已收">已收</option>
+                            <option value="未收">未收</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PaymentAmount">付款金额(元)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="PaymentAmount1" name="PaymentAmount" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PaymentTime">付款时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="PaymentTime1" name="PaymentTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark1" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateGoodsPurchase" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateGoodsPurchaseDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*添加现货销售合同*@
+    <div id="AddGoodsMarketingDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddGoodsMarketingForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="CustomerNameM">客户名称：</label></td>
+                    <td>
+                        <input id="CustomerNameM" class="easyui-combobox" name="CustomerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNoM">合同号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="ContractNoM" name="ContractNo" data-options="required:true" style="width:350px;height:35px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SigningTimeM">签订时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="SigningTimeM" name="SigningTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PickingTypeM">提货方式：</label></td>
+                    <td>
+                        <select id="PickingTypeM" class="easyui-combobox" name="PickingType" style="width:200px;height:35px" data-options="required:true">
+                            <option value="自提">自提</option>
+                            <option value="到厂">到厂</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractObjectM">合同标的：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="ContractObjectM" name="ContractObject" data-options="required:false" style="width:350px;height:35px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="UnitPriceM">合同单价(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="UnitPriceM" name="UnitPrice" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNumM">合同数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="ContractNumM" name="ContractNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="DeliveryTimeM">交货时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="DeliveryTimeM" name="DeliveryTime" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="AlreadyDeliveryNumM">已提货数量(吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="AlreadyDeliveryNumM" name="AlreadyDeliveryNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RealityDeliveryNumM">实际提货数量(吨)</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="RealityDeliveryNumM" name="RealityDeliveryNum" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="LogisticsCostM">物流成本(元/吨)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="LogisticsCostM" name="LogisticsCost" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="InvoiceStatusM">销项发票：</label></td>
+                    <td>
+                        <select id="InvoiceStatusM" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                            <option value="已收">已收</option>
+                            <option value="未收">未收</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="AlreadyPaymentM">已收货款(元)：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="AlreadyPaymentM" name="AlreadyPayment" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RemarkM">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="RemarkM" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddGoodsMarketing" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddGoodsMarketingDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*添加盘面对冲*@
+    <div id="AddGoodsFutureDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddGoodsFutureForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="Contract">合约代码：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="Contract" name="Contract" data-options="required:true" style="width:350px;height:35px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="FundAccount">资金账号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="FundAccount" name="FundAccount" data-options="required:true" style="width:350px;height:35px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Positions">持仓量：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Positions" name="Positions" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="BuyOpen">买入开仓价格：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="BuyOpen" name="BuyOpen" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SellClose">卖出平仓价格：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="SellClose" name="SellClose" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SellOpen">卖出开仓价格：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="SellOpen" name="SellOpen" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="BuyClose">买入平仓价格：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="BuyClose" name="BuyClose" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="PointCount">盈亏点数：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="PointCount" name="PointCount" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Amount">盈亏金额：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Amount" name="Amount" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddGoodsFuture" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddGoodsFutureDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div id="ShowGoodsMarketingListDialog" class="easyui-dialog" style="width:1200px;height:500px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="ShowGoodsMarketingGrid"></table>
+    </div>
+    <div id="ShowGoodsFutureListDialog" class="easyui-dialog" style="width:1200px;height:500px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="ShowGoodsFutureGrid"></table>
+    </div>
+</div>

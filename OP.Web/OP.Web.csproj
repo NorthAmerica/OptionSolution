@@ -179,6 +179,7 @@
     <Compile Include="Component\UpProduct.cs" />
     <Compile Include="Controllers\BrochureController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
+    <Compile Include="Controllers\GoodsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Global.asax.cs">
@@ -303,6 +304,9 @@
     <Content Include="Views\Brochure\UpdateBrochure.cshtml" />
     <Content Include="Views\Config\GuestBookList.cshtml" />
     <Content Include="Views\Home\FuturePriceList.cshtml" />
+    <Content Include="Views\Goods\GoodsPurchaseList.cshtml" />
+    <Content Include="Views\Goods\GoodsMarketingList.cshtml" />
+    <Content Include="Views\Goods\GoodsFutureList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

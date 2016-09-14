@@ -15,7 +15,6 @@
         BindUploadOptionsProductClickEvent();
     });
     function initTable() {
-
         $('#OptionsProductGrid').datagrid({
             title: '期权产品列表',
             iconCls: 'icon-user',
@@ -666,7 +665,7 @@
             }
             //默认产品状态为作废
             var CBStatus = false;
-            //debugger
+
             var token = $('@Html.AntiForgeryToken()').val();
             var headers = {};
             headers["__RequestVerificationToken"] = token;

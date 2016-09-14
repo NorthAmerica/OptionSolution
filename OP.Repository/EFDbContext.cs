@@ -36,6 +36,9 @@ namespace OP.Repository
         public DbSet<ONTime> ONTimes { get; set; }
         public DbSet<GuestBook> GuestBooks { get; set; }
         public DbSet<Brochure> Brochures { get; set; }
+        public DbSet<GoodsMarketing> GoodsMarketings { get; set; }
+        public DbSet<GoodsPurchase> GoodsPurchases { get; set; }
+        public DbSet<GoodsFuture> GoodsFutures { get; set; }
         public EFDbContext()
             : base("name=EFDbContext")
         {

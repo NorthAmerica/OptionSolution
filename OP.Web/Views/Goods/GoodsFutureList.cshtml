@@ -1,0 +1,113 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initGoodsFutureList();
+    });
+
+    function initGoodsFutureList() {
+        $('#GoodsFutureGrid').datagrid({
+            title: '现货盘面对冲列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsFutureList_Read',
+            sortName: 'RecordTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsFuturesID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsFuturesID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约代码', width: 80, sortable: true },
+                { field: 'FundAccount', title: '资金账号', width: 100, sortable: true },
+                { field: 'Positions', title: '持仓量', width: 60, sortable: true },
+                { field: 'ContractNo', title: '对应合同号', width: 50, sortable: true },
+                { field: 'BuyOpen', title: '买入开仓价格', width: 80, sortable: true },
+                { field: 'SellClose', title: '卖出平仓价格', width: 50, sortable: true },
+                { field: 'SellOpen', title: '卖出开仓价格', width: 50, sortable: true },
+                { field: 'BuyClose', title: '买入平仓价格', width: 80, sortable: true },
+                { field: 'PointCount', title: '盈亏点数', width: 60, sortable: true },
+                { field: 'Amount', title: '盈亏金额', width: 50, sortable: true },
+                { field: 'RecordTime', title: '记录时间', width: 60, sortable: true, formatter: formatDateBox }
+            ]],
+            toolbar: [{
+                id: 'btncut',
+                text: '删除盘面对冲',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteGoodsFutures();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initGoodsPurchaseList();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateGoodsPurchaseDialog();
+            }
+        });
+    }
+    //删除盘面对冲事件
+    function DeleteGoodsFutures() {
+        var deleteGoodsFuture = $("#GoodsFutureGrid").datagrid("getSelections");
+        if (deleteGoodsFuture.length == 1) {
+            var GoodsFuturesID = deleteGoodsFuture[0].GoodsFuturesID;
+            $.messager.confirm("删除信息", "您确认删除这条记录吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Goods/DeleteGoodsFuture',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: GoodsFuturesID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除盘面对冲记录成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#GoodsFutureGrid").datagrid("reload");
+                                $("#GoodsFutureGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+</script>
+<div>
+    <table id="GoodsFutureGrid"></table>
+</div>

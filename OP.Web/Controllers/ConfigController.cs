@@ -22,10 +22,10 @@ namespace OP.Web.Controllers
         private InterfaceUserRoleRepository UserRoleRepository;
         private InterfaceEventLogRepository LogRepository;
         private InterfaceGuestBookRepository GuestBookRepository;
-        public ConfigController(InterfaceMenuRepository menu, 
-            InterfaceRoleMenuRepository rolemenu, 
-            InterfaceRoleRepository role, 
-            InterfaceUserRepository user, 
+        public ConfigController(InterfaceMenuRepository menu,
+            InterfaceRoleMenuRepository rolemenu,
+            InterfaceRoleRepository role,
+            InterfaceUserRepository user,
             InterfaceUserRoleRepository userrole,
             InterfaceEventLogRepository eventlog,
             InterfaceGuestBookRepository guestbook)
@@ -43,7 +43,7 @@ namespace OP.Web.Controllers
         {
             if (!string.IsNullOrEmpty(Session["IsAdmin"]?.ToString()))
             {
-                if (Session["IsAdmin"]?.ToString()=="True")
+                if (Session["IsAdmin"]?.ToString() == "True")
                 {
                     return View();
                 }
@@ -56,7 +56,7 @@ namespace OP.Web.Controllers
             {
                 return new RedirectResult("/Home/Index");
             }
-            
+
         }
         /// <summary>
         /// 菜单创建
@@ -115,8 +115,10 @@ namespace OP.Web.Controllers
             catch (Exception ex)
             {
                 LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增用户失败" + ex.Message });
-                return Json(new { Success = false,
-                    Msg = "添加失败，"+ex.Message
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
                 });
             }
         }
@@ -186,7 +188,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除用户
@@ -283,7 +285,7 @@ namespace OP.Web.Controllers
                 return Json(new
                 {
                     Success = false,
-                    Msg = "添加失败，"+ex.Message
+                    Msg = "添加失败，" + ex.Message
                 });
             }
         }
@@ -349,7 +351,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除Role
@@ -497,10 +499,10 @@ namespace OP.Web.Controllers
                 return Json(new
                 {
                     Success = false,
-                    Msg = "添加失败，"+ex.Message
+                    Msg = "添加失败，" + ex.Message
                 });
             }
-            
+
         }
         /// <summary>
         /// 添加子菜单
@@ -540,7 +542,7 @@ namespace OP.Web.Controllers
                     Msg = "添加失败，" + ex.Message
                 });
             }
-            
+
         }
         /// <summary>
         /// 获取菜单详细信息
@@ -604,7 +606,7 @@ namespace OP.Web.Controllers
                     Success = false
                 });
             }
-            
+
         }
         /// <summary>
         /// 删除菜单
@@ -896,7 +898,7 @@ namespace OP.Web.Controllers
                             rm.MenuID = intMenuID;
                             lrm.Add(rm);
                         }
-                        UpdateChild(lrm, intMenuID, intRoleID);
+                        await UpdateChild(lrm, intMenuID, intRoleID);
                     }
                     RoleMenuRepository.AddRange(lrm);
                     return Json(new { Success = true });
@@ -921,7 +923,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <param name="MenuID"></param>
         /// <param name="RoleID"></param>
-        private async void UpdateChild(List<RoleMenu> lrm, int MenuID, int RoleID)
+        private async Task<string> UpdateChild(List<RoleMenu> lrm, int MenuID, int RoleID)
         {
             List<Menu> findall = await MenuRepository.FindAllAsync();
             IEnumerable<Menu> im = findall.Where(m => m.FMenuID == MenuID);
@@ -937,14 +939,11 @@ namespace OP.Web.Controllers
                         rm.MenuID = item.MenuID;
                         lrm.Add(rm);
                     }
-                    UpdateChild(lrm, item.MenuID, RoleID);
+                    await UpdateChild(lrm, item.MenuID, RoleID);
                 }
 
             }
-            else
-            {
-                return;
-            }
+            return string.Empty;
         }
         /// <summary>
         /// 删除RoleMenu
@@ -970,7 +969,7 @@ namespace OP.Web.Controllers
                             RoleMenu rm = await RoleMenuRepository.FindAsync(ur => ur.RoleID == intRoleID && ur.MenuID == intMenuID);
                             lrm.Add(rm);
                         }
-                        DeleteChild(lrm, intMenuID, intRoleID);
+                        await DeleteChild(lrm, intMenuID, intRoleID);
                     }
                     RoleMenuRepository.DeleteRange(lrm);
                     return Json(new
@@ -999,7 +998,7 @@ namespace OP.Web.Controllers
         /// <param name="lrm"></param>
         /// <param name="MenuID"></param>
         /// <param name="RoleID"></param>
-        private async void DeleteChild(List<RoleMenu> lrm, int MenuID, int RoleID)
+        private async Task<string> DeleteChild(List<RoleMenu> lrm, int MenuID, int RoleID)
         {
             IEnumerable<Menu> im = MenuRepository.FindAll().Where(m => m.FMenuID == MenuID);
             if (im != null && im.Count() != 0)
@@ -1009,16 +1008,13 @@ namespace OP.Web.Controllers
                     bool IsExist = await RoleMenuRepository.ExistAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
                     if (IsExist)
                     {
-                        RoleMenu rm =await RoleMenuRepository.FindAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
+                        RoleMenu rm = await RoleMenuRepository.FindAsync(umr => umr.MenuID == item.MenuID && umr.RoleID == RoleID);
                         lrm.Add(rm);
                     }
-                    DeleteChild(lrm, item.MenuID, RoleID);
+                    await DeleteChild(lrm, item.MenuID, RoleID);
                 }
             }
-            else
-            {
-                return;
-            }
+            return string.Empty;
         }
         #endregion
         #region 日志列表

@@ -59,6 +59,9 @@
     <Compile Include="Mappings\FuturePriceConfiguration.cs" />
     <Compile Include="Mappings\FuturesFundConfiguration.cs" />
     <Compile Include="Mappings\FuturesTradeVolumeConfiguration.cs" />
+    <Compile Include="Mappings\GoodsFutureConfiguration.cs" />
+    <Compile Include="Mappings\GoodsMarketingConfiguration.cs" />
+    <Compile Include="Mappings\GoodsPurchaseConfiguration.cs" />
     <Compile Include="Mappings\GuestBookConfiguration.cs" />
     <Compile Include="Mappings\ManageStatuConfiguration.cs" />
     <Compile Include="Mappings\MenuConfiguration.cs" />
@@ -86,6 +89,9 @@
     <Compile Include="Models\FuturePrice.cs" />
     <Compile Include="Models\FuturesFund.cs" />
     <Compile Include="Models\FuturesTradeVolume.cs" />
+    <Compile Include="Models\GoodsFuture.cs" />
+    <Compile Include="Models\GoodsMarketing.cs" />
+    <Compile Include="Models\GoodsPurchase.cs" />
     <Compile Include="Models\GuestBook.cs" />
     <Compile Include="Models\ManageStatus.cs" />
     <Compile Include="Models\Menu.cs" />

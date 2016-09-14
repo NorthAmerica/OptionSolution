@@ -61,6 +61,9 @@
     <Compile Include="Implementations\FuturePriceRepository.cs" />
     <Compile Include="Implementations\FuturesFundRepository.cs" />
     <Compile Include="Implementations\FuturesTradeVolumeRepository.cs" />
+    <Compile Include="Implementations\GoodsFutureRepository.cs" />
+    <Compile Include="Implementations\GoodsMarketingRepository.cs" />
+    <Compile Include="Implementations\GoodsPurchaseRepository.cs" />
     <Compile Include="Implementations\GuestBookRepository.cs" />
     <Compile Include="Implementations\ManageStatusRepository.cs" />
     <Compile Include="Implementations\MenuRepository.cs" />
@@ -89,6 +92,9 @@
     <Compile Include="InterfaceFuturePriceRepository.cs" />
     <Compile Include="InterfaceFuturesFundRepository.cs" />
     <Compile Include="InterfaceFuturesTradeVolumeRepository.cs" />
+    <Compile Include="InterfaceGoodsFutureRepository.cs" />
+    <Compile Include="InterfaceGoodsMarketingRepository.cs" />
+    <Compile Include="InterfaceGoodsPurchaseRepository.cs" />
     <Compile Include="InterfaceGuestBookRepository.cs" />
     <Compile Include="InterfaceManageStatusRepository.cs" />
     <Compile Include="InterfaceMenuRepository.cs" />
@@ -108,6 +114,10 @@
     <Compile Include="InterfaceTradeOrderRepository.cs" />
     <Compile Include="InterfaceUserRepository.cs" />
     <Compile Include="InterfaceUserRoleRepository.cs" />
+    <Compile Include="Migrations\201609140311226_goodsfuture.cs" />
+    <Compile Include="Migrations\201609140311226_goodsfuture.Designer.cs">
+      <DependentUpon>201609140311226_goodsfuture.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -120,6 +130,11 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201609140311226_goodsfuture.resx">
+      <DependentUpon>201609140311226_goodsfuture.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
