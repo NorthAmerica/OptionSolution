@@ -108,8 +108,8 @@
                         alert("添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -168,8 +168,8 @@
                         alert("添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -246,8 +246,8 @@
                         alert("修改失败，请检查");
                     }
                 },
-                error: function () {
-                    alert("修改失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -287,8 +287,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
                     
@@ -301,12 +301,8 @@
     }
     //清空文本框中的值
     function ClearText() {
-        $("#MenuName").val("");
-        $("#MenuURL").val("");
-        $("#OrderNum").val("");
-        $("#MenuName1").val("");
-        $("#MenuURL1").val("");
-        $("#OrderNum1").val("");
+        $('#AddMainMenuForm').form('clear');
+        $('#AddMenuForm').form('clear');
     }
 </script>
 <div>

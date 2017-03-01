@@ -88,8 +88,8 @@
                             alert("启用失败，请您检查");
                         }
                     },
-                    error: function () {
-                        alert("启用失败，请您检查")
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
                     }
                 });
             }
@@ -220,8 +220,8 @@
                         alert("修改失败，请检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("修改失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -270,8 +270,8 @@
                         alert("添加失败，请您检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -309,8 +309,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data.Message);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
 

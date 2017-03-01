@@ -13,6 +13,9 @@ namespace OP.Entities.Models
         public DateTime SigningTime { get; set; } //签订时间
         public string ContractType { get; set; } //合同类型
         public string ContractObject { get; set; } //合同标的
+        /// <summary>
+        /// 合同单价
+        /// </summary>
         public decimal UnitPrice { get; set; } //合同单价
         public decimal ContractNum { get; set; } //合同数量
         public decimal TotalPrice { get; set; } //合同总金额 = 合同数量*合同单价
@@ -20,11 +23,13 @@ namespace OP.Entities.Models
         public decimal AlreadyPickingNum { get; set; } //已提货数量
         public decimal AwaitPickdingNum { get; set; } //待提货数量=合同数量-已提货数量
         public decimal RealityPickdingNum { get; set; } //实际提货数量
+        public decimal RealityPrice { get; set; } //实际货款金额=实际提货数量*合同单价
         public decimal LogisticsCost { get; set; } //物流成本
-        public decimal TonCost { get; set; } //每顿成本=合同单价+物流成本
-        public decimal AllCost { get; set; } //总成本=每顿成本*总合同数量
+        public decimal TonCost { get; set; } //每吨成本=合同单价+物流成本
+        public decimal AllCost { get; set; } //总成本=每吨成本*总合同数量
         public string InvoiceStatus { get; set; } //发票状态
         public decimal PaymentAmount { get; set; } //付款金额
+        public decimal AwaitPayment { get; set; }//待付款金额=实际货款金额-付款金额
         public DateTime PaymentTime { get; set; } //付款时间
         public string Remark { get; set; } //备注
         public DateTime RecordTime { get; set; } //记录时间

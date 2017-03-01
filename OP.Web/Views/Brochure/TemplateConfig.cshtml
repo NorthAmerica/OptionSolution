@@ -110,8 +110,8 @@
                         $.messager.alert("友情提示", "拷贝失败:" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("拷贝失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         } else {
@@ -161,8 +161,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
                 }

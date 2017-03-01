@@ -167,9 +167,8 @@
                         alert("更新失败，请您检查");
                     }
                 },
-                error: function () {
-                    //debugger
-                    alert("更新失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 

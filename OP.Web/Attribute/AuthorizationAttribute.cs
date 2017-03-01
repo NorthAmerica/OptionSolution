@@ -79,7 +79,7 @@ namespace OP.Web.Attribute
         }
         /// <summary>
         /// 获取或者设置一个值，该值表示登录地址
-        /// 如果web.config中末定义AuthUrl的值，则默认为：/waste/user/login
+        /// 如果web.config中末定义AuthUrl的值，则默认为：/Home/login
         /// </summary>
         private String _AuthUrl = String.Empty;
         public String AuthUrl

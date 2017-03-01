@@ -22,13 +22,17 @@ namespace OP.Web.Controllers
         private InterfaceUserRoleRepository UserRoleRepository;
         private InterfaceEventLogRepository LogRepository;
         private InterfaceGuestBookRepository GuestBookRepository;
+        private InterfaceMenuActionRepository MenuActionRepository;
+        private InterfaceRoleActionRepository RoleActionRepository;
         public ConfigController(InterfaceMenuRepository menu,
             InterfaceRoleMenuRepository rolemenu,
             InterfaceRoleRepository role,
             InterfaceUserRepository user,
             InterfaceUserRoleRepository userrole,
             InterfaceEventLogRepository eventlog,
-            InterfaceGuestBookRepository guestbook)
+            InterfaceGuestBookRepository guestbook,
+            InterfaceMenuActionRepository menuaction,
+            InterfaceRoleActionRepository roleaction)
         {
             MenuRepository = menu;
             RoleMenuRepository = rolemenu;
@@ -37,6 +41,8 @@ namespace OP.Web.Controllers
             UserRoleRepository = userrole;
             LogRepository = eventlog;
             GuestBookRepository = guestbook;
+            MenuActionRepository = menuaction;
+            RoleActionRepository = roleaction;
         }
         // GET: Config首页
         public ActionResult Index()
@@ -841,6 +847,7 @@ namespace OP.Web.Controllers
         }
         #endregion
         #region 角色菜单维护
+        
         public ActionResult RoleMenuConfig()
         {
             return View();
@@ -1100,6 +1107,291 @@ namespace OP.Web.Controllers
             {
                 Success = false
             }, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+        #region 操作及操作权限维护
+        
+        public ActionResult ActionConfig()
+        {
+            return View();
+        }
+        /// <summary>
+        /// 操作规则列表数据源
+        /// </summary>
+        /// <returns></returns>
+        public async Task<ActionResult> ActionGrid_Read(string ID)
+        {
+            List<MenuAction> lma = await MenuActionRepository.FindAllAsync();
+            if (!string.IsNullOrEmpty(ID))
+            {
+                int intId = Convert.ToInt32(ID);
+                lma = lma.Where(a => a.MenuID == intId).ToList();
+            }
+            return Json(lma);
+        }
+        /// <summary>
+        /// 新增操作规则
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult AddAction(MenuAction model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    if (MenuActionRepository.Add(model) != null)
+                    {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增操作成功" });
+                        return Json(new
+                        {
+                            Success = true,
+                            Msg = "操作添加成功。"
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，请重新提交。"
+                });
+            }
+            catch (Exception ex)
+            {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增操作失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false,
+                    Msg = "添加失败，" + ex.Message
+                });
+            }
+        }
+        /// <summary>
+        /// 更新操作规则
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult UpdateAction(MenuAction model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    if (MenuActionRepository.Update(model))
+                    {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "修改操作规则成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false,
+                    Message="更新失败，参数有误。"
+                });
+            }
+            catch (Exception ex)
+            {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "修改操作规则失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+
+        }
+        /// <summary>
+        /// 根据MenuActionID得到MenuAction信息
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult> GetActionDetails(string ID)
+        {
+            if (!string.IsNullOrEmpty(ID))
+            {
+
+                int MenuActionID = Convert.ToInt32(ID);
+                MenuAction findaction = await MenuActionRepository.FindAsync(u => u.MenuActionID == MenuActionID);
+
+                if (findaction != null)
+                {
+                    return Json(new
+                    {
+                        Success = true,
+                        ActionName = findaction.ActionName,
+                        ActionUrl = findaction.ActionUrl
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json(new
+            {
+                Success = false
+            }, JsonRequestBehavior.AllowGet);
+        }
+        /// <summary>
+        /// 删除操作规则
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteAction(string ID)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(ID))
+                {
+                    //Guid userid = new Guid(ID);
+                    int MenuActionID = Convert.ToInt32(ID);
+                    MenuAction findAction = await MenuActionRepository.FindAsync(u => u.MenuActionID == MenuActionID);
+                    if (MenuActionRepository.Delete(findAction))
+                    {
+                        //查询关联表 操作角色表
+                        IEnumerable<RoleAction> IRM = await RoleActionRepository.FindListAsync(u => u.MenuActionID == MenuActionID, string.Empty, false);
+                        if (IRM != null && IRM.Count() != 0)
+                        {
+                            //删除关联项
+                            RoleActionRepository.DeleteRange(IRM);
+                        }
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除操作规则成功"});
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除操作规则失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+
+        }
+
+        /// <summary>
+        /// 删除操作权限
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteRoleAction(string MenuActionID,string RoleID)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(MenuActionID)&&!string.IsNullOrEmpty(RoleID))
+                {
+
+                    int intMenuActionID = Convert.ToInt32(MenuActionID);
+                    int intRoleID = Convert.ToInt32(RoleID);
+                    RoleAction findRole = await RoleActionRepository.FindAsync(u => u.MenuActionID == intMenuActionID&&u.RoleID== intRoleID);
+                    if (RoleActionRepository.Delete(findRole))
+                    {
+                        LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除操作权限成功" });
+                        return Json(new
+                        {
+                            Success = true
+                        });
+                    }
+                }
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+            catch (Exception ex)
+            {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "删除操作权限失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+
+        }
+        /// <summary>
+        /// 新增操作权限
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public async Task<ActionResult> AddRoleAction(string MenuActionID, string RoleIDs)
+        {
+            try
+            {
+                if (MenuActionID != null && RoleIDs != null)
+                {
+                    string[] roleid = RoleIDs.Split(',');
+                    int intMenuActionID = Convert.ToInt32(MenuActionID);
+                    List<RoleAction> lrm = new List<RoleAction>();
+                    foreach (var item in roleid)
+                    {
+                        int intRoleID = Convert.ToInt32(item);
+                        bool IsExist = await RoleActionRepository.ExistAsync(ur => ur.RoleID == intRoleID && ur.MenuActionID == intMenuActionID);
+                        if (!IsExist)
+                        {
+                            RoleAction ra = new RoleAction();
+                            ra.RoleID = intRoleID;
+                            ra.MenuActionID = intMenuActionID;
+                            lrm.Add(ra);
+                        }
+                        
+                    }
+                    RoleActionRepository.AddRange(lrm);
+                    return Json(new { Success = true });
+                }
+                return Json(new
+                {
+                    Success = false,
+                    Message = "参数有误，请检查。"
+                });
+            }
+            catch (Exception ex)
+            {
+                LogRepository.Add(new EventLog() { Name = Session["LoginedUser"].ToString(), Date = DateTime.Now.ToLocalTime(), Event = "新增操作权限失败" + ex.Message });
+                return Json(new
+                {
+                    Success = false
+                });
+            }
+
+        }
+        /// <summary>
+        /// RoleActionGrid数据源
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ActionResult> RoleActionGrid_Read(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                int MenuActionID = Convert.ToInt32(id);
+                List<RoleAction> findall = await RoleActionRepository.FindAllAsync();
+                IEnumerable<RoleAction> irm = findall.Where(u => u.MenuActionID == MenuActionID);
+                if (irm != null && irm.Count() != 0)
+                {
+                    List<Role> lRole = new List<Role>();
+                    foreach (RoleAction item in irm)
+                    {
+                        Role role = await RoleRepository.FindAsync(u => u.RoleID == item.RoleID);
+                        lRole.Add(role);
+                    }
+                    return Json(lRole);
+                }
+            }
+            return Json(new { });
         }
         #endregion
     }

@@ -173,9 +173,8 @@
                         alert("添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    //debugger
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 

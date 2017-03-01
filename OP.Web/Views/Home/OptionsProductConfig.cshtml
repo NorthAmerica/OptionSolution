@@ -307,8 +307,8 @@
                                 alert("上传失败，请您检查" + data.Message);
                             }
                         },
-                        error: function () {
-                            alert("上传失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
                 }
@@ -356,8 +356,8 @@
                                     alert("上传失败，请您检查" + data.Message);
                                 }
                             },
-                            error: function () {
-                                alert("上传失败，请您检查")
+                            error: function (data) {
+                                $.messager.alert('错误', data.responseText);
                             }
                         });
 
@@ -417,8 +417,8 @@
                             alert("启用失败，请您检查");
                         }
                     },
-                    error: function () {
-                        alert("启用失败，请您检查")
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
                     }
                 });
 
@@ -465,8 +465,8 @@
                             alert("停用失败，请您检查");
                         }
                     },
-                    error: function () {
-                        alert("停用失败，请您检查")
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
                     }
                 });
 
@@ -717,8 +717,8 @@
                         $.messager.alert("错误", "添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -942,8 +942,8 @@
                         alert("添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -996,8 +996,8 @@
                         alert("添加失败，请您检查");
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
 
@@ -1028,7 +1028,6 @@
                     <td>
                         <input id="SearchPartnerName" class="easyui-combobox" name="PartnerName"
                                data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',height:30,width:150" />
-                        @*<input type="text" class="form-control input-sm" id="SGSMC" name="GSMC" placeholder="公司名称">*@
                     </td>
 
                     <td><label for="SearchProductName">产品名称:</label></td>
@@ -1041,7 +1040,6 @@
                     <td>
                         <input id="SearchOptionType" class="easyui-combobox" name="OptionType"
                                data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',height:30,width:150" />
-                        @*<input type="text" class="form-control input-sm" id="SLXR" name="LXR" placeholder="主要联系人">*@
                     </td>
 
                     <td><label for="SearchBeginDate">启动日期:</label></td>

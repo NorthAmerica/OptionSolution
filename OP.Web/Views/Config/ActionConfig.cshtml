@@ -1,0 +1,547 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initMenuTree();
+        initActionGrid();
+        $('#ActionGrid').datagrid('loadData', { total: 0, rows: [] });
+        initRoleActionGrid();
+        BindAddActionClickEvent();
+        BindUpdateActionClickEvent();
+    });
+    //初始化菜单
+    function initMenuTree() {
+        $('#MenuTree').treegrid({
+            url: '/Config/MenuConfig_Read',
+            idField: 'MenuID',
+            treeField: 'MenuName',
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { title: 'ID', field: 'MenuID', width: 50, hidden: true },
+                { title: '菜单名称', field: 'MenuName', width: 180 }
+            ]],
+            onLoadSuccess: function (node, data) { $("#loading").css('display', 'none') },
+            onClickRow: function (row) {
+                // 在用户点击的时候提示
+                //$('#ActionGrid').datagrid('loadData', { total: 0, rows: [] });
+                $('#RoleActionGrid').datagrid('loadData', { total: 0, rows: [] });
+                $('#ActionGrid').datagrid('loadData', { total: 0, rows: [] });
+                $('#ActionGrid').datagrid('load', {
+                    id: row.MenuID
+                });
+            }
+        });
+    }
+    //初始化操作配置
+    function initActionGrid() {
+        $('#ActionGrid').datagrid({
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/ActionGrid_Read',
+            //sortName: 'UserID',
+            //sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'MenuActionID',
+            singleSelect: true,
+            fitColumns: false,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'MenuActionID', title: 'ID', width: 20, sortable: true,hidden:true },
+                { field: 'ActionName', title: '操作名字', width: 200, sortable: true },
+                { field: 'ActionUrl', title: '操作URL', width: 260, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加操作规则',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddActionDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改操作规则',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateActionDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除操作规则',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteAction();
+                }
+            }, '-'],
+            onClickRow: function (index, row) {
+                $('#RoleActionGrid').datagrid('loadData', { total: 0, rows: [] });
+                $('#RoleActionGrid').datagrid('load', {
+                    id: row.MenuActionID
+                });
+            },
+            onDblClickRow: function (index, row) {
+                UpdateActionDialog();
+            }
+        });
+    }
+    //添加操作规则
+    function AddActionDialog() {
+        if ($('#MenuTree').treegrid('getSelected') == null) {
+            $.messager.alert("友情提示", "请先选择一个菜单");
+            return;
+        }
+        //ClearText();
+        $('#AddActionDialog').dialog('open').dialog('setTitle', '添加操作规则');
+    }
+    //添加压缩包添加事件
+    function BindAddActionClickEvent() {
+        $("#btnAddAction").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddActionForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                MenuID: $('#MenuTree').treegrid('getSelected').MenuID,
+                ActionName: $("#ActionName").val(),
+                ActionUrl: $("#ActionUrl").val()
+            };
+
+            //使用异步实现删除用户角色信息
+            $.ajax({
+                type: 'POST',
+                url: '/Config/AddAction',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '添加成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddActionDialog').dialog('close');
+                        $("#ActionGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("删除失败，请检查"+data.Msg);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+
+        });
+    }
+    //修改操作规则
+    function UpdateActionDialog() {
+        var UpdateAction = $("#ActionGrid").datagrid("getSelections");
+        if (UpdateAction.length == 1) {
+            $("#UpdateActionDialog").dialog("open").dialog("setTitle", "修改操作规则");
+            ClearText();
+            BingActionDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateAction.length + "</font>行");
+        }
+    }
+    //绑定操作规则明细
+    function BingActionDetails() {
+        var CheckID = $("#ActionGrid").datagrid("getSelections")[0].MenuActionID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Config/GetActionDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#ID").val(CheckID);
+                $("#MenuID1").val(data.MenuID);
+                $("#ActionName1").val(data.ActionName);
+                $("#ActionUrl1").val(data.ActionUrl);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败." + data.Message);
+            }
+        });
+    }
+    //更新操作规则事件
+    function BindUpdateActionClickEvent() {
+        $("#btnUpdateAction").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#UpdateActionForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                MenuActionID: $("#ID").val(),
+                MenuID:$("#MenuID1").val(),
+                ActionName: $('#ActionName1').val(),
+                ActionUrl:$('#ActionUrl1').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Config/UpdateAction',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '更新操作规则成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#UpdateActionDialog').dialog('close');
+                        $("#ActionGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "更新失败，请您检查" + data.Message);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+        });
+    }
+    //删除操作规则
+    function DeleteAction() {
+        var deleteAction = $("#ActionGrid").datagrid("getSelections");
+        if (deleteAction.length == 1) {
+            var MenuActionID = deleteAction[0].MenuActionID;
+
+            $.messager.confirm("删除信息", "您确认删除这条操作规则吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Config/DeleteAction',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: MenuActionID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除操作规则成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#ActionGrid").datagrid("reload");
+                                $("#ActionGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data.Msg);
+                            }
+                        },
+                        error: function (data) {
+                            $.messager.alert('错误',data.responseText);
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //初始化操作权限
+    function initRoleActionGrid() {
+        $('#RoleActionGrid').datagrid({
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/RoleActionGrid_Read',
+            //sortName: 'UserID',
+            //sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'RoleActionID',
+            singleSelect: true,
+            fitColumns: false,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'RoleID', title: 'ID', width: 50, sortable: true },
+                { field: 'RoleName', title: '角色名', width: 200, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加操作权限',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddRoleActionDialog();
+                }
+            },{
+                id: 'btncut',
+                text: '删除操作权限',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteRoleAction();
+                }
+            }, '-'],
+            onDblClickRow: function (index, row) {
+                //UpdateActionDialog();
+            }
+        });
+    }
+    //新增操作权限
+    function AddRoleActionDialog() {
+        if ($('#ActionGrid').datagrid('getSelected') == null) {
+            $.messager.alert("友情提示", "请先选择一个操作规则");
+            return;
+        }
+        //ClearText();
+        AddRoleActionGrid();
+        $('#AddRoleActionDialog').dialog('open').dialog('setTitle', '添加操作权限');
+    }
+    //删除操作权限
+    function DeleteRoleAction() {
+        var deleteAction = $("#ActionGrid").datagrid("getSelections");
+        if (deleteAction.length==0) {
+            $.messager.alert("友情提示", "请先选择一个操作规则");
+            return;
+        }
+        var deleteRoleAction = $("#RoleActionGrid").datagrid("getSelections");
+        if (deleteRoleAction.length == 1) {
+            var RoleID = deleteRoleAction[0].RoleID;
+           
+            var postdata = {
+                MenuActionID: deleteAction[0].MenuActionID,
+                RoleID: RoleID
+            };
+            $.messager.confirm("删除信息", "您确认删除这条操作权限吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Config/DeleteRoleAction',
+                        cache: false,
+                        headers: headers,
+                        data: postdata,
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除操作权限成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $('#RoleActionGrid').datagrid('loadData', { total: 0, rows: [] });
+                                $('#RoleActionGrid').datagrid('reload');
+                                $('#RoleActionGrid').datagrid('clearSelections');
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data.Msg);
+                            }
+                        },
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //AddRoleActionGrid初始化
+    function AddRoleActionGrid() {
+        $('#AddRoleActionGrid').datagrid({
+            title: '角色列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/RoleConfig_Read',
+            sortName: 'RoleID',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'RoleID',
+            //pageSize: 10,
+            //pagination: true,
+            rownumbers: true,
+            singleSelect: false,
+            fitColumns: false,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'RoleID', title: 'ID', width: 50, sortable: true },
+                { field: 'RoleName', title: '角色名', width: 200, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnadd1',
+                text: '添加角色',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddRoleAction();
+                }
+            }, '-', {
+                id: 'btnrefresh1',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    $('#AddRoleActionGrid').datagrid('reload');
+                }
+            }]
+        });
+    }
+    //新增操作权限
+    function AddRoleAction() {
+        var selectAction = $("#ActionGrid").treegrid("getSelected");
+        if (selectAction == null) {
+            $.messager.alert("友情提示", "请先选择一个操作规范");
+            return;
+        }
+        var MenuActionID = selectAction.MenuActionID;
+        var RoleIDs = "";
+        var selectsRole = $("#AddRoleActionGrid").datagrid("getSelections");
+        if (selectsRole.length != 0) {
+            for (var i = 0; i < selectsRole.length; i++) {
+                RoleIDs += selectsRole[i].RoleID + ",";
+            }
+        } else {
+            $.messager.alert("友情提示", "请先选择一个角色");
+            return;
+        }
+        var token = $('@Html.AntiForgeryToken()').val();
+        var headers = {};
+        headers["__RequestVerificationToken"] = token;
+        var postdata = {
+            MenuActionID: MenuActionID,
+            RoleIDs: RoleIDs.slice(0, RoleIDs.length - 1)
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/Config/AddRoleAction',
+            cache: false,
+            headers: headers,
+            data: postdata,
+            success: function (data) {
+                if (data && data.Success) {
+                    $.messager.show({
+                        title: '我的消息',
+                        msg: '添加操作角色成功。',
+                        timeout: 5000,
+                        showType: 'slide'
+                    });
+                    $("#AddRoleActionDialog").dialog('close');
+                    $("#RoleActionGrid").datagrid('reload');
+                }
+                else {
+                    alert("添加失败，请检查."+data.Message);
+                }
+            },
+            error: function (data) {
+                $.messager.alert('错误', data.responseText);
+            }
+        });
+
+    }
+    function ClearText() {
+        $('#AddActionForm').form('clear');
+        $('#UpdateActionForm').form('clear');
+    }
+</script>
+<div id="cc" class="easyui-layout" style="height:700px;" fit="true">
+    <div data-options="region:'west',title:'菜单列表',split:true,collapsible:false" style="width:220px;">
+        <img id="loading" src="~/Images/loading.gif" width="160" height="160" />
+        <ul id="MenuTree"></ul>
+    </div>
+    <div data-options="region:'north',title:'操作权限设置-选择操作列表后自动更新',split:true,collapsible:false" style="height:200px;">
+        <table id="RoleActionGrid"></table>
+    </div>
+    <div data-options="region:'center',title:'操作列表-选择菜单后自动更新'" style="padding:5px;background:#eee;height:100px;">
+        <table id="ActionGrid"></table>
+    </div>
+</div>
+@*添加操作弹窗*@
+<div id="AddActionDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+     closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+    <form id="AddActionForm" method="post" novalidate="novalidate">
+        <table id="tblAdd">
+            <tr>
+                <td><label for="ActionName">操作名称：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="ActionName" name="ActionName" data-options="required:true" style="width:350px;" />
+                </td>
+            </tr>
+            <tr>
+                <td><label for="ActionUrl">操作URL：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="ActionUrl" name="ActionUrl" data-options="required:true" style="width:350px;" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center; padding-top:10px">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddAction" iconcls="icon-ok">确定</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddActionDialog').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+@*修改操作弹窗*@
+<div id="UpdateActionDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+     closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+    <form id="UpdateActionForm" method="post" novalidate="novalidate">
+        <table id="tblUpdate">
+            <tr style="visibility:hidden">
+                <td><label for="ID">ID:</label></td>
+                <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+            </tr>
+            <tr style="visibility:hidden">
+                <td><label for="MenuID">MenuID：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="MenuID1" name="MenuID" readonly="readonly" />
+                </td>
+            </tr>
+            <tr>
+                <td><label for="ActionName">操作名称：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="ActionName1" name="ActionName" data-options="required:true" style="width:350px;" />
+                </td>
+            </tr>
+            <tr>
+                <td><label for="ActionUrl">操作URL：</label></td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="ActionUrl1" name="ActionUrl" data-options="required:true" style="width:350px;" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center; padding-top:10px">
+                    <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateAction" iconcls="icon-ok">确定</a>
+                    <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateActionDialog').dialog('close')">关闭</a>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+@*添加权限弹窗*@
+<div id="AddRoleActionDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+     closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+    <table id="AddRoleActionGrid"></table>
+</div>

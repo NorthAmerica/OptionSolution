@@ -1,0 +1,387 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initGoodsProfitGrid();
+        BindAddGoodsProfitClickEvent();
+        BindUpdateGoodsProfitClickEvent();
+    });
+    function initGoodsProfitGrid() {
+        $('#GoodsProfitGrid').datagrid({
+            title: '利润核算列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsProfitList_Read',
+            sortName: 'RecordTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsProfitID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsProfitID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'SigningTime', title: '签约时间', width: 50, sortable: true, formatter: formatDateBox },
+                { field: 'PurchaseName', title: '采购方', width: 50, sortable: true },
+                { field: 'MarketingName', title: '销售方', width: 50, sortable: true },
+                { field: 'ContractType', title: '合同类型', width: 50, sortable: true },
+                { field: 'ContractObject', title: '合同标的', width: 50, sortable: true },
+                { field: 'PurchaseUnitPrice', title: '采购价', width: 50, sortable: true },
+                { field: 'MarketingUnitPrice', title: '销售价', width: 50, sortable: true },
+                { field: 'ContractNum', title: '合同数量', width: 50, sortable: true },
+                { field: 'TotalPrice', title: '合同总金额', width: 50, sortable: true },
+                { field: 'RealityPickdingNum', title: '实际提货数量', width: 50, sortable: true },
+                { field: 'RealityPrice', title: '实际采购成本', width: 50, sortable: true },
+                { field: 'RealityPayment', title: '实际销售收入', width: 50, sortable: true },
+                { field: 'Spread', title: '采销价差', width: 50, sortable: true },
+                { field: 'Profit', title: '利润', width: 50, sortable: true },
+                { field: 'ProfitPercentage', title: '单笔利润率', width: 50, sortable: true },
+                { field: 'ReflowTime', title: '资金回笼时间', width: 50, sortable: true },
+                { field: 'Status', title: '状态', width: 50, sortable: true },
+                { field: 'RecordTime', title: '记录时间', width: 50, sortable: true, formatter: formatDateBox }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加利润核算表',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddGoodsProfitDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改利润核算表',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateGoodsProfitDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除利润核算表',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteGoodsProfit();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initGoodsProfitGrid();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateGoodsProfitDialog();
+            }
+        });
+    }
+    //添加利润核算表
+    function AddGoodsProfitDialog() {
+        $('#AddGoodsProfitDialog').dialog('open').dialog('setTitle', '添加利润核算表');
+        ClearText();
+    }
+    //添加添加资金支付情况事件
+    function BindAddGoodsProfitClickEvent() {
+        $("#btnAddGoodsProfit").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddGoodsProfitForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            
+            var postdata = {
+                GoodsMarketingID: $("#GoodsMarketingID").combobox('getValue'),
+                RealityPickdingNum: $('#RealityPickdingNum').numberbox('getValue'),
+                ReflowTime: $('#ReflowTime').numberbox('getValue'),
+                Status: $("#Status").combobox('getText'),
+                Remark: $('#Remark').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/AddGoodsProfit',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '添加利润核算表成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddGoodsProfitDialog').dialog('close');
+                        $("#GoodsProfitGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查" + data.Message);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+        });
+    }
+    //修改利润核算表
+    function UpdateGoodsProfitDialog() {
+        var UpdateGoodsProfitID = $("#GoodsProfitGrid").datagrid("getSelections");
+        if (UpdateGoodsProfitID.length == 1) {
+            $("#UpdateGoodsProfitDialog").dialog("open").dialog("setTitle", "修改利润核算表");
+            ClearText();
+            BingGoodsProfitDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateGoodsProfitID.length + "</font>行");
+        }
+    }
+    //绑定利润核算表明细
+    function BingGoodsProfitDetails() {
+        var CheckID = $("#GoodsProfitGrid").datagrid("getSelections")[0].GoodsProfitID;
+
+        $.getJSON("/Goods/GetGoodsProfitDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#ID").val(CheckID);
+                $("#GoodsMarketingID1").combobox('setText', data.ContractNo);
+                $("#GoodsMarketingID1").combobox('setValue', data.GoodsMarketingID);
+                $("#RealityPickdingNum1").numberbox('setValue', data.RealityPickdingNum);
+                $("#ReflowTime1").numberbox('setValue', data.ReflowTime);
+                $("#Status1").combobox('setText', data.Status);
+                $("#Remark1").textbox('setText', data.Remark);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败." + data.Message);
+            }
+        });
+    }
+    //更新利润核算表事件
+    function BindUpdateGoodsProfitClickEvent() {
+        $("#btnUpdateGoodsProfit").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#UpdateGoodsProfitForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                GoodsProfitID: $("#ID").val(),
+                GoodsMarketingID: $("#GoodsMarketingID1").combobox('getValue'),
+                RealityPickdingNum: $('#RealityPickdingNum1').numberbox('getValue'),
+                ReflowTime: $('#ReflowTime1').numberbox('getValue'),
+                Status: $("#Status1").combobox('getText'),
+                Remark: $('#Remark1').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/UpdateGoodsProfit',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '更新利润核算表成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#UpdateGoodsProfitDialog').dialog('close');
+                        $("#GoodsProfitGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "更新失败，请您检查" + data.Message);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+        });
+    }
+    //删除利润核算表
+    function DeleteGoodsProfit() {
+        var deleteGoodsProfit = $("#GoodsProfitGrid").datagrid("getSelections");
+        if (deleteGoodsProfit.length == 1) {
+            var GoodsProfitID = deleteGoodsProfit[0].GoodsProfitID;
+
+            $.messager.confirm("删除信息", "您确认删除这条记录吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Goods/DeleteGoodsProfit',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: GoodsProfitID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除利润核算表成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#GoodsProfitGrid").datagrid("reload");
+                                $("#GoodsProfitGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //清除数据
+    function ClearText() {
+        $('#AddGoodsProfitForm').form('clear');
+        $('#UpdateGoodsProfitForm').form('clear');
+    }
+    //查询
+    function Search() {
+        $('#GoodsProfitGrid').datagrid('load', {
+            SigningTime: $('#SearchSigningTime').datebox('getText')
+        });
+    }
+</script>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchSigningTime">签订时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchSigningTime" name="SigningTime" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="GoodsProfitGrid"></table>
+    @*添加利润核算表*@
+    <div id="AddGoodsProfitDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddGoodsProfitForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="GoodsMarketingID">现货销售合同：</label></td>
+                    <td>
+                        <input id="GoodsMarketingID" class="easyui-combobox" name="GoodsMarketingID"
+                               data-options="editable:true,valueField:'GoodsMarketingID',textField:'ContractNo',url:'/Goods/GetAllGoodsMarketing',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RealityPickdingNum">实际提货数量：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="RealityPickdingNum" name="RealityPickdingNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ReflowTime">资金回笼时间：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="ReflowTime" name="ReflowTime" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Status">状态：</label></td>
+                    <td>
+                        <select id="Status" class="easyui-combobox" name="Status" style="width:200px;height:35px" data-options="editable:false,required:true">
+                            <option value="已完结">已完结</option>
+                            <option value="未完结">未完结</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddGoodsProfit" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddGoodsProfitDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改利润核算表*@
+    <div id="UpdateGoodsProfitDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateGoodsProfitForm" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="ID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="GoodsMarketingID">现货销售合同：</label></td>
+                    <td>
+                        <input id="GoodsMarketingID1" class="easyui-combobox" name="GoodsMarketingID"
+                               data-options="editable:true,valueField:'GoodsMarketingID',textField:'ContractNo',url:'/Goods/GetAllGoodsMarketing',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="RealityPickdingNum">实际提货数量：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="RealityPickdingNum1" name="RealityPickdingNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ReflowTime">资金回笼时间：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="ReflowTime1" name="ReflowTime" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Status">状态：</label></td>
+                    <td>
+                        <select id="Status1" class="easyui-combobox" name="Status" style="width:200px;height:35px" data-options="editable:false,required:true">
+                            <option value="已完结">已完结</option>
+                            <option value="未完结">未完结</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark1" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateGoodsProfit" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateGoodsProfitDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,390 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initGoodsPaymentGrid();
+        BindAddGoodsPaymentClickEvent();
+        BindUpdateGoodsPaymentClickEvent();
+    });
+    function initGoodsPaymentGrid() {
+        $('#GoodsPaymentGrid').datagrid({
+            title: '资金支付情况列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Goods/GoodsPaymentList_Read',
+            sortName: 'RecordTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GoodsPaymentID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GoodsPaymentID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'PaymentDate', title: '时间', width: 50, sortable: true, formatter: formatDateBox },
+                { field: 'ContractNo', title: '对应合同号', width: 100, sortable: true },
+                { field: 'CustomerName', title: '客户名称', width: 60, sortable: true },
+                { field: 'Get', title: '收取金额', width: 50, sortable: true },
+                { field: 'Pay', title: '支付金额', width: 80, sortable: true },
+                { field: 'Remark', title: '备注', width: 50, sortable: true },
+                { field: 'RecordTime', title: '记录时间', width: 60, sortable: true, formatter: formatDateBox }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加资金支付情况',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddGoodsPaymentDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改资金支付情况',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateGoodsPaymentDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除资金支付情况',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteGoodsPayment();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initGoodsPaymentGrid();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateGoodsPaymentDialog();
+            }
+        });
+    }
+    //添加资金支付情况
+    function AddGoodsPaymentDialog() {
+        $('#AddGoodsPaymentDialog').dialog('open').dialog('setTitle', '添加资金支付情况');
+        ClearText();
+    }
+    //添加添加资金支付情况事件
+    function BindAddGoodsPaymentClickEvent() {
+        $("#btnAddGoodsPayment").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddGoodsPaymentForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                CustomerName: $("#CustomerName").combobox('getText'),
+                ContractNo: $("#ContractNo").combobox('getText'),
+                PaymentDate: $('#PaymentDate').datebox('getText'),
+                Get: $('#Get').numberbox('getValue'),
+                Pay: $('#Pay').numberbox('getValue'),
+                Remark: $('#Remark').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/AddGoodsPayment',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '添加资金支付情况成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddGoodsPaymentDialog').dialog('close');
+                        $("#GoodsPaymentGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "添加失败，请您检查" + data.Message);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+        });
+    }
+    //修改资金支付情况
+    function UpdateGoodsPaymentDialog() {
+        var UpdateGoodsPaymentID = $("#GoodsPaymentGrid").datagrid("getSelections");
+        if (UpdateGoodsPaymentID.length == 1) {
+            $("#UpdateGoodsPaymentDialog").dialog("open").dialog("setTitle", "修改现货采购合同");
+            ClearText();
+            BingGoodsPaymentDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateGoodsPaymentID.length + "</font>行");
+        }
+    }
+    //绑定资金支付情况
+    function BingGoodsPaymentDetails() {
+        var CheckID = $("#GoodsPaymentGrid").datagrid("getSelections")[0].GoodsPaymentID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Goods/GetGoodsPaymentDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#ID").val(CheckID);
+                $("#CustomerName1").combobox('setText', data.CustomerName);
+                $("#ContractNo1").combobox('setText', data.ContractNo);
+                $("#ContractNo1").combobox('setValue', data.ContractNo);
+                $("#PaymentDate1").datebox('setValue', data.PaymentDate);
+                $("#Get1").numberbox('setValue', data.Get);
+                $("#Pay1").numberbox('setValue', data.Pay);
+                $("#Remark1").textbox('setText', data.Remark);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败." + data.Message);
+            }
+        });
+    }
+    //更新资金支付情况事件
+    function BindUpdateGoodsPaymentClickEvent() {
+        $("#btnUpdateGoodsPayment").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#UpdateGoodsPaymentForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var postdata = {
+                GoodsPaymentID: $("#ID").val(),
+                CustomerName: $("#CustomerName1").combobox('getText'),
+                ContractNo: $("#ContractNo1").combobox('getText'),
+                PaymentDate: $('#PaymentDate1').datebox('getText'),
+                Get: $('#Get1').numberbox('getValue'),
+                Pay: $('#Pay1').numberbox('getValue'),
+                Remark: $('#Remark1').val()
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '/Goods/UpdateGoodsPayment',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '更新资金支付情况成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#UpdateGoodsPaymentDialog').dialog('close');
+                        $("#GoodsPaymentGrid").datagrid("reload");
+                    }
+                    else {
+                        $.messager.alert("错误", "更新失败，请您检查" + data.Message);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+        });
+    }
+    //删除资金支付情况
+    function DeleteGoodsPayment() {
+        var deleteGoodsPayment = $("#GoodsPaymentGrid").datagrid("getSelections");
+        if (deleteGoodsPayment.length == 1) {
+            var GoodsPaymentID = deleteGoodsPayment[0].GoodsPaymentID;
+            
+            $.messager.confirm("删除信息", "您确认删除这条资金支付情况吗？", function (Delete) {
+                if (Delete) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Goods/DeleteGoodsPayment',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: GoodsPaymentID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除资金支付情况成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#GoodsPaymentGrid").datagrid("reload");
+                                $("#GoodsPaymentGrid").datagrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data.Msg);
+                            }
+                        },
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
+                        }
+                    });
+
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //内容清除器
+    function ClearText() {
+        $('#AddGoodsPaymentForm').form('clear');
+        $('#UpdateGoodsPaymentForm').form('clear');
+    }
+    //查询
+    function Search() {
+        $('#GoodsPaymentGrid').datagrid('load', {
+            PaymentDate: $('#SearchPaymentDate').datebox('getText')
+        });
+    }
+</script>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchPaymentDate">时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchPaymentDate" name="PaymentDate" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="GoodsPaymentGrid"></table>
+    @*添加资金支付情况*@
+    <div id="AddGoodsPaymentDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddGoodsPaymentForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="PaymentDate">时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="PaymentDate" name="PaymentDate" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNo">合同号：</label></td>
+                    <td>
+                        <input id="ContractNo" class="easyui-combobox" name="ContractNo"
+                               data-options="editable:true,valueField:'ContractNo',textField:'ContractNo',url:'/Goods/GetAllContractNo',required:true,height:35,width:200" />
+                        @*<input class="easyui-validatebox form-control" type="text" id="ContractNo" name="ContractNo" data-options="required:true" style="width:350px;height:35px" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="CustomerName">客户名称：</label></td>
+                    <td>
+                        <input id="CustomerName" class="easyui-combobox" name="CustomerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Get">收取金额：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Get" name="Get" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Pay">支付金额：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Pay" name="Pay" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddGoodsPayment" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddGoodsPaymentDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改现货采购合同*@
+    <div id="UpdateGoodsPaymentDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateGoodsPaymentForm" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="ID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="PaymentDate">时间：</label></td>
+                    <td>
+                        <input type="text" class="easyui-datebox" id="PaymentDate1" name="PaymentDate" data-options="height:35,required:true">
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="ContractNo">合同号：</label></td>
+                    <td>
+                        <input id="ContractNo1" class="easyui-combobox" name="ContractNo"
+                               data-options="editable:true,valueField:'ContractNo',textField:'ContractNo',url:'/Goods/GetAllContractNo',required:true,height:35,width:200" />
+                    @*<input class="easyui-validatebox form-control" type="text" id="ContractNo1" name="ContractNo" data-options="required:true" style="width:350px;height:35px" /></td>*@
+                </tr>
+                <tr>
+                    <td><label for="CustomerName">客户名称：</label></td>
+                    <td>
+                        <input id="CustomerName1" class="easyui-combobox" name="CustomerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Get">收取金额：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Get1" name="Get" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="Pay">支付金额：</label></td>
+                    <td>
+                        <input class="easyui-numberbox" type="text" id="Pay1" name="Pay" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label for="Remark">备注：</label></td>
+                    <td>
+                        <input class="easyui-textbox" type="text" id="Remark1" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdateGoodsPayment" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateGoodsPaymentDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

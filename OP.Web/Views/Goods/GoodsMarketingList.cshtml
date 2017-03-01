@@ -83,7 +83,7 @@
         var UpdateGoodsMarketingID = $("#GoodsMarketingGrid").datagrid("getSelections");
         if (UpdateGoodsMarketingID.length == 1) {
             $("#UpdateGoodsMarketingDialog").dialog("open").dialog("setTitle", "修改现货销售合同");
-            //ClearText();
+            ClearText();
             BingGoodsMarketingDetails();
         }
         else {
@@ -97,21 +97,21 @@
         //使用异步的getJSON请求绑定前台传递过来的数据httpget
         $.getJSON("/Goods/GetGoodsMarketingDetails", { ID: CheckID }, function (data) {
             if (data && data.Success) {
-                $("#ID").val(CheckID);
-                $("#CustomerNameM").combobox('setText', data.CustomerName);
-                $("#ContractNoM").val(data.ContractNo);
-                $("#SigningTimeM").datebox('setValue', data.SigningTime);
-                $("#PickingTypeM").combobox('setText', data.PickingType);
-                $("#ContractObjectM").val(data.ContractObject);
-                $("#UnitPriceM").numberbox('setValue', data.UnitPrice);
-                $("#ContractNumM").numberbox('setValue', data.ContractNum);
-                $("#DeliveryTimeM").datebox('setValue', data.DeliveryTime);
-                $("#AlreadyDeliveryNumM").numberbox('setValue', data.AlreadyDeliveryNum);
-                $("#RealityDeliveryNumM").numberbox('setValue', data.RealityDeliveryNum);
-                $("#LogisticsCostM").numberbox('setValue', data.LogisticsCost);
-                $("#InvoiceStatusM").combobox('setText', data.InvoiceStatus);
-                $("#AlreadyPaymentM").numberbox('setValue', data.AlreadyPayment);
-                $("#RemarkM").textbox('setText', data.Remark);
+                $("#GoodsMarketingID").val(CheckID);
+                $("#UCustomerNameM").combobox('setText', data.CustomerName);
+                $("#UContractNoM").val(data.ContractNo);
+                $("#USigningTimeM").datebox('setValue', data.SigningTime);
+                $("#UPickingTypeM").combobox('setText', data.PickingType);
+                $("#UContractObjectM").val(data.ContractObject);
+                $("#UUnitPriceM").numberbox('setValue', data.UnitPrice);
+                $("#UContractNumM").numberbox('setValue', data.ContractNum);
+                $("#UDeliveryTimeM").datebox('setValue', data.DeliveryTime);
+                $("#UAlreadyDeliveryNumM").numberbox('setValue', data.AlreadyDeliveryNum);
+                $("#URealityDeliveryNumM").numberbox('setValue', data.RealityDeliveryNum);
+                $("#ULogisticsCostM").numberbox('setValue', data.LogisticsCost);
+                $("#UInvoiceStatusM").combobox('setText', data.InvoiceStatus);
+                $("#UAlreadyPaymentM").numberbox('setValue', data.AlreadyPayment);
+                $("#URemarkM").textbox('setText', data.Remark);
             } else {
                 $.messager.alert("提示", "用户数据查询失败." + data.Message);
             }
@@ -129,21 +129,21 @@
             var headers = {};
             headers["__RequestVerificationToken"] = token;
             var postdata = {
-                GoodsMarketingID: $("#ID").val(),
-                CustomerName: $("#CustomerNameM").combobox('getText'),
-                ContractNo: $("#ContractNoM").val(),
-                SigningTime: $('#SigningTimeM').datebox('getText'),
-                PickingType: $('#PickingTypeM').combobox('getText'),
-                ContractObject: $('#ContractObjectM').val(),
-                UnitPrice: $('#UnitPriceM').numberbox('getValue'),
-                ContractNum: $('#ContractNumM').numberbox('getValue'),
-                DeliveryTime: $('#DeliveryTimeM').datebox('getValue'),
-                AlreadyDeliveryNum: $('#AlreadyDeliveryNumM').numberbox('getValue'),
-                RealityDeliveryNum: $('#RealityDeliveryNumM').numberbox('getValue'),
-                LogisticsCost: $('#LogisticsCostM').numberbox('getValue'),
-                InvoiceStatus: $('#InvoiceStatusM').combobox('getText'),
-                AlreadyPayment: $('#AlreadyPaymentM').numberbox('getValue'),
-                Remark: $('#RemarkM').val()
+                GoodsMarketingID: $("#GoodsMarketingID").val(),
+                CustomerName: $("#UCustomerNameM").combobox('getText'),
+                ContractNo: $("#UContractNoM").val(),
+                SigningTime: $('#USigningTimeM').datebox('getText'),
+                PickingType: $('#UPickingTypeM').combobox('getText'),
+                ContractObject: $('#UContractObjectM').val(),
+                UnitPrice: $('#UUnitPriceM').numberbox('getValue'),
+                ContractNum: $('#UContractNumM').numberbox('getValue'),
+                DeliveryTime: $('#UDeliveryTimeM').datebox('getValue'),
+                AlreadyDeliveryNum: $('#UAlreadyDeliveryNumM').numberbox('getValue'),
+                RealityDeliveryNum: $('#URealityDeliveryNumM').numberbox('getValue'),
+                LogisticsCost: $('#ULogisticsCostM').numberbox('getValue'),
+                InvoiceStatus: $('#UInvoiceStatusM').combobox('getText'),
+                AlreadyPayment: $('#UAlreadyPaymentM').numberbox('getValue'),
+                Remark: $('#URemarkM').val()
             }
 
             $.ajax({
@@ -167,8 +167,8 @@
                         $.messager.alert("错误", "更新失败，请您检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("更新失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         });
@@ -205,8 +205,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
 
@@ -218,10 +218,33 @@
         }
     }
     function ClearText() {
-
+        $('#UpdateGoodsMarketingForm').form('clear');
+    }
+    //查询
+    function Search() {
+        $('#GoodsMarketingGrid').datagrid('load', {
+            ContractNo: $('#SearchContractNo').val(),
+            SigningTime: $('#SearchSigningTime').datebox('getText'),
+            DeliveryTime: $('#SearchDeliveryTime').datebox('getText')
+        });
     }
 </script>
 <div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchContractNo">合同号:</label></td>
+                    <td><input type="text" class="form-control input-sm" id="SearchContractNo" name="ContractNo" placeholder="合同号"></td>
+                    <td><label for="SearchSigningTime">签订时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchSigningTime" name="SigningTime" data-options="height:30"></td>
+                    <td><label for="SearchDeliveryTime">交货时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchDeliveryTime" name="DeliveryTime" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
     <table id="GoodsMarketingGrid"></table>
     @*修改现货销售合同*@
     <div id="UpdateGoodsMarketingDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
@@ -229,30 +252,30 @@
         <form id="UpdateGoodsMarketingForm" method="post" novalidate="novalidate">
             <table id="tblAdd">
                 <tr style="visibility:hidden">
-                    <td><label for="ID">ID:</label></td>
-                    <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+                    <td><label for="GoodsMarketingID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="GoodsMarketingID" name="GoodsMarketingID" readonly="readonly" /></td>
                 </tr>
                 <tr>
                     <td><label for="CustomerNameM">客户名称：</label></td>
                     <td>
-                        <input id="CustomerNameM" class="easyui-combobox" name="CustomerName" readonly="readonly"
+                        <input id="UCustomerNameM" class="easyui-combobox" name="CustomerName" readonly="readonly"
                                data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:35,width:200" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="ContractNoM">合同号：</label></td>
-                    <td><input class="easyui-validatebox form-control" readonly="readonly" type="text" id="ContractNoM" name="ContractNo" data-options="required:true" style="width:350px;height:35px" /></td>
+                    <td><input class="easyui-validatebox form-control" readonly="readonly" type="text" id="UContractNoM" name="ContractNo" data-options="required:true" style="width:350px;height:35px" /></td>
                 </tr>
                 <tr>
                     <td><label for="SigningTimeM">签订时间：</label></td>
                     <td>
-                        <input type="text" class="easyui-datebox" readonly="readonly" id="SigningTimeM" name="SigningTime" data-options="height:35,required:true">
+                        <input type="text" class="easyui-datebox" readonly="readonly" id="USigningTimeM" name="SigningTime" data-options="height:35,required:true">
                     </td>
                 </tr>
                 <tr>
                     <td><label for="PickingTypeM">提货方式：</label></td>
                     <td>
-                        <select id="PickingTypeM" class="easyui-combobox" disabled="disabled" name="PickingType" style="width:200px;height:35px" data-options="required:true">
+                        <select id="UPickingTypeM" class="easyui-combobox" disabled="disabled" name="PickingType" style="width:200px;height:35px" data-options="required:true">
                             <option value="自提">自提</option>
                             <option value="到厂">到厂</option>
                         </select>
@@ -261,64 +284,64 @@
                 <tr>
                     <td><label for="ContractObjectM">合同标的：</label></td>
                     <td>
-                        <input class="easyui-validatebox form-control" readonly="readonly" type="text" id="ContractObjectM" name="ContractObject" data-options="required:false" style="width:350px;height:35px" />
+                        <input class="easyui-validatebox form-control" readonly="readonly" type="text" id="UContractObjectM" name="ContractObject" data-options="required:false" style="width:350px;height:35px" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="UnitPriceM">合同单价(元/吨)：</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" readonly="readonly" id="UnitPriceM" name="UnitPrice" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" readonly="readonly" id="UUnitPriceM" name="UnitPrice" data-options="required:true,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="ContractNumM">合同数量(吨)：</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" readonly="readonly" id="ContractNumM" name="ContractNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" readonly="readonly" id="UContractNumM" name="ContractNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="DeliveryTimeM">交货时间：</label></td>
                     <td>
-                        <input type="text" class="easyui-datebox" readonly="readonly" id="DeliveryTimeM" name="DeliveryTime" data-options="height:35,required:true">
+                        <input type="text" class="easyui-datebox" readonly="readonly" id="UDeliveryTimeM" name="DeliveryTime" data-options="height:35,required:true">
                     </td>
                 </tr>
                 <tr>
                     <td><label for="AlreadyDeliveryNumM">已提货数量(吨)：</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" id="AlreadyDeliveryNumM" name="AlreadyDeliveryNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" id="UAlreadyDeliveryNumM" name="AlreadyDeliveryNum" data-options="required:true,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="RealityDeliveryNumM">实际提货数量(吨)</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" id="RealityDeliveryNumM" name="RealityDeliveryNum" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" id="URealityDeliveryNumM" name="RealityDeliveryNum" data-options="required:false,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="LogisticsCostM">物流成本(元/吨)：</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" id="LogisticsCostM" name="LogisticsCost" data-options="required:false,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" id="ULogisticsCostM" name="LogisticsCost" data-options="required:false,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="InvoiceStatusM">销项发票：</label></td>
                     <td>
-                        <select id="InvoiceStatusM" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
-                            <option value="已收">已收</option>
-                            <option value="未收">未收</option>
+                        <select id="UInvoiceStatusM" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="editable:false,required:true">
+                            <option value="已开">已开</option>
+                            <option value="未开">未开</option>
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="AlreadyPaymentM">已收货款(元)：</label></td>
                     <td>
-                        <input class="easyui-numberbox" type="text" id="AlreadyPaymentM" name="AlreadyPayment" data-options="required:true,height:35,precision:2" style="width:350px;" />
+                        <input class="easyui-numberbox" type="text" id="UAlreadyPaymentM" name="AlreadyPayment" data-options="required:true,height:35,precision:2" style="width:350px;" />
                     </td>
                 </tr>
                 <tr>
                     <td><label for="RemarkM">备注：</label></td>
                     <td>
-                        <input class="easyui-textbox" type="text" id="RemarkM" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
+                        <input class="easyui-textbox" type="text" id="URemarkM" name="Remark" data-options="multiline:true" style="width:350px;height:100px" />
                     </td>
                 </tr>
                 <tr>

@@ -32,11 +32,13 @@ namespace OP.Entities.Mappings
             Property(x => x.AlreadyPickingNum).HasColumnName(@"AlreadyPickingNum").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.AwaitPickdingNum).HasColumnName(@"AwaitPickdingNum").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.RealityPickdingNum).HasColumnName(@"RealityPickdingNum").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
+            Property(x => x.RealityPrice).HasColumnName("@RealityPrice").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.LogisticsCost).HasColumnName(@"LogisticsCost").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.TonCost).HasColumnName(@"TonCost").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.AllCost).HasColumnName(@"AllCost").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.InvoiceStatus).HasColumnName(@"InvoiceStatus").IsOptional().HasColumnType("nvarchar");
             Property(x => x.PaymentAmount).HasColumnName(@"PaymentAmount").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
+            Property(x => x.AwaitPayment).HasColumnName(@"AwaitPayment").IsRequired().HasColumnType("decimal").HasPrecision(18, 2);
             Property(x => x.PaymentTime).HasColumnName(@"PaymentTime").IsRequired().HasColumnType("datetime");
             Property(x => x.Remark).HasColumnName(@"Remark").IsOptional().HasColumnType("nvarchar");
             Property(x => x.RecordTime).HasColumnName(@"RecordTime").IsRequired().HasColumnType("datetime");

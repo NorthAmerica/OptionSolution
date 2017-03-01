@@ -176,6 +176,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Attribute\AuthorizationAttribute.cs" />
     <Compile Include="Attribute\CSRFValidateAntiForgeryToken.cs" />
+    <Compile Include="Attribute\RoleAuthorizeAttribute.cs" />
     <Compile Include="Component\UpProduct.cs" />
     <Compile Include="Controllers\BrochureController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
@@ -185,6 +186,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AllContractNoModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\MenuTreeModel.cs" />
     <Compile Include="Models\OptionsProductModel.cs" />
@@ -307,6 +309,9 @@
     <Content Include="Views\Goods\GoodsPurchaseList.cshtml" />
     <Content Include="Views\Goods\GoodsMarketingList.cshtml" />
     <Content Include="Views\Goods\GoodsFutureList.cshtml" />
+    <Content Include="Views\Goods\GoodsPaymentList.cshtml" />
+    <Content Include="Views\Goods\GoodsProfitList.cshtml" />
+    <Content Include="Views\Config\ActionConfig.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

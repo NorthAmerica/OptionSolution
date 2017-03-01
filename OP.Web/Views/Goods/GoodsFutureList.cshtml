@@ -60,7 +60,7 @@
                 }
             }],
             onDblClickRow: function (index, row) {
-                UpdateGoodsPurchaseDialog();
+                //UpdateGoodsPurchaseDialog();
             }
         });
     }
@@ -95,8 +95,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
 
@@ -107,7 +107,24 @@
             $.messager.alert("友情提示", "请您选择要删除的数据");
         }
     }
+    //查询
+    function Search() {
+        $('#GoodsFutureGrid').datagrid('load', {
+            RecordTime: $('#SearchRecordTime').datebox('getText')
+        });
+    }
 </script>
 <div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>                   
+                    <td><label for="SearchRecordTime">记录日期:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchRecordTime" name="RecordTime" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
     <table id="GoodsFutureGrid"></table>
 </div>

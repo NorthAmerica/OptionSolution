@@ -63,9 +63,12 @@
     <Compile Include="Implementations\FuturesTradeVolumeRepository.cs" />
     <Compile Include="Implementations\GoodsFutureRepository.cs" />
     <Compile Include="Implementations\GoodsMarketingRepository.cs" />
+    <Compile Include="Implementations\GoodsPaymentRepository.cs" />
+    <Compile Include="Implementations\GoodsProfitRepository.cs" />
     <Compile Include="Implementations\GoodsPurchaseRepository.cs" />
     <Compile Include="Implementations\GuestBookRepository.cs" />
     <Compile Include="Implementations\ManageStatusRepository.cs" />
+    <Compile Include="Implementations\MenuActionRepository.cs" />
     <Compile Include="Implementations\MenuRepository.cs" />
     <Compile Include="Implementations\NumberTypeRepository.cs" />
     <Compile Include="Implementations\ONOFFSetRepository.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="Implementations\PartnerRepository.cs" />
     <Compile Include="Implementations\PartTypeRepository.cs" />
     <Compile Include="Implementations\RiseRuleRepository.cs" />
+    <Compile Include="Implementations\RoleActionRepository.cs" />
     <Compile Include="Implementations\RoleMenuRepository.cs" />
     <Compile Include="Implementations\RoleRepository.cs" />
     <Compile Include="Implementations\TdaysRepository.cs" />
@@ -94,9 +98,12 @@
     <Compile Include="InterfaceFuturesTradeVolumeRepository.cs" />
     <Compile Include="InterfaceGoodsFutureRepository.cs" />
     <Compile Include="InterfaceGoodsMarketingRepository.cs" />
+    <Compile Include="InterfaceGoodsPaymentRepository.cs" />
+    <Compile Include="InterfaceGoodsProfitRepository.cs" />
     <Compile Include="InterfaceGoodsPurchaseRepository.cs" />
     <Compile Include="InterfaceGuestBookRepository.cs" />
     <Compile Include="InterfaceManageStatusRepository.cs" />
+    <Compile Include="InterfaceMenuActionRepository.cs" />
     <Compile Include="InterfaceMenuRepository.cs" />
     <Compile Include="InterfaceNumberTypeRepository.cs" />
     <Compile Include="InterfaceONOFFSetRepository.cs" />
@@ -108,6 +115,7 @@
     <Compile Include="InterfacePartnerRepository.cs" />
     <Compile Include="InterfacePartTypeRepository.cs" />
     <Compile Include="InterfaceRiseRuleRepository.cs" />
+    <Compile Include="InterfaceRoleActionRepository.cs" />
     <Compile Include="InterfaceRoleMenuRepository.cs" />
     <Compile Include="InterfaceRoleRepository.cs" />
     <Compile Include="InterfaceTdaysRepository.cs" />

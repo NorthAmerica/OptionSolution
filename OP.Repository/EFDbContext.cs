@@ -39,6 +39,10 @@ namespace OP.Repository
         public DbSet<GoodsMarketing> GoodsMarketings { get; set; }
         public DbSet<GoodsPurchase> GoodsPurchases { get; set; }
         public DbSet<GoodsFuture> GoodsFutures { get; set; }
+        public DbSet<GoodsPayment> GoodsPayments { get; set; }
+        public DbSet<GoodsProfit> GoodsProfits { get; set; }
+        public DbSet<RoleAction> RoleActions { get; set; }
+        public DbSet<MenuAction> MenuActions { get; set; }
         public EFDbContext()
             : base("name=EFDbContext")
         {

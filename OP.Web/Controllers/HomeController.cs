@@ -282,6 +282,7 @@ namespace OP.Web.Controllers
         /// <param name="partner"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddPartner(Partner partner)
         {
@@ -350,6 +351,7 @@ namespace OP.Web.Controllers
         /// <param name="partner"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdatePartner(Partner partner)
         {
@@ -383,6 +385,7 @@ namespace OP.Web.Controllers
             
         }
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeletePartner(string ID)
         {
@@ -441,6 +444,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddNumberType(NumberType numtype)
         {
@@ -509,6 +513,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateNumberType(NumberType numtype)
         {
@@ -547,6 +552,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteNumberType(string ID)
         {
@@ -597,6 +603,7 @@ namespace OP.Web.Controllers
         /// <param name="optype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddOptionType(OptionType optype)
         {
@@ -665,6 +672,7 @@ namespace OP.Web.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateOptionType(OptionType type)
         {
@@ -703,6 +711,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteOptionType(string ID)
         {
@@ -986,6 +995,7 @@ namespace OP.Web.Controllers
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddOptionsProduct(OptionsProduct product)
         {
@@ -1396,6 +1406,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddFallRole(FallRole fallrole)
         {
@@ -1451,6 +1462,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddRiseRole(RiseRole riserole)
         {
@@ -1489,6 +1501,7 @@ namespace OP.Web.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> BeginOptionsProduct(string[] id)
         {
@@ -1534,6 +1547,7 @@ namespace OP.Web.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> EndOptionsProduct(string[] id)
         {
@@ -1625,6 +1639,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddPartType(PartType parttype)
         {
@@ -1693,6 +1708,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdatePartType(PartType parttype)
         {
@@ -1731,6 +1747,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeletePartType(string ID)
         {
@@ -1785,6 +1802,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddManageStatus(ManageStatus ms)
         {
@@ -1853,6 +1871,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateManageStatus(ManageStatus parttype)
         {
@@ -1891,6 +1910,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteManageStatus(string ID)
         {
@@ -1945,6 +1965,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddFundStatus(FundStatus ms)
         {
@@ -2012,6 +2033,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateFundStatus(FundStatus parttype)
         {
@@ -2050,6 +2072,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteFundStatus(string ID)
         {
@@ -2120,6 +2143,7 @@ namespace OP.Web.Controllers
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateFuturesTradeData(HttpPostedFileBase uploadedFile)
         {
@@ -2236,6 +2260,7 @@ namespace OP.Web.Controllers
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> UpdateFuturesFundData(HttpPostedFileBase uploadedFile)
         {
@@ -2606,6 +2631,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddCallPriceType(CallPriceType callprice)
         {
@@ -2673,6 +2699,7 @@ namespace OP.Web.Controllers
         /// <param name="numtype"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateCallPriceType(CallPriceType callprice)
         {
@@ -2711,6 +2738,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteCallPriceType(string ID)
         {
@@ -2784,6 +2812,7 @@ namespace OP.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult SwitchSet(bool ONOFFMode, bool HandSwitch)
         {
@@ -2821,6 +2850,7 @@ namespace OP.Web.Controllers
         /// <param name="EndTime"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult AddONTime(DateTime BeginTime, DateTime EndTime)
         {
@@ -2896,6 +2926,7 @@ namespace OP.Web.Controllers
         /// <param name="time"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public ActionResult UpdateONTime(ONTime time)
         {
@@ -2931,6 +2962,7 @@ namespace OP.Web.Controllers
         /// <param name="ID"></param>
         /// <returns></returns>
         [HttpPost]
+        //[RoleAuthorize]
         [CSRFValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteONTime(string ID)
         {

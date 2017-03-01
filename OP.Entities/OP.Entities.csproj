@@ -61,9 +61,12 @@
     <Compile Include="Mappings\FuturesTradeVolumeConfiguration.cs" />
     <Compile Include="Mappings\GoodsFutureConfiguration.cs" />
     <Compile Include="Mappings\GoodsMarketingConfiguration.cs" />
+    <Compile Include="Mappings\GoodsPaymentConfiguration.cs" />
+    <Compile Include="Mappings\GoodsProfitConfiguration.cs" />
     <Compile Include="Mappings\GoodsPurchaseConfiguration.cs" />
     <Compile Include="Mappings\GuestBookConfiguration.cs" />
     <Compile Include="Mappings\ManageStatuConfiguration.cs" />
+    <Compile Include="Mappings\MenuActionConfiguration.cs" />
     <Compile Include="Mappings\MenuConfiguration.cs" />
     <Compile Include="Mappings\NumberTypeConfiguration.cs" />
     <Compile Include="Mappings\OnoffSetConfiguration.cs" />
@@ -75,6 +78,7 @@
     <Compile Include="Mappings\PartnerConfiguration.cs" />
     <Compile Include="Mappings\PartTypeConfiguration.cs" />
     <Compile Include="Mappings\RiseRoleConfiguration.cs" />
+    <Compile Include="Mappings\RoleActionConfiguration.cs" />
     <Compile Include="Mappings\RoleConfiguration.cs" />
     <Compile Include="Mappings\RoleMenuConfiguration.cs" />
     <Compile Include="Mappings\TdayConfiguration.cs" />
@@ -91,10 +95,13 @@
     <Compile Include="Models\FuturesTradeVolume.cs" />
     <Compile Include="Models\GoodsFuture.cs" />
     <Compile Include="Models\GoodsMarketing.cs" />
+    <Compile Include="Models\GoodsPayment.cs" />
+    <Compile Include="Models\GoodsProfit.cs" />
     <Compile Include="Models\GoodsPurchase.cs" />
     <Compile Include="Models\GuestBook.cs" />
     <Compile Include="Models\ManageStatus.cs" />
     <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\MenuAction.cs" />
     <Compile Include="Models\NumberType.cs" />
     <Compile Include="Models\ONOFFSet.cs" />
     <Compile Include="Models\ONTime.cs" />
@@ -106,6 +113,7 @@
     <Compile Include="Models\PartType.cs" />
     <Compile Include="Models\RiseRole.cs" />
     <Compile Include="Models\Role.cs" />
+    <Compile Include="Models\RoleAction.cs" />
     <Compile Include="Models\RoleMenu.cs" />
     <Compile Include="Models\Tday.cs" />
     <Compile Include="Models\TradeOrder.cs" />

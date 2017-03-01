@@ -22,7 +22,7 @@
             ]],
             onLoadSuccess: function (node, data) { $("#RoleMenuloading").css('display', 'none') },
             onClickRow: function (row) {
-                // 在用户点击的时候提示
+
                 $('#RoleMenuGrid').datagrid('loadData', { total: 0, rows: [] });
                 $('#RoleMenuGrid').datagrid('load', {
                     id: row.MenuID
@@ -179,8 +179,8 @@
                             alert("删除失败，请检查");
                         }
                     },
-                    error: function () {
-                        alert("删除失败，请您检查")
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
                     }
                 });
                 
@@ -233,8 +233,8 @@
                     alert("添加失败，请检查");
                 }
             },
-            error: function () {
-                alert("添加失败，请您检查")
+            error: function (data) {
+                $.messager.alert('错误', data.responseText);
             }
         });
 

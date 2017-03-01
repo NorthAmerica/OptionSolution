@@ -48,7 +48,7 @@
                 { field: 'AwaitPickdingNum', title: '待提货数量(吨)', width: 50, sortable: true },
                 { field: 'RealityPickdingNum', title: '实际提货数量(吨)', width: 50, sortable: true },
                 { field: 'LogisticsCost', title: '物流成本(元/吨)', width: 50, sortable: true },
-                { field: 'TonCost', title: '每顿成本(元)', width: 50, sortable: true },
+                { field: 'TonCost', title: '每吨成本(元)', width: 50, sortable: true },
                 { field: 'AllCost', title: '总成本(元)', width: 80, sortable: true },
                 { field: 'InvoiceStatus', title: '发票状态', width: 50, sortable: true },
                 { field: 'PaymentAmount', title: '付款金额', width: 50, sortable: true },
@@ -282,8 +282,8 @@
                         $.messager.alert("错误", "添加失败，请您检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         });
@@ -347,8 +347,8 @@
                         $.messager.alert("错误", "添加失败，请您检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         });
@@ -408,8 +408,8 @@
                         $.messager.alert("错误", "添加失败，请您检查"+data.Message);
                     }
                 },
-                error: function () {
-                    alert("添加失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         });
@@ -419,7 +419,7 @@
         var UpdateGoodsPurchaseID = $("#GoodsPurchaseGrid").datagrid("getSelections");
         if (UpdateGoodsPurchaseID.length == 1) {
             $("#UpdateGoodsPurchaseDialog").dialog("open").dialog("setTitle", "修改现货采购合同");
-            //ClearText();
+            ClearText();
             BingGoodsPurchaseDetails();
         }
         else {
@@ -508,8 +508,8 @@
                         $.messager.alert("错误", "更新失败，请您检查" + data.Message);
                     }
                 },
-                error: function () {
-                    alert("更新失败，请您检查")
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
                 }
             });
         });
@@ -547,8 +547,8 @@
                                 $.messager.alert("友情提示", "删除失败:" + data);
                             }
                         },
-                        error: function () {
-                            alert("删除失败，请您检查")
+                        error: function (data) {
+                            $.messager.alert('错误', data.responseText);
                         }
                     });
 
@@ -560,11 +560,34 @@
         }
     }
     function ClearText() {
-        $("#AddGoodsPurchaseForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
-        $("#UpdateGoodsPurchaseForm").find(':input').not(':button, :submit, :reset').val('').removeAttr('checked').removeAttr('selected');
+        $("#AddGoodsPurchaseForm").form('clear');
+        $("#UpdateGoodsPurchaseForm").form('clear');
+    }
+    //查询
+    function Search() {
+        $('#GoodsPurchaseGrid').datagrid('load', {
+            ContractNo: $('#SearchContractNo').val(),
+            SigningTime: $('#SearchSigningTime').datebox('getText'),
+            PaymentTime: $('#SearchPaymentTime').datebox('getText')
+        });
     }
 </script>
 <div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchContractNo">合同号:</label></td>
+                    <td><input type="text" class="form-control input-sm" id="SearchContractNo" name="ContractNo" placeholder="合同号"></td>
+                    <td><label for="SearchSigningTime">签订时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchSigningTime" name="SigningTime" data-options="height:30"></td>
+                    <td><label for="SearchPaymentTime">付款时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SearchPaymentTime" name="PaymentTime" data-options="height:30"></td>
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
     <table id="GoodsPurchaseGrid"></table>
     @*添加现货采购合同*@
     <div id="AddGoodsPurchaseDialog" class="easyui-dialog" style="width:560px;height:600px;padding:10px 20px"
@@ -591,7 +614,7 @@
                 <tr>
                     <td><label for="ContractType">合同类型：</label></td>
                     <td>
-                        <select id="ContractType" class="easyui-combobox" name="ContractType" style="width:200px;height:35px" data-options="required:true">
+                        <select id="ContractType" class="easyui-combobox" name="ContractType" style="width:200px;height:35px" data-options="editable:false,required:true">
                             <option value="一口价">一口价</option>
                             <option value="基差">基差</option>
                             <option value="远期一口价">远期一口价</option>
@@ -643,7 +666,7 @@
                 <tr>
                     <td><label for="InvoiceStatus">发票状态：</label></td>
                     <td>
-                        <select id="InvoiceStatus" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                        <select id="InvoiceStatus" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="editabl:false, required:true">
                             <option value="已收">已收</option>
                             <option value="未收">未收</option>
                         </select>
@@ -705,7 +728,7 @@
                 <tr>
                     <td><label for="ContractType">合同类型：</label></td>
                     <td>
-                        <select id="ContractType1" class="easyui-combobox" disabled="disabled" name="ContractType" style="width:200px;" data-options="height:35,required:true">
+                        <select id="ContractType1" class="easyui-combobox" disabled="disabled" name="ContractType" style="width:200px;" data-options="editable:false,height:35,required:true">
                             <option value="一口价">一口价</option>
                             <option value="基差">基差</option>
                             <option value="远期一口价">远期一口价</option>
@@ -757,7 +780,7 @@
                 <tr>
                     <td><label for="InvoiceStatus">发票状态：</label></td>
                     <td>
-                        <select id="InvoiceStatus1" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                        <select id="InvoiceStatus1" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true,editable:false">
                             <option value="已收">已收</option>
                             <option value="未收">未收</option>
                         </select>
@@ -815,7 +838,7 @@
                 <tr>
                     <td><label for="PickingTypeM">提货方式：</label></td>
                     <td>
-                        <select id="PickingTypeM" class="easyui-combobox" name="PickingType" style="width:200px;height:35px" data-options="required:true">
+                        <select id="PickingTypeM" class="easyui-combobox" name="PickingType" style="width:200px;height:35px" data-options="editabl:false, required:true">
                             <option value="自提">自提</option>
                             <option value="到厂">到厂</option>
                         </select>
@@ -866,7 +889,7 @@
                 <tr>
                     <td><label for="InvoiceStatusM">销项发票：</label></td>
                     <td>
-                        <select id="InvoiceStatusM" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="required:true">
+                        <select id="InvoiceStatusM" class="easyui-combobox" name="InvoiceStatus" style="width:200px;height:35px" data-options="editable:false,required:true">
                             <option value="已收">已收</option>
                             <option value="未收">未收</option>
                         </select>
