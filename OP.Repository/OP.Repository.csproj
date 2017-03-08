@@ -70,6 +70,8 @@
     <Compile Include="Implementations\ManageStatusRepository.cs" />
     <Compile Include="Implementations\MenuActionRepository.cs" />
     <Compile Include="Implementations\MenuRepository.cs" />
+    <Compile Include="Implementations\MonitorConditionRepository.cs" />
+    <Compile Include="Implementations\MonitorRepository.cs" />
     <Compile Include="Implementations\NumberTypeRepository.cs" />
     <Compile Include="Implementations\ONOFFSetRepository.cs" />
     <Compile Include="Implementations\ONTimeRepository.cs" />
@@ -105,6 +107,8 @@
     <Compile Include="InterfaceManageStatusRepository.cs" />
     <Compile Include="InterfaceMenuActionRepository.cs" />
     <Compile Include="InterfaceMenuRepository.cs" />
+    <Compile Include="InterfaceMonitorConditionRepository.cs" />
+    <Compile Include="InterfaceMonitorRepository.cs" />
     <Compile Include="InterfaceNumberTypeRepository.cs" />
     <Compile Include="InterfaceONOFFSetRepository.cs" />
     <Compile Include="InterfaceONTimeRepository.cs" />
@@ -126,6 +130,22 @@
     <Compile Include="Migrations\201609140311226_goodsfuture.Designer.cs">
       <DependentUpon>201609140311226_goodsfuture.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703010215075_MonitorCondition.cs" />
+    <Compile Include="Migrations\201703010215075_MonitorCondition.Designer.cs">
+      <DependentUpon>201703010215075_MonitorCondition.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703010222486_MonitorCondition_update.cs" />
+    <Compile Include="Migrations\201703010222486_MonitorCondition_update.Designer.cs">
+      <DependentUpon>201703010222486_MonitorCondition_update.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703020319594_Monitor20170302.cs" />
+    <Compile Include="Migrations\201703020319594_Monitor20170302.Designer.cs">
+      <DependentUpon>201703020319594_Monitor20170302.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703020321554_Monitor20170302-2.cs" />
+    <Compile Include="Migrations\201703020321554_Monitor20170302-2.Designer.cs">
+      <DependentUpon>201703020321554_Monitor20170302-2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -142,6 +162,18 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201609140311226_goodsfuture.resx">
       <DependentUpon>201609140311226_goodsfuture.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703010215075_MonitorCondition.resx">
+      <DependentUpon>201703010215075_MonitorCondition.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703010222486_MonitorCondition_update.resx">
+      <DependentUpon>201703010222486_MonitorCondition_update.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703020319594_Monitor20170302.resx">
+      <DependentUpon>201703020319594_Monitor20170302.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703020321554_Monitor20170302-2.resx">
+      <DependentUpon>201703020321554_Monitor20170302-2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

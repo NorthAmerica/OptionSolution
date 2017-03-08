@@ -182,6 +182,7 @@
     <Compile Include="Controllers\ConfigController.cs" />
     <Compile Include="Controllers\GoodsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MonitorController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -312,6 +313,8 @@
     <Content Include="Views\Goods\GoodsPaymentList.cshtml" />
     <Content Include="Views\Goods\GoodsProfitList.cshtml" />
     <Content Include="Views\Config\ActionConfig.cshtml" />
+    <Content Include="Views\Monitor\Index.cshtml" />
+    <Content Include="Views\Monitor\AuditMonitor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

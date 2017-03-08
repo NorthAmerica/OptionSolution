@@ -43,6 +43,8 @@ namespace OP.Repository
         public DbSet<GoodsProfit> GoodsProfits { get; set; }
         public DbSet<RoleAction> RoleActions { get; set; }
         public DbSet<MenuAction> MenuActions { get; set; }
+        public DbSet<Entities.Models.MonitorCondition> MonitorConditions { get; set; }
+        public DbSet<Monitor> Monitors { get; set; }
         public EFDbContext()
             : base("name=EFDbContext")
         {

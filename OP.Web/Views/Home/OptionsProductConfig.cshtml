@@ -368,11 +368,14 @@
     }
     //启用产品(支持多项选择)
     function BeginOptionsProduct() {
-
-        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 1) {
-            $.messager.alert("友情提示", "产品已经启动了，不能重复启动。");
-            return;
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        for (var i = 0; i < selects.length; i++) {
+            if (selects[i].Status == 1) {
+                $.messager.alert("友情提示", "产品已经启动了，不能重复启动。");
+                return;
+            }
         }
+
         //if ($("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
         //    $.messager.alert("友情提示", "产品已经停用了，不能再次启动。");
         //    return;
@@ -427,10 +430,14 @@
     }
     //作废产品（支持多项选择）
     function EndOptionsProduct() {
-        if ($("#OptionsProductGrid").datagrid("getSelected").Status == 2) {
-            $.messager.alert("友情提示", "产品已经作废了，不能重复作废。");
-            return;
+        var selects = $("#OptionsProductGrid").datagrid("getSelections");
+        for (var i = 0; i < selects.length; i++) {
+            if (selects[i].Status == 2) {
+                $.messager.alert("友情提示", "产品已经作废了，不能重复作废。");
+                return;
+            }
         }
+
         $.messager.confirm("停用产品", "您确定停用该产品？", function (End) {
             if (End) {
                 var token = $('@Html.AntiForgeryToken()').val();

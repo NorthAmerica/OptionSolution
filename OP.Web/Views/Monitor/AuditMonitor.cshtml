@@ -1,0 +1,268 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initMonitorConfigGridX();
+        initShowMonitorConditionGridX();
+
+    });
+    //初始化MonitorConfigGrid
+    function initMonitorConfigGridX() {
+        $('#MonitorConfigGridX').datagrid({
+            title: '监控参数控制列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Monitor/MonitorList_Read',
+            sortName: 'EditTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'MonitorID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: false,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'MonitorID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约代码', width: 80, sortable: true },
+                { field: 'MonitorDate', title: '监控日期', width: 100, sortable: true, formatter: formatDateBox },
+                { field: 'Editor', title: '编辑人', width: 80, sortable: true },
+                { field: 'EditTime', title: '编辑时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'Auditor', title: '审核人', width: 50, sortable: true },
+                { field: 'AuditTime', title: '审核时间', width: 60, sortable: true, formatter: formatDateBox },
+                {
+                    field: 'IsAudit', title: "是否审核", width: 60,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return 'color:red;';
+                        }
+                        else {
+                            return 'color:green;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return value = '未审核';
+                        } else {
+                            return value = '已审核';
+                        }
+                    }
+                },
+                {
+                    field: 'IsActive', title: "是否启用", width: 60,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return 'color:red;';
+                        }
+                        else {
+                            return 'color:green;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return value = '停用';
+                        } else {
+                            return value = '启用';
+                        }
+                    }
+                }
+            ]],
+            toolbar: [{
+                id: 'btnread',
+                text: '查看监控参数',
+                iconCls: 'icon-tip',
+                handler: function () {
+                    ReadMonitorConditionDialogX();
+                }
+            }, '-', {
+                id: 'btnbegin',
+                text: '审核通过',
+                iconCls: 'icon-begin',
+                handler: function () {
+                    PassMonitor();
+                }
+            }, '-', {
+                id: 'btnend',
+                text: '审核未通过',
+                iconCls: 'icon-end',
+                handler: function () {
+                    RejectMonitor();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initMonitorConfigGridX();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                ReadMonitorConditionDialog();
+            }
+        });
+    }
+    //初始化查看监控条目
+    function initShowMonitorConditionGridX() {
+        $('#ShowMonitorConditionGridX').datagrid({
+            title: '监控参数列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Monitor/MonitorConditionGrid_Read',
+            sortName: 'MainPosition',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'MonitorConditionID',
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'MonitorConditionID', title: 'ID', width: 20, sortable: true, hidden: true },
+                { field: 'MonitorID', title: 'MonitorID', width: 20, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约名称', width: 10, sortable: true },
+                { field: 'MonitorDate', title: '监控日期', width: 15, sortable: true, formatter: formatDateBox },
+                { field: 'MainPosition', title: '持仓', width: 10, sortable: true },
+                { field: 'MinPosition', title: '最小持仓', width: 10, sortable: true },
+                { field: 'MaxPosition', title: '最大持仓', width: 20, sortable: true },
+                { field: 'MinPrice', title: '最小价格', width: 30, sortable: true },
+                { field: 'MaxPrice', title: '最大价格', width: 40, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnrefreshFallRole',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initShowMonitorConditionGridX();
+                }
+            }]
+        });
+    }
+    //监控参数审核通过
+    function PassMonitor() {
+        $.messager.confirm("审核监控条目", "您确定审核通过该监控条目？", function (Begin) {
+            if (Begin) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#MonitorConfigGridX").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].MonitorID);
+                        //console.info(IDs);
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Monitor/PassMonitor',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '审核监控参数成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#MonitorConfigGridX").datagrid("reload");
+                        }
+                        else {
+                            alert("审核失败，" + data.Msg);
+                        }
+                    },
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
+                    }
+                });
+
+            }
+        });
+    }
+    //监控参数审核不通过
+    function RejectMonitor() {
+        $.messager.confirm("审核不通过", "您确定审核不通过该监控参数？将会同时停用所选监控条目！", function (End) {
+            if (End) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#MonitorConfigGridX").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].MonitorID);
+                        //console.info(IDs);
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Monitor/RejectMonitor',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '审核监控参数成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#MonitorConfigGridX").datagrid("reload");
+                        }
+                        else {
+                            alert("停用失败，" + data.Msg);
+                        }
+                    },
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
+                    }
+                });
+
+            }
+        });
+    }
+
+    function ReadMonitorConditionDialogX() {
+        var selects = $("#MonitorConfigGridX").datagrid("getSelections");
+        if (selects.length == 1) {
+            var select = $("#MonitorConfigGridX").datagrid("getSelected");
+        } else {
+            //$.messager.alert("友情提示", "每次只能修改一行数据");
+            return;
+        }
+        $('#ShowMonitorConditionDialogX').dialog('open').dialog('setTitle', '查看监控参数');
+        $('#ShowMonitorConditionGridX').datagrid('loadData', { total: 0, rows: [] });
+        $('#ShowMonitorConditionGridX').datagrid('load', {
+            id: select.MonitorID
+        });
+
+        initShowMonitorConditionGridX();
+    }
+</script>
+<div>
+    <table id="MonitorConfigGridX"></table>
+
+    @* 监控参数列表弹窗 *@
+    <div id="ShowMonitorConditionDialogX" class="easyui-dialog" style="width:900px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="ShowMonitorConditionGridX"></table>
+    </div>
+</div>
+

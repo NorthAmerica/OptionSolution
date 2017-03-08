@@ -1,0 +1,541 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initMonitorConfigGrid();
+        initShowMonitorConditionGrid();
+        BindAddMonitorClickEvent();
+        BindUploadMonitorConditionClickEvent();
+    });
+    //初始化MonitorConfigGrid
+    function initMonitorConfigGrid() {
+        $('#MonitorConfigGrid').datagrid({
+            title: '监控参数控制列表',
+            iconCls: '',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Monitor/MonitorList_Read',
+            sortName: 'EditTime',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'MonitorID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: false,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'MonitorID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约代码', width: 80, sortable: true },
+                { field: 'MonitorDate', title: '监控日期', width: 100, sortable: true, formatter: formatDateBox },
+                { field: 'Editor', title: '编辑人', width: 80, sortable: true },
+                { field: 'EditTime', title: '编辑时间', width: 60, sortable: true, formatter: formatDateBox },
+                { field: 'Auditor', title: '审核人', width: 50, sortable: true },
+                { field: 'AuditTime', title: '审核时间', width: 60, sortable: true, formatter: formatDateBox },
+                {
+                    field: 'IsAudit', title: "是否审核", width: 60,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return 'color:red;';
+                        }
+                        else {
+                            return 'color:green;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return value = '未审核';
+                        } else{
+                            return value = '已审核';
+                        }
+                    }
+                },
+                {
+                    field: 'IsActive', title: "是否启用", width: 60,
+                    styler: function (value, row, index) {
+                        if (value == 0) {
+                            return 'color:red;';
+                        }
+                        else {
+                            return 'color:green;';
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        if (value == 0) {
+                            return value = '停用';
+                        } else {
+                            return value = '启用';
+                        }
+                    }
+                }
+            ]],
+            toolbar: [{
+                id: 'btnadd',
+                text: '添加监控参数条目',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddMonitorDialog();
+                }
+            }, '-', {
+                id: 'btnupload',
+                text: '上传监控参数Excel',
+                iconCls: 'icon-excel',
+                handler: function () {
+                    UploadMonitorConditionDialog();
+                }
+            }, '-', {
+                id: 'btnread',
+                text: '查看监控参数',
+                iconCls: 'icon-tip',
+                handler: function () {
+                    ReadMonitorConditionDialog();
+                }
+            }, '-', {
+                id: 'btnbegin',
+                text: '启用',
+                iconCls: 'icon-begin',
+                handler: function () {
+                    BeginMonitor();
+                }
+            }, '-', {
+                id: 'btnend',
+                text: '停用',
+                iconCls: 'icon-end',
+                handler: function () {
+                    EndMonitor();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initMonitorConfigGrid();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                ReadMonitorConditionDialog();
+            }
+        });
+    }
+    //初始化查看监控条目
+    function initShowMonitorConditionGrid() {
+        $('#ShowMonitorConditionGrid').datagrid({
+            title: '监控参数列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Monitor/MonitorConditionGrid_Read',
+            sortName: 'MainPosition',
+            sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'MonitorConditionID',
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'MonitorConditionID', title: 'ID', width: 20, sortable: true, hidden: true },
+                { field: 'MonitorID', title: 'MonitorID', width: 20, sortable: true, hidden: true },
+                { field: 'Contract', title: '合约名称', width: 10, sortable: true },
+                { field: 'MonitorDate', title: '监控日期', width: 15, sortable: true, formatter: formatDateBox },
+                { field: 'MainPosition', title: '持仓', width: 10, sortable: true },
+                { field: 'MinPosition', title: '最小持仓', width: 10, sortable: true },
+                { field: 'MaxPosition', title: '最大持仓', width: 20, sortable: true },
+                { field: 'MinPrice', title: '最小价格', width: 30, sortable: true },
+                { field: 'MaxPrice', title: '最大价格', width: 40, sortable: true }
+            ]],
+            toolbar: [{
+                id: 'btnrefreshFallRole',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initShowMonitorConditionGrid();
+                }
+            }]
+        });
+    }
+    //添加监控参数条目
+    function AddMonitorDialog() {
+        $('#AddMonitorDialog').dialog('open').dialog('setTitle', '添加监控参数条目');
+        $('#AddMonitorForm').form('clear');
+    }
+    //绑定新增上涨规则按钮
+    function BindAddMonitorClickEvent() {
+        $('#btnAddMonitor').click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddMonitorForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                MonitorName: $("#MonitorName").val(),
+                Contract: $("#Contract").val(),
+                MonitorDate: $('#MonitorDate').datebox('getText')
+            };
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Monitor/AddMonitor',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增监控参数条目成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddMonitorDialog').dialog('close');
+                        $("#MonitorConfigGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.responseText);
+                }
+            });
+
+        });
+    }
+    //上传监控参数Excel-------------------------------------------------------------------------------------
+    function UploadMonitorConditionDialog() {
+        var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
+        if (Selections.length != 1) {
+            $.messager.alert('错误', '只能选择一项监控条目进行数据上传，现在已经选择了' + Selections.length + '条。请重新选择。');
+            return;
+        }
+        $("#UploadMonitorConditionDialog").dialog("open").dialog("setTitle", "上传监控参数数据");
+        //数据清空
+        $('#UploadedFile').val('');
+        $("#FileProgress").css("width",
+              '0%');
+        $('#FileProgress span').text("0%");
+        $("#FileName").text('');
+        $("#FileSize").text('');
+    }
+    //新增产品数据事件
+    function BindUploadMonitorConditionClickEvent() {
+        $("#btnUploadMonitorCondition").click(function () {
+            var form = $('#UploadMonitorConditionForm')[0];
+            var dataString = new FormData(form);
+            
+            dataString.append('id', Selections[0].MonitorID);
+            dataString.append('monitordate', formatDateBox(Selections[0].MonitorDate));
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //dataString.append('ProductID', $("#ProductGrid").datagrid("getSelections")[0].ProductID);
+            $.ajax({
+                url: '/Monitor/UploadMonitorCondition',  //Server script to process data
+                type: 'POST',
+                xhr: function () {  // Custom XMLHttpRequest
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) { // Check if upload property exists
+                        //myXhr.upload.onprogress = progressHandlingFunction
+                        myXhr.upload.addEventListener('progress', progressHandlingFunction,
+                        false); // For handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                //Ajax events
+                success: successHandler,
+                error: errorHandler,
+                complete: completeHandler,
+                headers: headers,
+                // Form data
+                data: dataString,
+                //Options to tell jQuery not to process data or worry about content-type.
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    }
+    function successHandler(data) {
+        if (data.statusCode == 400) {
+            $.messager.alert('错误', data.status);
+        } else if (data.statusCode == 200) {
+            $.messager.alert('成功', data.status);
+        }
+    }
+    function errorHandler(e) {
+        alert(e.status);
+    }
+    function completeHandler(data) {
+        $("#UploadMonitorConditionDialog").dialog("close");
+        $('#MonitorGrid').datagrid('reload');
+    }
+    function progressHandlingFunction(e) {
+        if (e.lengthComputable) {
+            var percentComplete = Math.round(e.loaded * 100 / e.total);
+            $("#FileProgress").css("width",
+              percentComplete + '%').attr('aria-valuenow', percentComplete);
+            $('#FileProgress span').text(percentComplete + "%");
+        }
+        else {
+            $('#FileProgress span').text('unable to compute');
+        }
+    }
+    function singleFileSelected(evt) {
+        //var selectedFile = evt.target.files can use this  or select input file element
+        //and access it's files object
+        var selectedFile = ($("#UploadedFile"))[0].files[0];//FileControl.files[0];
+        if (selectedFile) {
+            if (selectedFile.name.split('.').length >= 2) {
+                var FileType = selectedFile.name.split('.')[selectedFile.name.split('.').length - 1];
+                if (FileType.toLowerCase() != "xlsx" && FileType.toLowerCase() != "xls") {
+                    $.messager.alert('友情提示', '上传文件必须为Excel的文件格式，请重新选择');
+                    $('#UploadedFile').val('');
+                    $("#FileName").text('');
+                    $("#FileSize").text('');
+                    return false;
+                }
+            }
+            var FileSize = 0;
+            //var imageType = /image.*/;
+            if (selectedFile.size > 1048576) {
+                FileSize = Math.round(selectedFile.size * 100 / 1048576) / 100 + " MB";
+            }
+            else if (selectedFile.size > 1024) {
+                FileSize = Math.round(selectedFile.size * 100 / 1024) / 100 + " KB";
+            }
+            else {
+                FileSize = selectedFile.size + " Bytes";
+            }
+            // here we will add the code of thumbnail preview of upload images
+
+            $("#FileName").text("名称 : " + selectedFile.name);
+            $("#FileSize").text("大小 : " + FileSize);
+
+        }
+    }
+    //----------------------------------------------------------------------------------------------------
+    //查看监控参数
+    function ReadMonitorConditionDialog() {
+        var selects = $("#MonitorConfigGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            var select = $("#MonitorConfigGrid").datagrid("getSelected");
+        } else {
+            //$.messager.alert("友情提示", "每次只能修改一行数据");
+            return;
+        }
+        $('#ShowMonitorConditionDialog').dialog('open').dialog('setTitle', '查看监控参数');
+        $('#ShowMonitorConditionGrid').datagrid('loadData', { total: 0, rows: [] });
+        $('#ShowMonitorConditionGrid').datagrid('load', {
+            id: select.MonitorID
+        });
+
+        initShowMonitorConditionGrid();
+    }
+    //启用
+    function BeginMonitor() {
+        var selects = $("#MonitorConfigGrid").datagrid("getSelections");
+        for (var i = 0; i < selects.length; i++) {
+            if(selects[i].IsAudit==0)
+            {
+                $.messager.alert("友情提示", "监控参数条目中有未通过审核，不能启动。");
+                return;
+            }
+        }
+
+        $.messager.confirm("启用产品", "您确定开始启用该产品？", function (Begin) {
+            if (Begin) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].MonitorID);
+                        //console.info(IDs);
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Monitor/BeginMonitor',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '启用监控参数成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#MonitorConfigGrid").datagrid("reload");
+                        }
+                        else {
+                            alert("启用失败，"+data.Msg);
+                        }
+                    },
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
+                    }
+                });
+
+            }
+        });
+    }
+    //停用
+    function EndMonitor() {
+        $.messager.confirm("停用产品", "您确定开始停用该监控条目？", function (End) {
+            if (End) {
+                var token = $('@Html.AntiForgeryToken()').val();
+                var headers = {};
+                headers["__RequestVerificationToken"] = token;
+                var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
+                var IDs = [];
+                if (Selections.length != 0) {
+                    for (var i = 0; i < Selections.length; i++) {
+                        IDs.push(Selections[i].MonitorID);
+                        //console.info(IDs);
+                    }
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '/Monitor/EndMonitor',
+                    cache: false,
+                    headers: headers,
+                    data: { id: IDs },
+                    success: function (data) {
+                        if (data && data.Success) {
+                            $.messager.show({
+                                title: '我的消息',
+                                msg: '停用监控参数成功。',
+                                timeout: 5000,
+                                showType: 'slide'
+                            });
+
+                            $("#MonitorConfigGrid").datagrid("reload");
+                        }
+                        else {
+                            alert("停用失败，" + data.Msg);
+                        }
+                    },
+                    error: function (data) {
+                        $.messager.alert('错误', data.responseText);
+                    }
+                });
+
+            }
+        });
+    }
+</script>
+<div>
+    <table id="MonitorConfigGrid"></table>
+
+    @*添加添加监控参数条目弹窗*@
+    <div id="AddMonitorDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddMonitorForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="MonitorName">监控名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="MonitorName" name="MonitorName" data-options="required:true" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="Contract">合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="Contract" name="Contract" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="MonitorDate">监控日期：</label></td>
+                    <td><input type="text" class="easyui-datebox" id="MonitorDate" name="MonitorDate" data-options="required:true,height:30"></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddMonitor" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddMonitorDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    @*-----------------------------------------------------------------------------------------------------------------
+        上传监控参数Excel数据弹窗*@
+    <div id="UploadMonitorConditionDialog" class="easyui-dialog" style="width:560px;height:500px;padding:10px 20px;display:block;"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <div class="alert alert-danger" role="alert">
+            <strong>提醒!</strong><br />上传的数据必须符合数据模板的规格.
+        </div>
+        <div class="alert alert-info" role="alert">
+            <div id="FileName" class="info"></div>
+            <div id="FileSize" class="info"></div>
+        </div>
+        <form id="UploadMonitorConditionForm" method="post" novalidate="novalidate" enctype="multipart/form-data">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="UploadedFile">监控参数上传：</label></td>
+                    <td>
+                        <input type="file" name="UploadedFile" id="UploadedFile" onchange="singleFileSelected()" />
+                    </td>
+                </tr>
+                @*<tr>
+                        <td><label for="Address">数据模板下载：</label></td>
+                        <td>
+                            <a href="~/FileUpLoad/数据模板.xlsx" title="数据模板下载" target="_blank">数据模板.xlsx</a>||
+                            <a href="~/FileUpLoad/数据模板.xls" title="数据模板下载" target="_blank">数据模板.xls</a>
+                        </td>
+                    </tr>*@
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUploadMonitorCondition" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UploadMonitorConditionDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+        <div class="progress">
+            <div id="FileProgress"
+                 class="progress-bar progress-bar-striped" role="progressbar"
+                 aria-valuenow="0" aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0%;">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    @* 监控参数列表弹窗 *@
+    <div id="ShowMonitorConditionDialog" class="easyui-dialog" style="width:900px;height:600px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <table id="ShowMonitorConditionGrid"></table>
+    </div>
+</div>

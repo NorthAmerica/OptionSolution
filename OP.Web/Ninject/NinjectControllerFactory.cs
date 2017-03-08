@@ -59,6 +59,8 @@ namespace OP.Web.Ninject
             ninjectKernel.Bind<InterfaceGoodsProfitRepository>().To<GoodsProfitRepository>();
             ninjectKernel.Bind<InterfaceMenuActionRepository>().To<MenuActionRepository>();
             ninjectKernel.Bind<InterfaceRoleActionRepository>().To<RoleActionRepository>();
+            ninjectKernel.Bind<InterfaceMonitorRepository>().To<MonitorRepository>();
+            ninjectKernel.Bind<InterfaceMonitorConditionRepository>().To<MonitorConditionRepository>();
             //put bindings here
         }
     }

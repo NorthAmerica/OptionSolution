@@ -68,6 +68,8 @@
     <Compile Include="Mappings\ManageStatuConfiguration.cs" />
     <Compile Include="Mappings\MenuActionConfiguration.cs" />
     <Compile Include="Mappings\MenuConfiguration.cs" />
+    <Compile Include="Mappings\MonitorConditionConfiguration.cs" />
+    <Compile Include="Mappings\MonitorConfiguration.cs" />
     <Compile Include="Mappings\NumberTypeConfiguration.cs" />
     <Compile Include="Mappings\OnoffSetConfiguration.cs" />
     <Compile Include="Mappings\OnTimeConfiguration.cs" />
@@ -102,6 +104,8 @@
     <Compile Include="Models\ManageStatus.cs" />
     <Compile Include="Models\Menu.cs" />
     <Compile Include="Models\MenuAction.cs" />
+    <Compile Include="Models\Monitor.cs" />
+    <Compile Include="Models\MonitorCondition.cs" />
     <Compile Include="Models\NumberType.cs" />
     <Compile Include="Models\ONOFFSet.cs" />
     <Compile Include="Models\ONTime.cs" />
