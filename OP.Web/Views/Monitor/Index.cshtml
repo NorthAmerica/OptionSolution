@@ -220,6 +220,7 @@
     //上传监控参数Excel-------------------------------------------------------------------------------------
     function UploadMonitorConditionDialog() {
         var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
+        
         if (Selections.length != 1) {
             $.messager.alert('错误', '只能选择一项监控条目进行数据上传，现在已经选择了' + Selections.length + '条。请重新选择。');
             return;
@@ -238,7 +239,7 @@
         $("#btnUploadMonitorCondition").click(function () {
             var form = $('#UploadMonitorConditionForm')[0];
             var dataString = new FormData(form);
-            
+            var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
             dataString.append('id', Selections[0].MonitorID);
             dataString.append('monitordate', formatDateBox(Selections[0].MonitorDate));
             var token = $('@Html.AntiForgeryToken()').val();
