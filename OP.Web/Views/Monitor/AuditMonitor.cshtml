@@ -1,4 +1,6 @@
-﻿
+﻿@* 
+    审核监控参数
+ *@
 @{
     Layout = null;
 }
@@ -19,7 +21,7 @@
             autoRowHeight: true,
             striped: true,
             url: '/Monitor/MonitorList_Read',
-            sortName: 'EditTime',
+            sortName: 'MonitorName',
             sortOrder: 'desc',
             border: true,
             remoteSort: false,
@@ -34,6 +36,7 @@
             columns: [[
                 { field: 'ck', checkbox: true },
                 { field: 'MonitorID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'MonitorName', title: '监控名称', width: 80, sortable: true },
                 { field: 'Contract', title: '合约代码', width: 80, sortable: true },
                 { field: 'MonitorDate', title: '监控日期', width: 100, sortable: true, formatter: formatDateBox },
                 { field: 'Editor', title: '编辑人', width: 80, sortable: true },

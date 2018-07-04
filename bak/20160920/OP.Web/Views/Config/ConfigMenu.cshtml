@@ -1,0 +1,28 @@
+﻿@* 配置页面菜单 *@
+<div id="aa" class="easyui-accordion" style="width:253px;">
+    <div title="基础配置" data-options="iconCls:'icon-save',selected:true" style="overflow:auto;padding:10px;">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('人员管理','/Config/UserConfig',this)">人员管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('角色管理','/Config/RoleConfig',this)">角色管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('菜单管理','/Config/MenuConfig',this)">菜单管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('人员角色管理', '/Config/UserRoleConfig', this)">人员角色管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('菜单角色管理', '/Config/RoleMenuConfig', this)">菜单角色管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('留言栏管理', '/Config/GuestBookList', this)">留言栏管理</a>
+            </li>
+            <li class="nav-li" role="presentation">
+                <a href="#" onclick="newone('日志列表', '/Config/EventLogList', this)">日志列表</a>
+            </li>
+        </ul>
+    </div>
+</div> 

@@ -1,0 +1,186 @@
+﻿@model OP.Brochure.Models.BrochureViewModel
+@{
+    ViewBag.Title = "购买须知";
+}
+<script type="text/JavaScript">
+
+$.extend($.fn.validatebox.defaults.rules, {
+    phoneNum: { 
+        validator: function(value, param){
+         return /^1[3-8]+\d{9}$/.test(value);
+        },
+        message: '请输入正确的手机号码。'
+    },
+
+    telNum:{ 
+      validator: function(value, param){
+          return /(^(0[0-9]{2,3}\-)?([2-9][0-9]{6,7})+(\-[0-9]{1,4})?$)|(^((\d3)|(\d{3}\-))?(1[358]\d{9})$)/.test(value);
+         },
+      message: '请输入正确的手机或电话号码。'
+    }
+});
+
+</script>
+<script>
+    $(function () {
+        BindSendGuestBookClickEvent();
+    })
+
+    function BindSendGuestBookClickEvent() {
+        $('#btnSendGuestBook').click(function () {
+            if ($('#GuestBookForm').form('validate')) {
+                if ($('#switch-Checking').bootstrapSwitch('state')) {
+
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+
+                    //创建传递的参数
+                    var postdata = {
+                        GuestName: $("#GuestName").val(),
+                        GuestMobile: $("#GuestMobile").val(),
+                        GuestContent: $("#GuestContent").val()
+                    };
+
+                    //发送异步请求到后台保存用户数据
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Home/SendGuestBook',
+                        cache: false,
+                        headers: headers,
+                        data: postdata,
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.alert('提示', '提交成功');
+                                ClearData();
+                            }
+                            else {
+                                $.messager.alert('提示', "提交失败，请您检查");
+                                ClearData();
+                            }
+                        },
+                        error: function () {
+                            $.messager.alert('提示', "提交失败，请您检查");
+                            ClearData();
+                        }
+                    });
+                } else {
+                    $.messager.alert("提示", "请先点击认证才能提交。");
+                }
+            }
+        });
+    }
+    function ClearData() {
+        $('#switch-Checking').bootstrapSwitch('toggleState', false);
+        $('#GuestName').val('');
+        $("#GuestMobile").val('');
+        $("#GuestContent").val('');
+    }
+</script>
+<div class="product-a"><div class="Iron-Man"> 价格追补服务-@Model.ProductName</div></div>
+<div class="product-b">
+    <!--标题文字部分-->
+    <div class="size">
+        <div>
+            <!-- style="width:100px;" -->
+            <p>产品期限：</p>
+            <p>标的合约：</p>
+            <p>购买起点：</p>
+            @if (Model.AmountType == "保费")
+            {
+                <p>服<em>务</em>费：</p>
+            }
+            else if (Model.AmountType == "保证金")
+            {
+                <p>保<em>证</em>金：</p>
+            }
+
+            <p>购买时间：</p>
+        </div>
+        <div>
+            <!--  style="width:455px;" -->
+            <p>@Model.Deadline 天</p>
+            <p>@Model.Contract @Model.ContractDescrip</p>
+            <p>@Model.BuyBegin</p>
+            @if (Model.PriceType == "单位值")
+            {
+                <p>@Model.Price 元/吨</p>
+            }
+            else if (Model.PriceType == "固定值")
+            {
+                <p>@Model.Price 元</p>
+            }
+
+            <p>@Model.BuyTime</p>
+        </div>
+    </div>
+</div>
+<a id="pp"></a>
+<div class="product-c"></div>
+
+<div id="contant">
+    <div class="img-a"><img src="~/images/arrow.jpg" /></div>
+    <div class="img-b"><img src="~/images/arrow1.jpg"></div>
+    <div class="img-c"><img src="~/images/arrow3.jpg" style="transform:rotate(-180deg);"></div>
+    <div class="img-d"><img src="~/images/arrow3.jpg"></div>
+    <div class="img-e"><img src="~/images/arrow4.jpg"></div>
+
+    <div class="nav-a">
+        <img src="~/images/nav_02.png" usemap="#Map" border="0" />
+        <map name="Map" id="Map">
+            <area shape="rect" coords="3,5,204,53" href="../index/@Model.OptionsProductID" />
+            <area shape="rect" coords="206,7,407,53" href="../buy/@Model.OptionsProductID" />
+            <area shape="rect" coords="410,6,605,51" href="../example/@Model.OptionsProductID" />
+        </map>
+    </div>
+
+
+    <!--购买流程-->
+    <div class="buy-a"><img src="~/images/solid.jpg" /></div>
+    <div class="buy">
+        <div style=" height:100px; margin-top:15px; margin-left:250px;">
+            <div class="l-ch">在“现货超市”购买现货</div><div class="xian">进入购物车<img src="~/images/buy.png" /></div>
+            <div class="l-ch">在确认订单信息页选购“价格追补服务产品”</div><div class="xian">提交订单<img src="~/images/book.png" /></div><div class="p-ch">支付结算</div>
+        </div>
+    </div>
+
+    <!--常见问题-->
+    <div class="FAQ"><img src="~/images/solid.jpg" /></div>
+    <div class="Questions" style="margin-bottom:10px;">
+        @Html.Raw(Model.FAQ)
+    </div>
+    <form id="GuestBookForm" method="post" novalidate="novalidate">
+        <table width="670" class="message">
+
+            <tr>
+                <td width="60">姓名：</td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="GuestName" name="GuestName" data-options="required:true,validType:'length[1,32]'" style="width:400px;" />
+                </td>
+            </tr>
+            <tr>
+                <td>手机：</td>
+                <td>
+                    <input class="easyui-validatebox form-control" type="text" id="GuestMobile" name="GuestMobile" data-options="prompt:'请输入正确的手机或电话号码。',validType:'telNum',required:true" style="width:400px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">内容：</td>
+                <td>
+                    <input class="easyui-textbox" type="text" id="GuestContent" name="GuestContent" data-options="multiline:true" style="width:405px;height:100px" />
+                </td>
+            </tr>
+            <tr>
+                <td>认证：</td>
+                <td><input id="switch-Checking" type="checkbox" data-on-text="已认证" data-off-text="未认证"></td>
+            </tr>
+            <tr>
+                <td colspan="2" valign="top">
+                    <a href="javascript:void(0)" class="easyui-linkbutton send" id="btnSendGuestBook">发送</a>
+                    <img src="~/images/ly.png" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+

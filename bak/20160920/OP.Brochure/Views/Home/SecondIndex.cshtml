@@ -1,0 +1,173 @@
+﻿@model List<OP.Brochure.Models.BrochureViewModel>
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <title>快诺价格追补服务</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <script type="application/x-javascript"> addEventListener("load", function() {setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <!meta charset utf="8">
+    <!--flexslider-css-->
+    <link href="~/Content/flexslider.css" rel='stylesheet' type='text/css' />
+    <!--bootstrap-->
+    <link href="~/Content/bootstrap.min.3.3.4.css" rel="stylesheet" type="text/css">
+    <!--coustom css-->
+    <link href="~/Content/style.css" rel="stylesheet" type="text/css" />
+    <!--fonts-->
+    @*<link href='http://fonts.useso.com/css?family=Coda:400,800' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.useso.com/css?family=Jockey+One' rel='stylesheet' type='text/css'>*@
+    <!--script-->
+    <script type="text/javascript" src="~/Scripts/move-top.js"></script>
+    <script type="text/javascript" src="~/Scripts/easing.js"></script>
+    <script src="~/Scripts/modernizr.custom.js"></script>
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.3.3.4.js"></script>
+    <!--script-->
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            $(".scroll").click(function (event) {
+                event.preventDefault();
+                $('html,body').animate({ scrollTop: $(this.hash).offset().top }, 900);
+            });
+        });
+    </script>
+    <!--fonts-->
+</head>
+<body style="font-family: 'Microsoft YaHei',微软雅黑;">
+    <div class="header" id="home">
+        <div class="header-banner">
+            <!-- Top Navigation -->
+            <div class="container page-seperator">
+                <section class="color bgi">
+                    <h3 style="font-size:70px;font-weight:bold;">快诺价格追补服务 为钢铁保价护航</h3>
+                    <h3>价格追补 跌价无忧</h3>
+                    @*<button type="button" class="btn btn-warning but1">Read more</button>*@
+                </section>
+                <section class="col-3 ss-style-doublediagonal our-features">
+                    <h1>产品特点</h1>
+                    <p></p>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-sort-by-attributes our-icons" aria-hidden="true"></span>
+                        <h3>价格下跌即可追补</h3>
+                        <p></p>
+                    </div>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-fullscreen our-icons" aria-hidden="true"></span>
+                        <h3>追补方式多样</h3>
+                        <p></p>
+                    </div>
+                    <div class="column our-feat">
+                        <span class="glyphicon glyphicon-random our-icons" aria-hidden="true"></span>
+                        <h3>追补期限灵活</h3>
+                        <p></p>
+                    </div>
+                    <div class="clearfix"></div>
+                </section>
+            </div>
+        </div>
+        <div class="our-work" id="our-work">
+            <div class="container">
+                <h2>产品列表</h2>
+                <p></p>
+                <div class="gallery-bottom">
+                    @foreach (var bvm in Model)
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a href="/Home/Index/@bvm.OptionsProductID" rel="title" target="_blank" class="b-link-stripe b-animate-go  thickbox" style="width:320px;">
+                                    <div style="width:320px;height:350px;background-image:url(../../images/IMG_3.jpg);background-size:auto;">
+                                        <h3>
+                                            <span style="display:block;padding-top:150px;font-size:larger;color:white;font-weight:bolder;" class="txt">@bvm.ProductName</span>
+                                        </h3>
+                                    </div> @*<img class="img-responsive" src="~/images/IMG_3.jpg" />*@
+
+                                    @*<div class="b-wrapper">
+                                            <h3 class="b-animate b-from-left b-delay03">
+                                                <span class="text-left" style="display:block;padding-top:30px;padding-left:20px;padding-right:20px;font-size:large">产品特征：<br/><br />@Html.Raw(bvm.Contract)</span>
+                                                <span class="glyphicon glyphicon-arrow-right gal-icn" aria-hidden="true"></span>
+                                            </h3>
+                                        </div>*@
+                                </a>
+                            </div>
+                            <div class="col-md-8 alert-info" style="height:350px;width:780px;display:table;">
+                                <div style="display: table-cell;vertical-align: middle;">
+                                    <h1 style="font-weight:bolder">产品特征</h1>
+                                    <div class="row" style="padding-left:20px;">
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">产品期限：<span style="font-weight:normal">@bvm.Deadline </span></span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">标的合约：<span style="font-weight:normal">@bvm.Contract @bvm.ContractDescrip</span></span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left">
+                                                @if (bvm.AmountType == "保费")
+                                                {
+                                                    <span>服&ensp;务&ensp;费：</span>
+                                                }
+                                                else if (bvm.AmountType == "保证金")
+                                                {
+                                                    <span>保&ensp;证&ensp;金：</span>
+                                                }
+                                                @if (bvm.PriceType == "单位值")
+                                                {
+                                                    <span style="font-weight:normal">@bvm.Price 元/吨</span>
+                                                }
+                                                else if (bvm.PriceType == "固定值")
+                                                {
+                                                    <span style="font-weight:normal">@bvm.Price 元</span>
+                                                }
+                                            </span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left;text-align:left">
+                                                追补说明：<span style="font-weight:normal;line-height:150%">@bvm.PayDescrip</span>
+                                            </span>
+                                        </div>
+                                        <div class="col-md-12" style="padding-bottom:5px;">
+                                            <span style="font-size:larger;font-weight:bolder;float:left;text-align:left">
+                                                结算公式：<span style="font-weight:normal;line-height:150%">
+                                                    @Html.Raw(bvm.SettlementFormula)
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">&emsp;</div>
+                    }
+
+
+                    <div class="clearfix"></div>
+                    @*<script src="~/Scripts/jquery.chocolat.js"></script>*@
+                    @*<link rel="stylesheet" href="~/Content/chocolat.css" type="text/css" media="screen" charset="utf-8">*@
+                    <!--light-box-files -->
+                    @*<script type="text/javascript" charset="utf-8">
+                                $(function() {
+                                $('.bottom-gallery a').Chocolat();
+                                });
+                        </script>*@
+                </div>
+
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="container">
+
+                <div class="copy-rt">
+                    <p>Copyright &copy; 2016.湖南联创控股集团有限公司/快诺讯汇网络技术股份有限公司版权所有 &emsp; 战略合作伙伴:<a href="http://www.dayouf.com/" target="_blank" title="大有期货有限公司">大有期货有限公司/湖南迅财航商贸有限公司</a></p>
+                </div>
+            </div>
+        </div>
+        <a href="#home" id="toTop" class="scroll" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9358B78A-326B-49E5-BCC0-E9CC6C03414B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OP.Repository</RootNamespace>
+    <AssemblyName>OP.Repository</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ContextFactory.cs" />
+    <Compile Include="DESEncrypt.cs" />
+    <Compile Include="EFDbContext.cs" />
+    <Compile Include="Implementations\BaseRepository.cs" />
+    <Compile Include="Implementations\BrochureRepository.cs" />
+    <Compile Include="Implementations\CallPriceTypeRepository.cs" />
+    <Compile Include="Implementations\EventLogRepository.cs" />
+    <Compile Include="Implementations\FallRoleRepository.cs" />
+    <Compile Include="Implementations\FundStatusRepository.cs" />
+    <Compile Include="Implementations\FuturePriceRepository.cs" />
+    <Compile Include="Implementations\FuturesFundRepository.cs" />
+    <Compile Include="Implementations\FuturesTradeVolumeRepository.cs" />
+    <Compile Include="Implementations\GuestBookRepository.cs" />
+    <Compile Include="Implementations\ManageStatusRepository.cs" />
+    <Compile Include="Implementations\MenuRepository.cs" />
+    <Compile Include="Implementations\NumberTypeRepository.cs" />
+    <Compile Include="Implementations\ONOFFSetRepository.cs" />
+    <Compile Include="Implementations\ONTimeRepository.cs" />
+    <Compile Include="Implementations\OptionsProductRepository.cs" />
+    <Compile Include="Implementations\OptionTradeRepository.cs" />
+    <Compile Include="Implementations\OptionTradeSumRepository.cs" />
+    <Compile Include="Implementations\OptionTypeRepository.cs" />
+    <Compile Include="Implementations\PartnerRepository.cs" />
+    <Compile Include="Implementations\PartTypeRepository.cs" />
+    <Compile Include="Implementations\RiseRuleRepository.cs" />
+    <Compile Include="Implementations\RoleMenuRepository.cs" />
+    <Compile Include="Implementations\RoleRepository.cs" />
+    <Compile Include="Implementations\TdaysRepository.cs" />
+    <Compile Include="Implementations\TradeOrderRepository.cs" />
+    <Compile Include="Implementations\UserRepository.cs" />
+    <Compile Include="Implementations\UserRoleRepository.cs" />
+    <Compile Include="InterfaceBaseRepository.cs" />
+    <Compile Include="InterfaceBrochureRepository.cs" />
+    <Compile Include="InterfaceCallPriceTypeRepository.cs" />
+    <Compile Include="InterfaceEventLogRepository.cs" />
+    <Compile Include="InterfaceFallRoleRepository.cs" />
+    <Compile Include="InterfaceFundStatusRepository.cs" />
+    <Compile Include="InterfaceFuturePriceRepository.cs" />
+    <Compile Include="InterfaceFuturesFundRepository.cs" />
+    <Compile Include="InterfaceFuturesTradeVolumeRepository.cs" />
+    <Compile Include="InterfaceGuestBookRepository.cs" />
+    <Compile Include="InterfaceManageStatusRepository.cs" />
+    <Compile Include="InterfaceMenuRepository.cs" />
+    <Compile Include="InterfaceNumberTypeRepository.cs" />
+    <Compile Include="InterfaceONOFFSetRepository.cs" />
+    <Compile Include="InterfaceONTimeRepository.cs" />
+    <Compile Include="InterfaceOptionsProductRepository.cs" />
+    <Compile Include="InterfaceOptionTradeRepository.cs" />
+    <Compile Include="InterfaceOptionTradeSumRepository.cs" />
+    <Compile Include="InterfaceOptionTypeRepository.cs" />
+    <Compile Include="InterfacePartnerRepository.cs" />
+    <Compile Include="InterfacePartTypeRepository.cs" />
+    <Compile Include="InterfaceRiseRuleRepository.cs" />
+    <Compile Include="InterfaceRoleMenuRepository.cs" />
+    <Compile Include="InterfaceRoleRepository.cs" />
+    <Compile Include="InterfaceTdaysRepository.cs" />
+    <Compile Include="InterfaceTradeOrderRepository.cs" />
+    <Compile Include="InterfaceUserRepository.cs" />
+    <Compile Include="InterfaceUserRoleRepository.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OP.Entities\OP.Entities.csproj">
+      <Project>{bf62a089-0f29-48aa-943b-5eed5025e0c9}</Project>
+      <Name>OP.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

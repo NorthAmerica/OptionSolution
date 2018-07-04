@@ -1,0 +1,400 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initTreeGrid();
+        BindAddMainMenuClickEvent();
+        BindAddMenuClickEvent();
+        BindUpdateMenuClickEvent();
+    });
+    function initTreeGrid() {
+        $('#MenuTreeGrid').treegrid({
+            url: '/Config/MenuConfig_Read',
+            idField: 'MenuID',
+            treeField: 'MenuName',
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { title: 'ID', field: 'MenuID', width: 50, hidden:true},
+                { title: '菜单名称', field: 'MenuName', width: 180 },
+                { title: '菜单URL', field: 'MenuURL', width: 200 },
+                { title: '排序号', field: 'OrderNum', width: 200 }
+            ]],
+            toolbar: [{
+                id: 'btnmainadd',
+                text: '添加一级菜单',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddMainMenuDialog();
+                }
+            }, '-', {
+                id: 'btnadd',
+                text: '添加子菜单',
+                iconCls: 'icon-add',
+                handler: function () {
+                    AddMenuDialog();
+                }
+            }, '-', {
+                id: 'btnedit',
+                text: '修改菜单',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    UpdateMenuDialog();
+                }
+            }, '-', {
+                id: 'btncut',
+                text: '删除菜单',
+                iconCls: 'icon-cut',
+                handler: function () {
+                    DeleteMenu();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTreeGrid();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                UpdateMenuDialog();
+            }
+        });
+
+    }
+    //添加主菜单
+    function AddMainMenuDialog() {
+        $('#AddMainMenuDialog').dialog('open').dialog('setTitle', '添加主菜单');
+        ClearText();
+    }
+    //主菜单添加事件
+    function BindAddMainMenuClickEvent() {
+        $("#btnAddMainMenu").click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddMainMenuForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //创建传递的参数
+            var postdata = {
+                MenuName: $("#MenuName").val(),
+                MenuURL: $("#MenuURL").val(),
+                OrderNum: $("#OrderNum").val()
+            };
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Config/AddMainMenu',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增主菜单成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddMainMenuDialog').dialog('close');
+                        $("#MenuTreeGrid").treegrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    //添加子菜单
+    function AddMenuDialog() {
+        var selects = $("#MenuTreeGrid").datagrid("getSelections");
+        if (selects.length != 1) {
+            $.messager.alert("友情提示", "请先选择一个主菜单作为子菜单的上一级。");
+            return;
+        }
+        $('#AddMenuDialog').dialog('open').dialog('setTitle', '添加子菜单');
+        ClearText();
+    }
+    //子菜单添加事件
+    function BindAddMenuClickEvent() {
+        $("#btnAddMenu").click(function () {
+
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddMenuForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+
+            var MenuID = $("#MenuTreeGrid").treegrid("getSelections")[0].MenuID;
+            //创建传递的参数
+            var postdata = {
+                FMenuID: MenuID,
+                MenuName: $("#MenuName1").val(),
+                MenuURL: $("#MenuURL1").val(),
+                OrderNum: $("#OrderNum1").val()
+            };
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Config/AddMenu',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增子菜单成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddMenuDialog').dialog('close');
+                        $("#MenuTreeGrid").treegrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查");
+                    }
+                },
+                error: function () {
+                    alert("添加失败，请您检查")
+                }
+            });
+
+        });
+    }
+    //修改菜单
+    function UpdateMenuDialog() {
+        var selects = $("#MenuTreeGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            $("#UpdateMenuDialog").dialog("open").dialog("setTitle", "修改菜单信息");
+            BingMenuDetails();
+        } else {
+            $.messager.alert("友情提示", "请先选择一个您需要修改的菜单。");
+            return;
+        }
+    }
+    //读取菜单信息
+    function BingMenuDetails() {
+        //首先获取选中的菜单的ID
+        var MenuID = $("#MenuTreeGrid").treegrid("getSelections")[0].MenuID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Config/GetMenuDetails", { ID: MenuID }, function (data) {
+            if (data && data.Success) {
+                $("#ID").val(MenuID);
+                $("#MenuName2").val(data.MenuName);
+                $("#MenuURL2").val(data.MenuURL);
+                $("#OrderNum2").val(data.OrderNum);
+                $("#FID").val(data.FMenuID);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败");
+            }
+
+        });
+    }
+    //修改菜单事件
+    function BindUpdateMenuClickEvent() {
+        $("#btnUpdate").click(function () {
+            //首先判断前台的验证是否通过
+            var valid = $('#UpdateMenuForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            //创建传递的参数
+            var postdata = {
+                MenuID: $("#ID").val(),
+                MenuName: $("#MenuName2").val(),
+                MenuURL: $("#MenuURL2").val(),
+                OrderNum:$("#OrderNum2").val(),
+                FMenuID: $("#FID").val()
+            };
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            //使用异步实现修改用户信息
+            $.ajax({
+                type: 'POST',
+                url: '/Config/UpdateMenu',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '修改菜单成功。',
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $("#UpdateMenuDialog").dialog('close');
+                        $("#MenuTreeGrid").treegrid('reload');
+                    }
+                    else {
+                        alert("修改失败，请检查");
+                    }
+                },
+                error: function () {
+                    alert("修改失败，请您检查")
+                }
+            });
+
+        });
+    }
+    //删除菜单
+    function DeleteMenu() {
+        //获取到用户选定ID
+        var deleteMenu = $("#MenuTreeGrid").treegrid("getSelections");
+        //判断用户选择了多少条数据
+        if (deleteMenu.length == 1) {
+            var MenuID = deleteMenu[0].MenuID;
+            var MenuName = deleteMenu[0].MenuName;
+            $.messager.confirm("删除信息", "您确认删除<font color='Red' size='3'>" + MenuName + "</font>菜单吗？将会把该菜单下的所有子菜单一并删除！", function (DeleteMenuInfo) {
+                if (DeleteMenuInfo) {
+                    var token = $('@Html.AntiForgeryToken()').val();
+                    var headers = {};
+                    headers["__RequestVerificationToken"] = token;
+                    $.ajax({
+                        type: 'POST',
+                        url: '/Config/DeleteMenu',
+                        cache: false,
+                        headers: headers,
+                        data: { ID: MenuID },
+                        success: function (data) {
+                            if (data && data.Success) {
+                                $.messager.show({
+                                    title: '我的消息',
+                                    msg: '删除菜单成功。',
+                                    timeout: 5000,
+                                    showType: 'slide'
+                                });
+                                $("#MenuTreeGrid").treegrid("reload");
+                                $("#MenuTreeGrid").treegrid("clearSelections");
+                            }
+                            else {
+                                $.messager.alert("友情提示", "删除失败:" + data);
+                            }
+                        },
+                        error: function () {
+                            alert("删除失败，请您检查")
+                        }
+                    });
+                    
+                }
+            });
+        }
+        else {
+            $.messager.alert("友情提示", "请您选择要删除的数据");
+        }
+    }
+    //清空文本框中的值
+    function ClearText() {
+        $("#MenuName").val("");
+        $("#MenuURL").val("");
+        $("#OrderNum").val("");
+        $("#MenuName1").val("");
+        $("#MenuURL1").val("");
+        $("#OrderNum1").val("");
+    }
+</script>
+<div>
+    <table id="MenuTreeGrid"></table>
+    @*添加主菜单弹窗*@
+    <div id="AddMainMenuDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddMainMenuForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="MenuName">菜单名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuName" name="MenuName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="MenuURL">菜单URL：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuURL" name="MenuURL" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="OrderNum">排序号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="OrderNum" name="OrderNum" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddMainMenu" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddMainMenuDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*添加子菜单弹窗*@
+    <div id="AddMenuDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="AddMenuForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="MenuName">菜单名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuName1" name="MenuName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="MenuURL">菜单URL：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuURL1" name="MenuURL" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="OrderNum">排序号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="OrderNum1" name="OrderNum" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddMenu" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddMenuDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*修改菜单弹窗*@
+    <div id="UpdateMenuDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="UpdateMenuForm" method="post" novalidate="novalidate">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="ID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="ID" name="ID" readonly="readonly" /></td>
+                </tr>
+                <tr style="visibility:hidden">
+                    <td><label for="ID">FID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="FID" name="FID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Name">菜单名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuName2" name="MenuName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Password">菜单URL：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="MenuURL2" name="MenuURL" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="OrderNum">排序号：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="OrderNum2" name="OrderNum" data-options="required:true" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#UpdateMenuDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

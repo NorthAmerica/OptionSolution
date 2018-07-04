@@ -46,10 +46,11 @@ namespace OP.Web.Controllers
             int ppage = Convert.ToInt32(page == null ? 1 : page);
             int prows = Convert.ToInt32(rows == null ? 1 : rows);
             IEnumerable<Monitor> imonitor = await MonitorRepository.FindAllAsync();
+            IEnumerable<Monitor> imonitorByOrder = imonitor.OrderByDescending(i => i.MonitorDate).ToList();
             return Json(new
             {
-                total = imonitor.Count(),
-                rows = imonitor.Skip((ppage - 1) * prows).Take(prows)
+                total = imonitorByOrder.Count(),
+                rows = imonitorByOrder.Skip((ppage - 1) * prows).Take(prows)
             });
         }
         /// <summary>
@@ -59,20 +60,43 @@ namespace OP.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [CSRFValidateAntiForgeryToken]
-        public ActionResult AddMonitor(Monitor model)
+        public ActionResult AddMonitor(bool IsCopy,Monitor model)
         {
             try
             {
+                int MonitorConditionNum = 0;
+                Guid OldMonitorID = Guid.Empty;
                 if (model != null)
                 {
                     model.Editor = Session["LoginedUser"] != null ? Session["LoginedUser"].ToString() : "";
                     model.EditTime = DateTime.Now.ToLocalTime();
                     model.IsActive = false;
                     model.IsAudit = false;
+                    if (IsCopy)
+                    {
+                        OldMonitorID = model.MonitorID;
+                        model.MonitorID = Guid.NewGuid();
+                    }
                     Monitor addModel = MonitorRepository.Add(model);
+                    
+                    if (IsCopy)
+                    {
+                        List<MonitorCondition> lmc = MonitorConditionRepository.FindList(m => m.MonitorID == OldMonitorID, string.Empty,false).ToList();
+                        if (lmc!=null && lmc.Count!=0)
+                        {
+                            foreach (var item in lmc)
+                            {
+                                item.Contract = model.Contract;
+                                item.MonitorDate = model.MonitorDate;
+                                item.MonitorConditionID = Guid.NewGuid();
+                                item.MonitorID = addModel.MonitorID;
+                            }
+                            MonitorConditionNum = MonitorConditionRepository.AddRange(lmc);
+                        }
+                    }
                     if (addModel != null)
                     {
-                        return Json(new { Success = true });
+                        return Json(new { Success = true ,Msg = "新增监控条件"+ MonitorConditionNum });
                     }
                 }
                 return Json(new { Success = false, Msg = "参数有误" });
@@ -82,6 +106,16 @@ namespace OP.Web.Controllers
                 return Json(new { Success = false, Msg = ex.ToString() });
             }
 
+        }
+        /// <summary>
+        /// 复制监控条目
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [CSRFValidateAntiForgeryToken]
+        public ActionResult CopyMonitor(string MonitorID, Monitor model)
+        {
+            return Json(new { Success = false, Msg = "参数有误" });
         }
         /// <summary>
         /// 启动监控
@@ -195,6 +229,8 @@ namespace OP.Web.Controllers
                         {
                             Monitor mo = await MonitorRepository.FindAsync(o => o.MonitorID == gid);
                             mo.IsAudit = true;
+                            mo.Auditor= Session["LoginedUser"] != null ? Session["LoginedUser"].ToString() : "";
+                            mo.AuditTime = DateTime.Now.ToLocalTime();
                             if (!MonitorRepository.Update(mo))
                             {
                                 return Json(new
@@ -243,6 +279,8 @@ namespace OP.Web.Controllers
                             Monitor mo = await MonitorRepository.FindAsync(o => o.MonitorID == gid);
                             mo.IsAudit = false;
                             mo.IsActive = false;
+                            mo.Auditor = Session["LoginedUser"] != null ? Session["LoginedUser"].ToString() : "";
+                            mo.AuditTime = DateTime.Now.ToLocalTime();
                             if (!MonitorRepository.Update(mo))
                             {
                                 return Json(new

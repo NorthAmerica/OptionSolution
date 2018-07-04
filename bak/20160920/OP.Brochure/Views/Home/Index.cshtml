@@ -1,0 +1,109 @@
+﻿@model OP.Brochure.Models.BrochureViewModel
+@{
+    ViewBag.Title = "产品详情";
+}
+<div class="product-a"><div class="Iron-Man"> 价格追补服务-@Model.ProductName</div></div>
+<div class="product-b">
+    <!--标题文字部分-->
+    <div class="size">
+        <div>
+            <!-- style="width:100px;" -->
+            <p>产品期限：</p>
+            <p>标的合约：</p>
+            <p>购买起点：</p>
+            @if (Model.AmountType == "保费")
+            {
+                <p>服<em>务</em>费：</p>
+            }
+            else if (Model.AmountType == "保证金")
+            {
+                <p>保<em>证</em>金：</p>
+            }
+            
+            <p>购买时间：</p>
+        </div>
+        <div>
+            <!--  style="width:455px;" -->
+            <p>@Model.Deadline 天</p>
+            <p>@Model.Contract @Model.ContractDescrip</p>
+            <p>@Model.BuyBegin</p>
+            @if (Model.PriceType == "单位值")
+            {
+                <p>@Model.Price 元/吨</p>
+            }
+            else if (Model.PriceType == "固定值")
+            {
+                <p>@Model.Price 元</p>
+            }
+            
+            <p>@Model.BuyTime</p>
+        </div>
+    </div>
+</div>
+<a id="pp"></a>
+<div class="product-c"></div>
+
+<div id="contant">
+
+    <div class="img-a"><img src="~/images/arrow.jpg" /></div>
+    <div class="img-b"><img src="~/images/arrow1.jpg"></div>
+    <div class="img-c"><img src="~/images/arrow3.jpg" style="transform:rotate(-180deg);"></div>
+
+    <div class="img-d"><img src="~/images/arrow3.jpg"></div>
+    <div class="img-e"><img src="~/images/arrow4.jpg"></div>
+
+    <div class="nav">
+        <img src="~/images/nav_01.png" width="607" height="55" usemap="#Map" border="0" />
+        <map name="Map" id="Map">
+            <area shape="rect" coords="3,5,204,53" href="../index/@Model.OptionsProductID" />
+            <area shape="rect" coords="206,7,407,53" href="../buy/@Model.OptionsProductID" />
+            <area shape="rect" coords="410,6,605,51" href="../example/@Model.OptionsProductID" />
+        </map>
+    </div>
+    <!--结算说明-->
+    <div class="date-b"><img src="~/images/solid.jpg" /></div>
+    <div class="explain">
+        <p><font>追补说明：</p>
+        <p></font>@Html.Raw(Model.PayDescrip)</p>
+        <p><font>结算公式：</p>
+        <p></font>@Html.Raw(Model.SettlementFormula)</p>
+        <div class="explain">
+                @if (!string.IsNullOrEmpty(@Model.SFPic))
+                {
+                    <div style="margin-left:250px; border:15px solid #5c0d01; width:630px;">
+                        <img src="/Home/ShowSFPic/@Model.BrochureID" width="630" height="327" />
+                    </div>
+                }
+            <!--日期说明-->
+            <div class="date"><img src="~/images/solid.jpg" /></div>
+            <div class="buy">
+                <p><font>生效日：</p>
+                <p></font>@Html.Raw(Model.StartDateDescrip)</p>
+                <p><font>到期日：</p>
+                <p></font>@Html.Raw(Model.EndDateDescrip)</p>
+                <p><font>交易日：</p>
+                <p></font>@Html.Raw(Model.TradeDateDescrip)</p>
+            </div>
+            <!--示例图-->
+            @if (!string.IsNullOrEmpty(@Model.ExamplePic))
+            { 
+            <div class="buy-c"><img src="~/images/solid.jpg" /></div>
+            <div class="explain">
+                <div style="margin-left:250px; border:15px solid #5c0d01; width:630px;">
+                    <img src="/Home/ShowExamplePic/@Model.BrochureID" width="630" height="327" />
+                </div>
+            </div>
+            }
+            <div class="curson">
+                <p><a href="http://www.shfe.com.cn/statements/dataview.html" target="_blank">上海期货交易所期货价格查询</a></p>
+                <p><a href="@Model.RiskAnnouncementURL" target="_blank">《价格追补服务风险揭示书》</a></p>
+                <p><a href="@Model.PurchaseAgreementURL" target="_blank">《价格追补服务购买协议》</a></p>
+            </div>
+            <div class="curson">
+                <p>产品设计：湖南迅财航商贸有限公司</p>
+                <p>产品发行：快诺讯汇（长沙）网络技术股份有限公司</p>
+                <p>战略合作机构：湖南联创控股集团有限公司、大有期货有限公司</p>
+            </div>
+        </div>
+        </div>
+</div>

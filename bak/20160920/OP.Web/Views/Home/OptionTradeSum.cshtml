@@ -1,0 +1,152 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initOptionTradeSumGrid();
+        initManageStatus();
+        initOptionType();
+    });
+    function initOptionTradeSumGrid() {
+        $('#OptionTradeSumGrid').datagrid({
+            title: '期权交易汇总列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/OptionTradeSumGrid_Read',
+            sortName: 'EndDate',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'OptionsProductID',
+            pageSize: 10,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'OptionsProductID', title: '产品ID', width: 100, sortable: true },
+                { field: 'ProductName', title: '产品名称', width: 200, sortable: true },
+                { field: 'BeginDate', title: '开始日期', width: 200, sortable: true, formatter: formatDateBox },
+                { field: 'EndDate', title: '结算日期', width: 200, sortable: true, formatter: formatDateBox },
+                { field: 'OptionType', title: '期权类型', width: 200, sortable: true },
+                { field: 'TradeNumSum', title: '成交量合计', width: 200, sortable: true },
+                { field: 'TradeChargeSum', title: '手续费合计', width: 300, sortable: true },
+                { field: 'TradePriceSum', title: '成交保费合计', width: 200, sortable: true },
+                { field: 'TradeMarginSum', title: '成交保证金合计', width: 200, sortable: true },
+                { field: 'RiseCompensateSum', title: '上涨赔付合计', width: 200, sortable: true },
+                { field: 'FallCompensateSum', title: '下跌赔付合计', width: 200, sortable: true }
+            ]],
+            //toolbar: [{
+            //    id: 'btnadd',
+            //    text: '查看成交明细',
+            //    iconCls: 'icon-add',
+            //    handler: function () {
+            //        OptionTradeDialog();
+            //    }
+            //}, '-'],
+            onDblClickRow: function (index, row) {
+                ShowOptionTradeDialog();
+            }
+        });
+    }
+    function initManageStatus() {
+        $('#SearchManageStatus').combobox({
+            url: '/Home/GetManageStatus',
+            valueField: 'ManageStatusNum',
+            textField: 'ManageStatusName',
+            editable: false,
+            height: 30, width: 130
+        });
+    }
+    function initOptionType() {
+        $('#SearchOptionType1').combobox({
+            url: '/Home/GetOptionType',
+            valueField: 'OptionTypeName',
+            textField: 'OptionTypeName',
+            editable: false,
+            height: 30, width: 130
+        });
+    }
+    //查询事件
+    function Search1() {
+        //console.info($('#SearchManageStatus').combobox('getValue'));
+        $('#OptionTradeSumGrid').datagrid('load', {
+            PartnerName: $('#SearchPartnerName').combobox('getText'),
+            ManageStatus: $('#SearchManageStatus').combobox('getValue'),
+            OptionType: $('#SearchOptionType1').combobox('getText'),
+            BeginDate1: $('#SBeginDate1').datebox('getText'),
+            BeginDate2: $('#SBeginDate2').datebox('getText')
+        });
+    }
+    //查询事件
+    function Search2() {
+        //console.info($('#SearchManageStatus').combobox('getValue'));
+        $('#OptionTradeSumGrid').datagrid('load', {
+            PartnerName: $('#SearchPartnerName').combobox('getText'),
+            ManageStatus: $('#SearchManageStatus').combobox('getValue'),
+            OptionType: $('#SearchOptionType1').combobox('getText'),
+            EndDate1: $('#SEndDate1').datebox('getText'),
+            EndDate2: $('#SEndDate2').datebox('getText')
+        });
+    }
+</script>
+<style>
+    #SearchForm table tr td {
+        padding-left: 5px;
+    }
+</style>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SearchPartnerName">合作者名称:</label></td>
+                    <td>
+                        <input id="SearchPartnerName" class="easyui-combobox" name="PartnerName"
+                               data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',height:30,width:130" />
+                    </td>
+                    <td></td>
+                    <td><label for="SearchManageStatus">处理状态:</label></td>
+                    <td>
+                        <input id="SearchManageStatus" name="ManageStatus" value="请选择">
+                        @*<input id="SearchManageStatus" class="easyui-combobox" name="ManageStatus"
+                               data-options="editable:false,valueField:'ManageStatusNum',textField:'ManageStatusName',
+                               url:'/Home/GetManageStatus',height:30,width:150" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SearchOptionType1">期权类型:</label></td>
+                    <td><input id="SearchOptionType1" name="OptionType" value="请选择"></td>
+                </tr>
+                <tr>
+                    <td><label for="SBeginDate1">开始日期  从:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SBeginDate1" name="BeginDate" data-options="height:30"></td>
+                    <td>-------</td>
+                    <td><label for="SBeginDate2">到:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SBeginDate2" name="BeginDate" data-options="height:30"></td>
+                    
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search1()">查询</a></td>
+                </tr>
+                <tr>
+                    <td><label for="SEndDate1">结算日期  从:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SEndDate1" name="EndDate" data-options="height:30"></td>
+                    <td>-------</td>
+                    <td><label for="SEndDate2">到:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SEndDate2" name="EndDate" data-options="height:30"></td>
+
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search2()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="OptionTradeSumGrid"></table>
+</div>

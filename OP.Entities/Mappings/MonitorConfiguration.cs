@@ -21,6 +21,7 @@ namespace OP.Entities.Mappings
             Property(x => x.MonitorID).HasColumnName(@"MonitorID").IsRequired().HasColumnType("uniqueidentifier").HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
             Property(x => x.MonitorName).HasColumnName(@"MonitorName").IsOptional().HasColumnType("nvarchar");
             Property(x => x.Contract).HasColumnName(@"Contract").IsOptional().HasColumnType("nvarchar");
+            Property(x => x.Account).HasColumnName(@"Account").IsOptional().HasColumnType("nvarchar");
             Property(x => x.MonitorDate).HasColumnName(@"MonitorDate").IsRequired().HasColumnType("datetime");
             Property(x => x.Editor).HasColumnName(@"Editor").IsOptional().HasColumnType("nvarchar");
             Property(x => x.EditTime).HasColumnName(@"EditTime").IsOptional().HasColumnType("datetime");

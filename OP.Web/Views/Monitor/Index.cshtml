@@ -9,6 +9,7 @@
         initShowMonitorConditionGrid();
         BindAddMonitorClickEvent();
         BindUploadMonitorConditionClickEvent();
+        BindCopyMonitorClickEvent();
     });
     //初始化MonitorConfigGrid
     function initMonitorConfigGrid() {
@@ -20,8 +21,8 @@
             autoRowHeight: true,
             striped: true,
             url: '/Monitor/MonitorList_Read',
-            sortName: 'EditTime',
-            sortOrder: 'desc',
+            //sortName: 'MonitorName',
+            //sortOrder: 'desc',
             border: true,
             remoteSort: false,
             idField: 'MonitorID',
@@ -35,7 +36,9 @@
             columns: [[
                 { field: 'ck', checkbox: true },
                 { field: 'MonitorID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'MonitorName',title:'监控名称',width:80,sortable:true },
                 { field: 'Contract', title: '合约代码', width: 80, sortable: true },
+                { field: 'Account', title: '绑定监控账户', width: 80, sortable: true },
                 { field: 'MonitorDate', title: '监控日期', width: 100, sortable: true, formatter: formatDateBox },
                 { field: 'Editor', title: '编辑人', width: 80, sortable: true },
                 { field: 'EditTime', title: '编辑时间', width: 60, sortable: true, formatter: formatDateBox },
@@ -83,7 +86,7 @@
                 text: '添加监控参数条目',
                 iconCls: 'icon-add',
                 handler: function () {
-                    AddMonitorDialog();
+                    AddMonitorDialog(false);
                 }
             }, '-', {
                 id: 'btnupload',
@@ -100,6 +103,13 @@
                     ReadMonitorConditionDialog();
                 }
             }, '-', {
+                id: 'btntemp',
+                text: '复制监控表格',
+                iconCls: 'icon-temp',
+                handler: function () {
+                    AddMonitorDialog(true);
+                }
+            },'-', {
                 id: 'btnbegin',
                 text: '启用',
                 iconCls: 'icon-begin',
@@ -165,16 +175,18 @@
             }]
         });
     }
-    //添加监控参数条目
-    function AddMonitorDialog() {
-        $('#AddMonitorDialog').dialog('open').dialog('setTitle', '添加监控参数条目');
-        $('#AddMonitorForm').form('clear');
+    //复制监控参数条目
+    function CopyMonitorDialog() {
+        
+        $('#CopyMonitorDialog').dialog('open').dialog('setTitle', '复制监控参数条目');
+        $('#CopyMonitorForm').form('clear');
     }
-    //绑定新增上涨规则按钮
-    function BindAddMonitorClickEvent() {
-        $('#btnAddMonitor').click(function () {
+
+    //绑定复制监控参数条目
+    function BindCopyMonitorClickEvent() {
+        $('#btnCopyMonitor').click(function () {
             //验证所有的文本框是否通过用户的验证
-            var valid = $('#AddMonitorForm').form('validate');
+            var valid = $('#CopyMonitorForm').form('validate');
             if (valid == false) {
                 return false;
             }
@@ -183,15 +195,17 @@
             headers["__RequestVerificationToken"] = token;
             //创建传递的参数
             var postdata = {
-                MonitorName: $("#MonitorName").val(),
-                Contract: $("#Contract").val(),
-                MonitorDate: $('#MonitorDate').datebox('getText')
+                MonitorID: $("#MonitorConfigGrid").datagrid("getSelections")[0].MonitorID,
+                MonitorName: $("#CMonitorName").val(),
+                Contract: $("#CContract").val(),
+                Account: $("#CAccount").val(),
+                MonitorDate: $('#CMonitorDate').datebox('getText')
             };
 
             //发送异步请求到后台保存用户数据
             $.ajax({
                 type: 'POST',
-                url: '/Monitor/AddMonitor',
+                url: '/Monitor/CopyMonitor',
                 cache: false,
                 headers: headers,
                 data: postdata,
@@ -199,11 +213,11 @@
                     if (data && data.Success) {
                         $.messager.show({
                             title: '我的消息',
-                            msg: '新增监控参数条目成功。',
+                            msg: '复制监控参数条目成功。',
                             timeout: 5000,
                             showType: 'slide'
                         });
-                        $('#AddMonitorDialog').dialog('close');
+                        $('#CopyMonitorDialog').dialog('close');
                         $("#MonitorConfigGrid").datagrid("reload");
                     }
                     else {
@@ -217,10 +231,89 @@
 
         });
     }
+
+
+    //添加监控参数条目
+    function AddMonitorDialog(isCopy) {
+        if (isCopy) {
+            var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
+            if (Selections.length != 1) {
+                $.messager.alert('错误', '必须选择一个需要复制的监控参数条目，现在已经选择了' + Selections.length + '条。请重新选择。');
+                return;
+            }
+        }
+        $('#AddMonitorDialog').dialog('open').dialog('setTitle', '添加监控参数条目');
+        $('#AddMonitorForm').form('clear');
+        if (isCopy) {
+            $('#MonitorID').val(Selections[0].MonitorID);
+        }
+    }
+    //绑定新增监控参数条目
+    function BindAddMonitorClickEvent() {
+        $('#btnAddMonitor').click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#AddMonitorForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var token = $('@Html.AntiForgeryToken()').val();
+            var headers = {};
+            headers["__RequestVerificationToken"] = token;
+            var MonitorIDVal = $('#MonitorID').val();
+            if (MonitorIDVal == null || MonitorIDVal == '') {
+                //创建传递的参数
+                var postdata = {
+                    IsCopy: false,
+                    MonitorName: $("#MonitorName").val(),
+                    Contract: $("#Contract").val(),
+                    Account: $("#Account").val(),
+                    MonitorDate: $('#MonitorDate').datebox('getText')
+                };
+            } else {
+                var postdata = {
+                    IsCopy:true,
+                    MonitorID: $('#MonitorID').val(),
+                    MonitorName: $("#MonitorName").val(),
+                    Contract: $("#Contract").val(),
+                    Account: $("#Account").val(),
+                    MonitorDate: $('#MonitorDate').datebox('getText')
+                };
+            }
+            
+
+            //发送异步请求到后台保存用户数据
+            $.ajax({
+                type: 'POST',
+                url: '/Monitor/AddMonitor',
+                cache: false,
+                headers: headers,
+                data: postdata,
+                success: function (data) {
+                    if (data && data.Success) {
+                        $.messager.show({
+                            title: '我的消息',
+                            msg: '新增监控参数条目成功。' + data.Msg,
+                            timeout: 5000,
+                            showType: 'slide'
+                        });
+                        $('#AddMonitorDialog').dialog('close');
+                        $("#MonitorConfigGrid").datagrid("reload");
+                    }
+                    else {
+                        alert("添加失败，请您检查"+data.Msg);
+                    }
+                },
+                error: function (data) {
+                    $.messager.alert('错误', data.Msg);
+                }
+            });
+
+        });
+    }
     //上传监控参数Excel-------------------------------------------------------------------------------------
     function UploadMonitorConditionDialog() {
         var Selections = $("#MonitorConfigGrid").datagrid("getSelections");
-        
+
         if (Selections.length != 1) {
             $.messager.alert('错误', '只能选择一项监控条目进行数据上传，现在已经选择了' + Selections.length + '条。请重新选择。');
             return;
@@ -454,6 +547,12 @@
          closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
         <form id="AddMonitorForm" method="post" novalidate="novalidate">
             <table id="tblAdd">
+                <tr style="display:none">
+                    <td><label for="MonitorID">ID：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="MonitorID" name="MonitorID" style="width:350px;" />
+                    </td>
+                </tr>
                 <tr>
                     <td><label for="MonitorName">监控名称：</label></td>
                     <td>
@@ -473,6 +572,14 @@
                     <td></td>
                 </tr>
                 <tr>
+                    <td><label for="Account">绑定监控账户[如果为全局设置便为空]：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="Account" name="Account" data-options="required:false,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
                     <td><label for="MonitorDate">监控日期：</label></td>
                     <td><input type="text" class="easyui-datebox" id="MonitorDate" name="MonitorDate" data-options="required:true,height:30"></td>
                 </tr>
@@ -484,6 +591,55 @@
                     <td colspan="2" style="text-align:center; padding-top:10px">
                         <a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddMonitor" iconcls="icon-ok">确定</a>
                         <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#AddMonitorDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+
+    @*复制监控参数条目弹窗*@
+    <div id="CopyMonitorDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="CopyMonitorForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="CMonitorName">监控名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="CMonitorName" name="CMonitorName" data-options="required:true" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="CContract">合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="CContract" name="CContract" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="CAccount">绑定监控账户[如果为全局设置便为空]：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="CAccount" name="CAccount" data-options="required:false,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="CMonitorDate">监控日期：</label></td>
+                    <td><input type="text" class="easyui-datebox" id="CMonitorDate" name="CMonitorDate" data-options="required:true,height:30"></td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnCopyMonitor" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#CopyMonitorDialog').dialog('close')">关闭</a>
                     </td>
                 </tr>
             </table>

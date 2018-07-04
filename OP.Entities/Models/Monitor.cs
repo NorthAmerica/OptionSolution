@@ -14,6 +14,7 @@ namespace OP.Entities.Models
         public Guid MonitorID { get; set; }
         public string MonitorName { get; set; } //监控名称
         public string Contract { get; set; }//合约名称
+        public string Account { get; set; } //绑定监控账户
         public DateTime MonitorDate { get; set; }//监控日期
         public string Editor { get; set; }//编辑人
         public DateTime? EditTime { get; set; } //编辑时间

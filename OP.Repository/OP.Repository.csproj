@@ -146,6 +146,10 @@
     <Compile Include="Migrations\201703020321554_Monitor20170302-2.Designer.cs">
       <DependentUpon>201703020321554_Monitor20170302-2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706210828562_20170621Monitor.cs" />
+    <Compile Include="Migrations\201706210828562_20170621Monitor.Designer.cs">
+      <DependentUpon>201706210828562_20170621Monitor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -174,6 +178,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703020321554_Monitor20170302-2.resx">
       <DependentUpon>201703020321554_Monitor20170302-2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706210828562_20170621Monitor.resx">
+      <DependentUpon>201706210828562_20170621Monitor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

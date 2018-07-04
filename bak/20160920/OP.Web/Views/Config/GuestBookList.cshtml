@@ -1,0 +1,124 @@
+﻿
+@{
+    Layout = null;
+}
+<script>
+    $(function () {
+        initTable();
+    })
+    function initTable() {
+        $('#GuestBookGrid').datagrid({
+            title: '留言栏列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/GuestBookGrid_Read',
+            sortName: 'GuestDate',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'GuestBookID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'GuestBookID', title: 'ID', width: 50, sortable: false, hidden: true },
+                { field: 'GuestName', title: '留言人', width: 50, sortable: false },
+                { field: 'GuestMobile', title: '联系方式', width: 100, sortable: false},
+                { field: 'GuestContent', title: '留言内容', width: 300, sortable: false },
+                { field: 'GuestDate', title: '留言时间', width: 300, sortable: false }
+            ]],
+            toolbar: [{
+                id: 'btnedit',
+                text: '显示详情',
+                iconCls: 'icon-edit',
+                handler: function () {
+                    ShowGuestBookDialog();
+                }
+            }, '-', {
+                id: 'btnrefresh',
+                text: '刷新',
+                iconCls: 'icon-reload',
+                handler: function () {
+                    initTable();
+                }
+            }],
+            onDblClickRow: function (index, row) {
+                ShowGuestBookDialog();
+            }
+        });
+    }
+    //显示详情
+    function ShowGuestBookDialog() {
+        var GuestBook = $("#GuestBookGrid").datagrid("getSelections");
+        if (GuestBook.length == 1) {
+            $("#ShowGuestBookDialog").dialog("open").dialog("setTitle", "显示详情");
+            BingGuestBookDetails();
+        }
+        else {
+            $.messager.alert("友情提示", "每次只能修改一行数据，你已经选择了<font color='red' size='6'>" + UpdateUserInfoID.length + "</font>行");
+        }
+    }
+    //获取显示详情
+    function BingGuestBookDetails() {
+        //首先获取选中的用户的ID
+        var CheckID = $("#GuestBookGrid").datagrid("getSelections")[0].GuestBookID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Config/GetGuestBookDetails", { ID: CheckID }, function (data) {
+            if (data && data.Success) {
+                $("#GuestBookID").val(CheckID);
+                $("#GuestName").val(data.GuestName);
+                $("#GuestMobile").val(data.GuestMobile);
+                $("#GuestContent").val(data.GuestContent);
+                $("#GuestDate").val(data.GuestDate);
+            } else {
+                $.messager.alert("提示", "用户数据查询失败");
+            }
+
+        });
+    }
+</script>
+<div>
+    <table id="GuestBookGrid"></table>‘
+    @*显示详情弹窗*@
+    <div id="ShowGuestBookDialog" class="easyui-dialog" style="width:560px;height:340px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+            <table id="tblUpdate">
+                <tr style="visibility:hidden">
+                    <td><label for="GuestBookID">ID:</label></td>
+                    <td><input class="easyui-validatebox" type="text" id="GuestBookID" name="GuestBookID" readonly="readonly" /></td>
+                </tr>
+                <tr>
+                    <td><label for="GuestName">姓名：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="GuestName" name="GuestName" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="Password">手机：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="GuestMobile" name="GuestMobile" data-options="required:true,validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="GuestContent">留言内容：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="GuestContent" name="GuestContent" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="GuestDate">留言时间：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="GuestDate" name="GuestDate" style="width:350px;" /></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#ShowGuestBookDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+    </div>
+</div>

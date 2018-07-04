@@ -1,0 +1,430 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initOptionTradeGrid();
+        BindConfigContractClickEvent();
+        initManageStatus();
+        initOptionType();
+    });
+    function initOptionTradeGrid() {
+        $('#OptionTradeGrid').datagrid({
+            title: '期权交易列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/OptionTradeGrid_Read',
+            sortName: 'EndDate',
+            sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'OptionTradeID',
+            pageSize: 10,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'OptionTradeID', title: 'ID', width: 100, sortable: true, hidden: true },
+                { field: 'OptionsProductID', title: '产品ID', width: 100, sortable: true,hidden:true },
+                { field: 'ProductName', title: '期权产品名称', width: 200, sortable: true },
+                { field: 'Deadline', title: '产品期限(天)', width: 200, sortable: true },
+                { field: 'TradeNum', title: '成交量', width: 200, sortable: true },
+                { field: 'TradeCharge', title: '成交手续费', width: 200, sortable: true },
+                { field: 'TradePrice', title: '成交保费', width: 200, sortable: true },
+                { field: 'TradeMargin', title: '成交保证金', width: 200, sortable: true },
+                {
+                    field: 'BeginDate', title: '开始日期', width: 300, sortable: true, formatter: formatDateBox
+                },
+                { field: 'Contract', title: '合约名称', width: 200, sortable: true },
+                { field: 'BeginClose', title: '基准价', width: 200, sortable: true },
+                { field: 'EndClose', title: '结算价', width: 200, sortable: true },
+                { field: 'EndDate', title: '结算日期', width: 200, sortable: true, formatter: formatDateBox },
+                { field: 'RiseCompensate', title: '上涨赔付金额', width: 200, sortable: true },
+                { field: 'FallCompensate', title: '下跌赔付金额', width: 200, sortable: true },
+                {
+                    field: 'ManageStatus', title: '处理状态', width: 200, sortable: true, formatter: function (value, row, index) {
+                        if (value == '0') {
+                            return value = '数据已接收但未处理';
+                        } else if(value=='1') {
+                            return value = '合约已设置完成';
+                        } else if (value == '2') {
+                            return value = '基准价结算日已同步,等待结算';
+                        } else if (value == '3') {
+                            return value = '结算价接收完成';
+                        } else if (value == '4') {
+                            return value = '结算已完成';
+                        } else if (value == '5') {
+                            return value = '数据发送完成';
+                        }
+                    }
+                }
+            ]],
+            //toolbar: [{
+            //    id: 'btnadd',
+            //    text: '配置合约名称',
+            //    iconCls: 'icon-add',
+            //    handler: function () {
+            //        ConfigContractDialog();
+            //    }
+            //}, '-'],
+            onDblClickRow: function (index, row) {
+                ShowOptionsProductDialog();
+            }
+        });
+    }
+    //显示期权产品明细
+    function ShowOptionsProductDialog() {
+        var selects = $("#OptionTradeGrid").datagrid("getSelections");
+        if (selects.length == 1) {
+            $('#ShowOptionsProductDialog').dialog('open').dialog('setTitle', '显示期权产品');
+            BingOptionsProductDetails();
+        } else {
+            $.messager.alert("友情提示", "请先选择一个您需要查看的产品。");
+            return;
+        }
+    }
+    //读取期权产品信息
+    function BingOptionsProductDetails() {
+        //首先获取选中的菜单的ID
+        var OptionsProductID = $("#OptionTradeGrid").treegrid("getSelections")[0].OptionsProductID;
+
+        //使用异步的getJSON请求绑定前台传递过来的数据httpget
+        $.getJSON("/Home/GetOptionsProductDetails", { ID: OptionsProductID }, function (data) {
+            if (data && data.Success) {
+                //$("#MenuName2").val(data.MenuName);
+                $("#SPartnerName").val(data.PartnerName),
+                $("#SProductName").val(data.ProductName),
+                $("#SProductDescription").val(data.ProductDescription),
+                $("#SOptionType").val(data.OptionType),
+                $("#SContract").val(data.Contract),
+                $("#SContractChs").val(data.ContractChs),
+                $("#SDeadline").val(data.Deadline),
+                $("#SUnit").val(data.Unit),
+                $("#SCharge").val(data.Charge),
+                $("#SChargeType").val(data.ChargeType),
+                $("#SPrice").val(data.Price),
+                $("#SPriceType").val(data.PriceType),
+                $("#SCallPriceType").val(data.CallPriceType),
+                $("#SClosingPriceDesc").val(data.ClosingPriceDesc),
+                //Margin: $("#Margin").numberbox('getValue'),
+                $("#SAmountType").val(data.AmountType),
+                $("#SMaxNum").val(data.MaxNum),
+                $("#SProductDesc").textbox('setText', data.ProductDesc),
+                $("#SProductDtlDesc").textbox('setText', data.ProductDtlDesc),
+                $("#SFormula").textbox('setText', data.Formula),
+                $("#SProductUrl").textbox('setText', data.ProductUrl)
+            } else {
+                $.messager.alert("提示", "用户数据查询失败");
+            }
+
+        });
+    }
+    //配置合约名称弹窗
+    function ConfigContractDialog() {
+        var select = $("#OptionTradeGrid").datagrid("getSelected");
+        if (select == null) {
+            $.messager.alert("友情提示", "请先选择一个成交明细");
+            return;
+        }
+        if($("#OptionTradeGrid").datagrid("getSelected").BeginClose!=0)
+        {
+            $.messager.alert("友情提示", "已经生成了基准价，不能再修改合约名称。");
+            return;
+        }
+        $('#ConfigContractDialog').dialog('open').dialog('setTitle', '配置合约名称');
+        $('#ConfigContractForm').form('clear');
+        $('#OptionTradeID').val($("#OptionTradeGrid").datagrid("getSelected").OptionTradeID);
+    }
+    //配置合约名称
+    function BindConfigContractClickEvent() {
+        $('#btnConfigContract').click(function () {
+            //验证所有的文本框是否通过用户的验证
+            var valid = $('#ConfigContractForm').form('validate');
+            if (valid == false) {
+                return false;
+            }
+            var postdata = {
+                Contract: $("#Contract").val() + $("#Exchange").combobox('getValue'),
+                OptionTradeID: $("#OptionTradeID").val()
+            }
+            //发送异步请求到后台保存用户数据
+            $.post("/Home/ConfigContract", postdata, function (data) {
+                if (data && data.Success) {
+                    $.messager.show({
+                        title: '我的消息',
+                        msg: '配置合约名称成功。',
+                        timeout: 5000,
+                        showType: 'slide'
+                    });
+                    $('#ConfigContractDialog').dialog('close');
+                    $("#OptionTradeGrid").datagrid("reload");
+                }
+                else {
+                    alert("添加失败，请您检查" + data.Message);
+                }
+            });
+        });
+    }
+    function initManageStatus() {
+        $('#SManageStatusOTL').combobox({
+            url: '/Home/GetManageStatus',
+            valueField: 'ManageStatusNum',
+            textField: 'ManageStatusName',
+            editable: false,
+            height: 30, width: 130
+        });
+    }
+    function initOptionType() {
+        $('#SOptionTypeOTL').combobox({
+            url: '/Home/GetOptionType',
+            valueField: 'OptionTypeName',
+            textField: 'OptionTypeName',
+            editable: false,
+            height: 30, width: 130
+        });
+    }
+    //查询事件
+    function Search() {
+        $('#OptionTradeGrid').datagrid('load', {
+            PartnerName: $('#SPartnerNameOTL').combobox('getText'),
+            ManageStatus: $('#SManageStatusOTL').combobox('getValue'),
+            OptionType: $('#SOptionTypeOTL').combobox('getText'),
+            BeginDate: $('#SBeginDate').datebox('getText'),
+            EndDate: $('#SEndDate').datebox('getText'),
+            
+        });
+    }
+</script>
+<style>
+    #SearchForm table tr td{
+        padding-left:5px;
+    }
+</style>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+            <form id="SearchForm" class="form-inline">
+                <table class="searchtb">
+                    <tr>
+                        <td><label for="SPartnerNameOTL">合作者名称:</label></td>
+                        <td>
+                            <input id="SPartnerNameOTL" class="easyui-combobox" name="PartnerName"
+                                   data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',height:30,width:130" />
+                        </td>
+                        <td><label for="SManageStatusOTL">处理状态:</label></td>
+                        <td>
+                            <input id="SManageStatusOTL" name="ManageStatus" value="请选择">
+                        </td>
+                        </tr>
+                    <tr>
+                        <td><label for="SOptionTypeOTL">期权类型:</label></td>
+                        <td><input id="SOptionTypeOTL" name="OptionType" value="请选择"></td>
+                        <td><label for="SBeginDate">开始日期:</label></td>
+                        <td><input type="text" class="easyui-datebox" id="SBeginDate" name="BeginDate"  data-options="height:30"></td>
+
+                        <td><label for="SEndDate">结算日期:</label></td>
+                        <td><input type="text" class="easyui-datebox" id="SEndDate" name="EndDate"  data-options="height:30"></td>
+
+                        <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                    </tr>
+                </table>
+            </form>
+    </div>
+    <table id="OptionTradeGrid"></table>
+    @*配置合约名称弹窗*@
+    <div id="ConfigContractDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <div class="alert alert-danger" role="alert">
+            <strong>提醒!</strong><br />将同时修改"同一成交日期""同一产品"的合约名称.
+        </div>
+        <form id="ConfigContractForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="Contract">合约名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="Contract" name="Contract" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="Exchange">交易所选择</label></td>
+                    <td>
+                        <select id="Exchange" class="easyui-combobox" name="Exchange" style="width:200px;height:30px;" data-options="required:true,editable:false">
+                            <option value=".SHF" selected="selected">.SHF上期所</option>
+                            <option value=".DCE">.DCE大商所</option>
+                            <option value=".CZC">.CZC郑商所</option>
+                            <option value=".CFE">.CFE中金所</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr hidden="hidden">
+                    <td><label for="OptionTradeID">产品ID：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="OptionTradeID" name="OptionTradeID" data-options="required:false" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        <a href="javascript:void(0)" class="easyui-linkbutton" id="btnConfigContract" iconcls="icon-ok">确定</a>
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#ConfigContractDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    @*显示期权产品弹窗*@
+    <div id="ShowOptionsProductDialog" class="easyui-dialog" style="width:560px;height:540px;padding:10px 20px"
+         closed="true" resizable="true" modal="true" buttons="#dlg-buttons" align="center">
+        <form id="ShowOptionsProductForm" method="post" novalidate="novalidate">
+            <table id="tblAdd">
+                <tr>
+                    <td><label for="SPartnerName">合作者名称：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPartnerName" name="PartnerName" readonly="readonly" style="width:350px;" />
+                        @*<input id="PartnerName" class="easyui-combobox" name="PartnerName"
+                            data-options="editable:false,valueField:'PartnerID',textField:'PartnerName',url:'/Home/GetPartner',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SProductName">产品名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SProductName" name="ProductName" readonly="readonly" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDescription">产品特征：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SProductDescription" name="ProductDescription" readonly="readonly" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SContract">合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SContract" name="Contract" readonly="readonly" data-options="validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SContractChs">中文合约名称：</label></td>
+                    <td><input class="easyui-validatebox form-control" type="text" id="SContractChs" name="ContractChs" readonly="readonly" data-options="validType:'length[1,32]'" style="width:350px;" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SOptionType">期权类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SOptionType" name="OptionType" readonly="readonly" style="width:350px;" />
+                        @*<input id="OptionType" class="easyui-combobox" name="OptionType"
+                            data-options="editable:false,valueField:'OptionTypeID',textField:'OptionTypeName',url:'/Home/GetOptionType',required:true,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SDeadline">产品期限(天)：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SDeadline" name="Deadline" readonly="readonly" style="width:350px;" />
+                        @*<input class="easyui-numberbox" type="text" id="Deadline" name="Deadline" data-options="required:true,validType:'length[1,32]',height:30" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SUnit">产品单位：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SUnit" name="Unit" readonly="readonly" style="width:350px;" />
+                        @*<input class="easyui-validatebox form-control" type="text" id="Unit" name="Unit" data-options="required:true,validType:'length[1,32]'" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SCharge">产品手续费：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SCharge" name="Charge" readonly="readonly" style="width:350px;" />
+                        @*<input class="easyui-numberbox" type="text" id="Charge" name="Charge" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SChargeType">手续费类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SChargeType" name="ChargeType" readonly="readonly" style="width:350px;" />
+                        @*<input id="ChargeType" class="easyui-combobox" name="ChargeType"
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="SPrice">产品费用：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPrice" name="Price" readonly="readonly" style="width:350px;" />
+                        @*<input class="easyui-numberbox" type="text" id="Price" name="Price" data-options="required:false,height:30,precision:2" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SPriceType">金额类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SPriceType" name="PriceType" readonly="readonly" style="width:350px;" />
+                        @*<input id="PriceType" class="easyui-combobox" name="PriceType"
+                            data-options="editable:false,valueField:'NumberTypeID',textField:'NumberTypeName',url:'/Home/GetNumberType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label for="SAmountType">产品费用类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SAmountType" name="AmountType" readonly="readonly" style="width:350px;" />
+                        @*<select id="AmountType" class="easyui-combobox" name="AmountType"
+                                    data-options="editable:false,required:false,height:30,width:200">
+                                <option value="保证金">保证金</option>
+                                <option value="保费">保费</option>
+                            </select>*@
+                    </td>
+                </tr>
+                <tr>
+                    <td>&emsp;</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label for="SCallPriceType">结算价类型：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SCallPriceType" name="CallPriceType" readonly="readonly" style="width:350px;" />
+                        @*<input id="CallPriceType" class="easyui-combobox" name="CallPriceType"
+                            data-options="editable:false,valueField:'CallPriceTypeID',textField:'CallPriceTypeName',url:'/Home/GetCallPriceType',required:false,height:30,width:200" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SMaxNum">最大购买数：</label></td>
+                    <td>
+                        <input class="easyui-validatebox form-control" type="text" id="SMaxNum" name="MaxNum" readonly="readonly" style="width:350px;" />
+                        @*<input class="easyui-numberbox" type="text" id="MaxNum" name="MaxNum" data-options="required:true,height:30" style="width:350px;" />*@
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDesc">产品描述（显示在提交订单中）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductDesc" name="ProductDesc" data-options="multiline:true" readonly="readonly" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductDtlDesc">产品详细描述（显示在保单详情，分行）：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductDtlDesc" name="ProductDtlDesc" data-options="multiline:true" readonly="readonly" style="width:350px;height:100px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SClosingPriceDesc">收盘价描述：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SClosingPriceDesc" name="ClosingPriceDesc" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SFormula">收益计算公式：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SFormula" name="Formula" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td><label for="SProductUrl">产品详情链接：</label></td>
+                    <td><input class="easyui-textbox" type="text" id="SProductUrl" name="ProductUrl" data-options="" readonly="readonly" style="width:350px;height:30px" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align:center; padding-top:10px">
+                        @*<a href="javascript:void(0)" class="easyui-linkbutton" id="btnAddOptionsProduct" iconcls="icon-ok">确定</a>*@
+                        <a href="javascript:void(0)" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#ShowOptionsProductDialog').dialog('close')">关闭</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>

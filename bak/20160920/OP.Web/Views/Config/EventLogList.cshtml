@@ -1,0 +1,70 @@
+﻿
+@{
+    Layout = null;
+}
+<script type="text/javascript" src="~/Scripts/formatDatebox.js"></script>
+<script>
+    $(function () {
+        initTable();
+    })
+    function initTable() {
+        $('#EventLogGrid').datagrid({
+            title: '日志列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Config/EventLogGrid_Read',
+            //sortName: 'Date',
+            //sortOrder: 'desc',
+            border: true,
+            remoteSort: false,
+            idField: 'EventLogID',
+            pageSize: 20,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'EventLogID', title: 'ID', width: 50, sortable: false, hidden: true },
+                { field: 'Name', title: '操作人', width: 50, sortable: false },
+                { field: 'Date', title: '操作时间', width: 100, sortable: false, formatter: formatDateBoxFull },
+                { field: 'Event', title: '操作事件', width: 300, sortable: false }
+            ]]
+        });
+    }
+    function Search() {
+        $('#EventLogGrid').datagrid('load', {
+            Name: $('#SName').val(),
+            Date: $('#SDate').datebox('getText')
+        });
+    }
+</script>
+<style>
+    #SearchForm table tr td {
+        padding-left: 5px;
+    }
+</style>
+<div>
+    <div class="panel panel-primary" style="margin:10px 20px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="SName">操作人:</label></td>
+                    <td><input type="text" class="form-control input-sm" id="SName" name="Name" placeholder="操作人"></td>
+
+                    <td><label for="SDate">操作时间:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SDate" name="Date" data-options="editable:false,height:30"></td>
+
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="EventLogGrid"></table>
+</div>

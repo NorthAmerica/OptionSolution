@@ -1,0 +1,73 @@
+﻿
+@{
+    Layout = null;
+}
+
+<script>
+    $(function () {
+        initFuturesPriceGrid();
+    });
+
+    function initFuturesPriceGrid() {
+        $('#FuturesPriceGrid').datagrid({
+            title: '期货价格列表',
+            iconCls: 'icon-user',
+            loadMsg: '数据加载中...',
+            nowrap: true,
+            autoRowHeight: true,
+            striped: true,
+            url: '/Home/FuturesPriceGrid_Read',
+            //sortName: 'Date',
+            //sortOrder: 'asc',
+            border: true,
+            remoteSort: false,
+            idField: 'FuturePriceID',
+            pageSize: 10,
+            pageNumber: 1,
+            pageList: [10, 20, 30],
+            pagination: true,
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'FuturePriceID', title: 'ID', width: 50, sortable: true, hidden: true },
+                { field: 'TradeCode', title: '合约名称', width: 200, sortable: true },
+                { field: 'Price', title: '价格', width: 200, sortable: true },
+                { field: 'Type', title: '价格类型', width: 300, sortable: true },
+                { field: 'Date', title: '时间', width: 300, sortable: true }
+            ]]
+        });
+    }
+    //查询事件
+    function Search() {
+        $('#FuturesPriceGrid').datagrid('load', {
+            TradeCode: $('#STradeCode').val(),
+            StartDate: $('#SStartDate').datebox('getText'),
+            EndDate: $('#SEndDate').datebox('getText')
+        });
+    }
+</script>
+<div>
+    <div class="panel panel-primary" style="margin-bottom:10px;background-color:#b5cffe;padding:10px 10px">
+        <form id="SearchForm" class="form-inline">
+            <table class="searchtb">
+                <tr>
+                    <td><label for="STradeCode">合约名称:</label></td>
+                    <td>
+                        <input type="text" class="form-control input-sm" id="STradeCode" name="TradeCode" placeholder="合约名称">
+                    </td>
+
+                    <td><label for="SStartDate">开始日期:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SStartDate" name="StartDate" data-options="height:30"></td>
+
+                    <td><label for="SEndDate">结束日期:</label></td>
+                    <td><input type="text" class="easyui-datebox" id="SEndDate" name="EndDate" data-options="height:30"></td>
+
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton" id="btnUpdate" iconcls="icon-search" onclick="Search()">查询</a></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <table id="FuturesPriceGrid"></table>
+</div>
