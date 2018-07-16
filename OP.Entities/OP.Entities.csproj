@@ -109,6 +109,7 @@
     <Compile Include="Models\NumberType.cs" />
     <Compile Include="Models\ONOFFSet.cs" />
     <Compile Include="Models\ONTime.cs" />
+    <Compile Include="Models\OptionOrder.cs" />
     <Compile Include="Models\OptionsProduct.cs" />
     <Compile Include="Models\OptionTrade.cs" />
     <Compile Include="Models\OptionTradeSum.cs" />
