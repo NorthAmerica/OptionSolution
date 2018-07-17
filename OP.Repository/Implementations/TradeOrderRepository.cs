@@ -3,7 +3,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class TradeOrderRepository  : BaseRepository<TradeOrder>, InterfaceTradeOrderRepository
+    public class TradeOrderRepository  : BaseRepository<TradeOrder>, ITradeOrderRepository
     {
     }
 }

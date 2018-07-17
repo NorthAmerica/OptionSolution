@@ -16,12 +16,12 @@ namespace OP.Web.Controllers
 {
     public class MonitorController : AsyncController
     {
-        private InterfaceMonitorRepository MonitorRepository;
-        private InterfaceMonitorConditionRepository MonitorConditionRepository;
-        private InterfaceEventLogRepository LogRepository;
-        public MonitorController(InterfaceMonitorRepository monitor, 
-            InterfaceMonitorConditionRepository monitorcondition,
-            InterfaceEventLogRepository eventLog)
+        private IMonitorRepository MonitorRepository;
+        private IMonitorConditionRepository MonitorConditionRepository;
+        private IEventLogRepository LogRepository;
+        public MonitorController(IMonitorRepository monitor, 
+            IMonitorConditionRepository monitorcondition,
+            IEventLogRepository eventLog)
         {
             MonitorRepository = monitor;
             MonitorConditionRepository = monitorcondition;

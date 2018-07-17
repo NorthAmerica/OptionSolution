@@ -26,41 +26,41 @@ namespace OP.Web.Ninject
 
         private void AddBindings()
         {
-            ninjectKernel.Bind<InterfaceUserRepository>().To<UserRepository>();
-            ninjectKernel.Bind<InterfaceMenuRepository>().To<MenuRepository>();
-            ninjectKernel.Bind<InterfaceRoleMenuRepository>().To<RoleMenuRepository>();
-            ninjectKernel.Bind<InterfaceRoleRepository>().To<RoleRepository>();
-            ninjectKernel.Bind<InterfaceUserRoleRepository>().To<UserRoleRepository>();
-            ninjectKernel.Bind<InterfaceFuturesFundRepository>().To<FuturesFundRepository>();
-            ninjectKernel.Bind<InterfaceFuturesTradeVolumeRepository>().To<FuturesTradeVolumeRepository>();
-            ninjectKernel.Bind<InterfaceFuturePriceRepository>().To<FuturePriceRepository>();
-            ninjectKernel.Bind<InterfaceFallRoleRepository>().To<FallRoleRepository>();
-            ninjectKernel.Bind<InterfaceOptionsProductRepository>().To<OptionsProductRepository>();
-            ninjectKernel.Bind<InterfacePartnerRepository>().To<PartnerRepository>();
+            ninjectKernel.Bind<IUserRepository>().To<UserRepository>();
+            ninjectKernel.Bind<IMenuRepository>().To<MenuRepository>();
+            ninjectKernel.Bind<IRoleMenuRepository>().To<RoleMenuRepository>();
+            ninjectKernel.Bind<IRoleRepository>().To<RoleRepository>();
+            ninjectKernel.Bind<IUserRoleRepository>().To<UserRoleRepository>();
+            ninjectKernel.Bind<IFuturesFundRepository>().To<FuturesFundRepository>();
+            ninjectKernel.Bind<IFuturesTradeVolumeRepository>().To<FuturesTradeVolumeRepository>();
+            ninjectKernel.Bind<IFuturePriceRepository>().To<FuturePriceRepository>();
+            ninjectKernel.Bind<IFallRoleRepository>().To<FallRoleRepository>();
+            ninjectKernel.Bind<IOptionsProductRepository>().To<OptionsProductRepository>();
+            ninjectKernel.Bind<IPartnerRepository>().To<PartnerRepository>();
             ninjectKernel.Bind<InterfaceRiseRoleRepository>().To<RiseRoleRepository>();
-            ninjectKernel.Bind<InterfaceNumberTypeRepository>().To<NumberTypeRepository>();
-            ninjectKernel.Bind<InterfaceOptionTypeRepository>().To<OptionTypeRepository>();
-            ninjectKernel.Bind<InterfacePartTypeRepository>().To<PartTypeRepository>();
-            ninjectKernel.Bind<InterfaceOptionTradeRepository>().To<OptionTradeRepository>();
-            ninjectKernel.Bind<InterfaceOptionTradeSumRepository>().To<OptionTradeSumRepository>();
-            ninjectKernel.Bind<InterfaceFundStatusRepository>().To<FundStatusRepository>();
-            ninjectKernel.Bind<InterfaceManageStatusRepository>().To<ManageStatusRepository>();
-            ninjectKernel.Bind<InterfaceEventLogRepository>().To<EventLogRepository>();
-            ninjectKernel.Bind<InterfaceTdaysRepository>().To<TdaysRepository>();
-            ninjectKernel.Bind<InterfaceCallPriceTypeRepository>().To<CallPriceTypeRepository>();
-            ninjectKernel.Bind<InterfaceONOFFSetRepository>().To<ONOFFSetRepository>();
-            ninjectKernel.Bind<InterfaceONTimeRepository>().To<ONTimeRepository>();
-            ninjectKernel.Bind<InterfaceBrochureRepository>().To<BrochureRepository>();
-            ninjectKernel.Bind<InterfaceGuestBookRepository>().To<GuestBookRepository>();
-            ninjectKernel.Bind<InterfaceGoodsMarketingRepository>().To<GoodsMarketingRepository>();
-            ninjectKernel.Bind<InterfaceGoodsPurchaseRepository>().To<GoodsPurchaseRepository>();
-            ninjectKernel.Bind<InterfaceGoodsFutureRepository>().To<GoodsFutureRepository>();
-            ninjectKernel.Bind<InterfaceGoodsPaymentRepository>().To<GoodsPaymentRepository>();
-            ninjectKernel.Bind<InterfaceGoodsProfitRepository>().To<GoodsProfitRepository>();
-            ninjectKernel.Bind<InterfaceMenuActionRepository>().To<MenuActionRepository>();
-            ninjectKernel.Bind<InterfaceRoleActionRepository>().To<RoleActionRepository>();
-            ninjectKernel.Bind<InterfaceMonitorRepository>().To<MonitorRepository>();
-            ninjectKernel.Bind<InterfaceMonitorConditionRepository>().To<MonitorConditionRepository>();
+            ninjectKernel.Bind<INumberTypeRepository>().To<NumberTypeRepository>();
+            ninjectKernel.Bind<IOptionTypeRepository>().To<OptionTypeRepository>();
+            ninjectKernel.Bind<IPartTypeRepository>().To<PartTypeRepository>();
+            ninjectKernel.Bind<IOptionTradeRepository>().To<OptionTradeRepository>();
+            ninjectKernel.Bind<IOptionTradeSumRepository>().To<OptionTradeSumRepository>();
+            ninjectKernel.Bind<IFundStatusRepository>().To<FundStatusRepository>();
+            ninjectKernel.Bind<IManageStatusRepository>().To<ManageStatusRepository>();
+            ninjectKernel.Bind<IEventLogRepository>().To<EventLogRepository>();
+            ninjectKernel.Bind<ITdaysRepository>().To<TdaysRepository>();
+            ninjectKernel.Bind<ICallPriceTypeRepository>().To<CallPriceTypeRepository>();
+            ninjectKernel.Bind<IONOFFSetRepository>().To<ONOFFSetRepository>();
+            ninjectKernel.Bind<IONTimeRepository>().To<ONTimeRepository>();
+            ninjectKernel.Bind<IBrochureRepository>().To<BrochureRepository>();
+            ninjectKernel.Bind<IGuestBookRepository>().To<GuestBookRepository>();
+            ninjectKernel.Bind<IGoodsMarketingRepository>().To<GoodsMarketingRepository>();
+            ninjectKernel.Bind<IGoodsPurchaseRepository>().To<GoodsPurchaseRepository>();
+            ninjectKernel.Bind<IGoodsFutureRepository>().To<GoodsFutureRepository>();
+            ninjectKernel.Bind<IGoodsPaymentRepository>().To<GoodsPaymentRepository>();
+            ninjectKernel.Bind<IGoodsProfitRepository>().To<GoodsProfitRepository>();
+            ninjectKernel.Bind<IMenuActionRepository>().To<MenuActionRepository>();
+            ninjectKernel.Bind<IRoleActionRepository>().To<RoleActionRepository>();
+            ninjectKernel.Bind<IMonitorRepository>().To<MonitorRepository>();
+            ninjectKernel.Bind<IMonitorConditionRepository>().To<MonitorConditionRepository>();
             //put bindings here
         }
     }

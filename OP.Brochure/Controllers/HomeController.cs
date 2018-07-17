@@ -14,12 +14,12 @@ namespace OP.Brochure.Controllers
 {
     public class HomeController : AsyncController
     {
-        private InterfaceBrochureRepository BrochureRepository;
-        private InterfaceGuestBookRepository GuestBookRepository;
-        private InterfaceOptionsProductRepository OptionsProductRepository;
-        public HomeController(InterfaceBrochureRepository br,
-            InterfaceGuestBookRepository gbr,
-            InterfaceOptionsProductRepository opr)
+        private IBrochureRepository BrochureRepository;
+        private IGuestBookRepository GuestBookRepository;
+        private IOptionsProductRepository OptionsProductRepository;
+        public HomeController(IBrochureRepository br,
+            IGuestBookRepository gbr,
+            IOptionsProductRepository opr)
         {
             BrochureRepository = br;
             GuestBookRepository = gbr;

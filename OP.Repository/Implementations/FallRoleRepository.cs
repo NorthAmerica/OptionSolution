@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class FallRoleRepository : BaseRepository<FallRole>, InterfaceFallRoleRepository
+    public class FallRoleRepository : BaseRepository<FallRole>, IFallRoleRepository
     {
     }
 }

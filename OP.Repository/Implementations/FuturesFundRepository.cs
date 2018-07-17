@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class FuturesFundRepository : BaseRepository<FuturesFund>, InterfaceFuturesFundRepository
+    public class FuturesFundRepository : BaseRepository<FuturesFund>, IFuturesFundRepository
     {
     }
 }

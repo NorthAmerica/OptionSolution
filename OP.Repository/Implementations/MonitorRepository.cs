@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class MonitorRepository : BaseRepository<Monitor>, InterfaceMonitorRepository
+    public class MonitorRepository : BaseRepository<Monitor>, IMonitorRepository
     {
     }
 }

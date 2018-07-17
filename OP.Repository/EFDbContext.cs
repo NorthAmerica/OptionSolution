@@ -45,6 +45,7 @@ namespace OP.Repository
         public DbSet<MenuAction> MenuActions { get; set; }
         public DbSet<Entities.Models.MonitorCondition> MonitorConditions { get; set; }
         public DbSet<Monitor> Monitors { get; set; }
+        public DbSet<OptionOrder> OptionOrders { get; set; }
         public EFDbContext()
             : base("name=EFDbContext")
         {

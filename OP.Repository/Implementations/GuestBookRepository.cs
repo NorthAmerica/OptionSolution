@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class GuestBookRepository : BaseRepository<GuestBook>, InterfaceGuestBookRepository
+    public class GuestBookRepository : BaseRepository<GuestBook>, IGuestBookRepository
     {
     }
 }

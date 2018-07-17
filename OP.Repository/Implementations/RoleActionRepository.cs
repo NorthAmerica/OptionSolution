@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class RoleActionRepository : BaseRepository<RoleAction>, InterfaceRoleActionRepository
+    public class RoleActionRepository : BaseRepository<RoleAction>, IRoleActionRepository
     {
     }
 }

@@ -24,8 +24,8 @@ namespace OP.Web.Controllers
     [Authorization]
     public class ReportController :AsyncController
     {
-        private InterfaceOptionTradeRepository OptionTradeRepository;
-        public ReportController(InterfaceOptionTradeRepository otr)
+        private IOptionTradeRepository OptionTradeRepository;
+        public ReportController(IOptionTradeRepository otr)
         {
             OptionTradeRepository = otr;
         }

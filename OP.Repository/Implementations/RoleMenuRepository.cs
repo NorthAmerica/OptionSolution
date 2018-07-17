@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class RoleMenuRepository : BaseRepository<RoleMenu>, InterfaceRoleMenuRepository
+    public class RoleMenuRepository : BaseRepository<RoleMenu>, IRoleMenuRepository
     {
     }
 }

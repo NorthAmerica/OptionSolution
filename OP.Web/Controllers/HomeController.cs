@@ -26,51 +26,51 @@ namespace OP.Web.Controllers
     //[CSRFValidateAntiForgeryToken]
     public class HomeController : AsyncController
     {
-        private InterfaceUserRepository UserRepository;
-        private InterfaceMenuRepository MenuRepository;
-        private InterfaceRoleMenuRepository RoleMenuRepository;
-        private InterfacePartnerRepository PartnerRepository;
-        private InterfaceNumberTypeRepository NumberTypeRepository;
-        private InterfaceOptionTypeRepository OptionTypeRepository;
-        private InterfaceOptionsProductRepository OptionsProductRepository;
-        private InterfaceFallRoleRepository FallRoleRepository;
+        private IUserRepository UserRepository;
+        private IMenuRepository MenuRepository;
+        private IRoleMenuRepository RoleMenuRepository;
+        private IPartnerRepository PartnerRepository;
+        private INumberTypeRepository NumberTypeRepository;
+        private IOptionTypeRepository OptionTypeRepository;
+        private IOptionsProductRepository OptionsProductRepository;
+        private IFallRoleRepository FallRoleRepository;
         private InterfaceRiseRoleRepository RiseRoleRepository;
-        private InterfacePartTypeRepository PartTypeRepository;
-        private InterfaceUserRoleRepository UserRoleRepository;
-        private InterfaceFuturesTradeVolumeRepository FuturesTradeVolumeRepository;
-        private InterfaceFuturesFundRepository FuturesFundRepository;
-        private InterfaceFuturePriceRepository FuturePriceRepository;
-        private InterfaceOptionTradeRepository OptionTradeRepository;
+        private IPartTypeRepository PartTypeRepository;
+        private IUserRoleRepository UserRoleRepository;
+        private IFuturesTradeVolumeRepository FuturesTradeVolumeRepository;
+        private IFuturesFundRepository FuturesFundRepository;
+        private IFuturePriceRepository FuturePriceRepository;
+        private IOptionTradeRepository OptionTradeRepository;
         //private InterfaceOptionTradeSumRepository OptionTradeSumRepository;
-        private InterfaceFundStatusRepository FundStatusRepository;
-        private InterfaceManageStatusRepository ManageStatusRepository;
-        private InterfaceEventLogRepository LogRepository;
-        private InterfaceCallPriceTypeRepository CallPriceTypeRepository;
-        private InterfaceONOFFSetRepository ONOFFSetRepository;
-        private InterfaceONTimeRepository ONTimeRepository;
+        private IFundStatusRepository FundStatusRepository;
+        private IManageStatusRepository ManageStatusRepository;
+        private IEventLogRepository LogRepository;
+        private ICallPriceTypeRepository CallPriceTypeRepository;
+        private IONOFFSetRepository ONOFFSetRepository;
+        private IONTimeRepository ONTimeRepository;
 
-        public HomeController(InterfaceMenuRepository menu,
-            InterfaceRoleMenuRepository rolemenu,
-            InterfaceUserRepository userrep,
-            InterfacePartnerRepository partnerrep,
-            InterfaceNumberTypeRepository numtyperep,
-            InterfaceOptionTypeRepository optiontyperep,
-            InterfaceOptionsProductRepository opproductrep,
-            InterfaceFallRoleRepository fallrolerep,
+        public HomeController(IMenuRepository menu,
+            IRoleMenuRepository rolemenu,
+            IUserRepository userrep,
+            IPartnerRepository partnerrep,
+            INumberTypeRepository numtyperep,
+            IOptionTypeRepository optiontyperep,
+            IOptionsProductRepository opproductrep,
+            IFallRoleRepository fallrolerep,
             InterfaceRiseRoleRepository riserolerep,
-            InterfacePartTypeRepository parttyperep,
-            InterfaceUserRoleRepository userrolerep,
-            InterfaceFuturesTradeVolumeRepository ftvrep,
-            InterfaceFuturesFundRepository fundrep,
-            InterfaceFuturePriceRepository pricerep,
-            InterfaceOptionTradeRepository traderep,
-            InterfaceOptionTradeSumRepository tradesumrep,
-            InterfaceFundStatusRepository fundstatusrep,
-            InterfaceManageStatusRepository managestatusrep,
-            InterfaceEventLogRepository eventlog,
-            InterfaceCallPriceTypeRepository callpricetyperep,
-            InterfaceONOFFSetRepository onoffsetrep,
-            InterfaceONTimeRepository ontimerep)
+            IPartTypeRepository parttyperep,
+            IUserRoleRepository userrolerep,
+            IFuturesTradeVolumeRepository ftvrep,
+            IFuturesFundRepository fundrep,
+            IFuturePriceRepository pricerep,
+            IOptionTradeRepository traderep,
+            IOptionTradeSumRepository tradesumrep,
+            IFundStatusRepository fundstatusrep,
+            IManageStatusRepository managestatusrep,
+            IEventLogRepository eventlog,
+            ICallPriceTypeRepository callpricetyperep,
+            IONOFFSetRepository onoffsetrep,
+            IONTimeRepository ontimerep)
         {
             MenuRepository = menu;
             RoleMenuRepository = rolemenu;

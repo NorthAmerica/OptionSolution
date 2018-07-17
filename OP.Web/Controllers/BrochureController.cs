@@ -17,10 +17,10 @@ namespace OP.Web.Controllers
     /// </summary>
     public class BrochureController : AsyncController
     {
-        private InterfaceBrochureRepository BrochureRepository;
-        private InterfaceOptionsProductRepository OptionsProductRepository;
-        private InterfaceEventLogRepository LogRepository;
-        public BrochureController(InterfaceBrochureRepository br, InterfaceOptionsProductRepository opr,InterfaceEventLogRepository elr )
+        private IBrochureRepository BrochureRepository;
+        private IOptionsProductRepository OptionsProductRepository;
+        private IEventLogRepository LogRepository;
+        public BrochureController(IBrochureRepository br, IOptionsProductRepository opr,IEventLogRepository elr )
         {
             BrochureRepository = br;
             OptionsProductRepository = opr;

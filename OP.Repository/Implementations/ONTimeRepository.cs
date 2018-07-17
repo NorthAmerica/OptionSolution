@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class ONTimeRepository: BaseRepository<ONTime>, InterfaceONTimeRepository
+    public class ONTimeRepository: BaseRepository<ONTime>, IONTimeRepository
     {
     }
 }

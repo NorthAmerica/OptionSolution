@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class FuturesTradeVolumeRepository : BaseRepository<FuturesTradeVolume>, InterfaceFuturesTradeVolumeRepository
+    public class FuturesTradeVolumeRepository : BaseRepository<FuturesTradeVolume>, IFuturesTradeVolumeRepository
     {
     }
 }

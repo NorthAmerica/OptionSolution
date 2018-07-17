@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class MenuActionRepository : BaseRepository<MenuAction>, InterfaceMenuActionRepository
+    public class MenuActionRepository : BaseRepository<MenuAction>, IMenuActionRepository
     {
     }
 }

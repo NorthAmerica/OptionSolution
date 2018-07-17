@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class PartTypeRepository: BaseRepository<PartType>, InterfacePartTypeRepository
+    public class PartTypeRepository: BaseRepository<PartType>, IPartTypeRepository
     {
     }
 }

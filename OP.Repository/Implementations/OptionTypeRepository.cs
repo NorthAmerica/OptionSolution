@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class OptionTypeRepository : BaseRepository<OptionType>, InterfaceOptionTypeRepository
+    public class OptionTypeRepository : BaseRepository<OptionType>, IOptionTypeRepository
     {
     }
 }

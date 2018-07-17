@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class ONOFFSetRepository : BaseRepository<ONOFFSet>, InterfaceONOFFSetRepository
+    public class ONOFFSetRepository : BaseRepository<ONOFFSet>, IONOFFSetRepository
     {
     }
 }

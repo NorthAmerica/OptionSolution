@@ -29,9 +29,9 @@ namespace OP.Brochure.Ninject
 
         private void AddBindings()
         {
-            ninjectKernel.Bind<InterfaceOptionsProductRepository>().To<OptionsProductRepository>();
-            ninjectKernel.Bind<InterfaceBrochureRepository>().To<BrochureRepository>();
-            ninjectKernel.Bind<InterfaceGuestBookRepository>().To<GuestBookRepository>();
+            ninjectKernel.Bind<IOptionsProductRepository>().To<OptionsProductRepository>();
+            ninjectKernel.Bind<IBrochureRepository>().To<BrochureRepository>();
+            ninjectKernel.Bind<IGuestBookRepository>().To<GuestBookRepository>();
             //put bindings here
         }
     }

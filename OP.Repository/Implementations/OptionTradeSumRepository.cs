@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class OptionTradeSumRepository : BaseRepository<OptionTradeSum>, InterfaceOptionTradeSumRepository
+    public class OptionTradeSumRepository : BaseRepository<OptionTradeSum>, IOptionTradeSumRepository
     {
     }
 }

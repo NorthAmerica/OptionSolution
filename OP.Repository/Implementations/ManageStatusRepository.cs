@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class ManageStatusRepository : BaseRepository<ManageStatus>, InterfaceManageStatusRepository
+    public class ManageStatusRepository : BaseRepository<ManageStatus>, IManageStatusRepository
     {
     }
 }

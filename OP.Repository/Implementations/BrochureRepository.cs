@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class BrochureRepository : BaseRepository<Brochure>, InterfaceBrochureRepository
+    public class BrochureRepository : BaseRepository<Brochure>, IBrochureRepository
     {
     }
 }

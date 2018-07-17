@@ -15,24 +15,24 @@ namespace OP.Web.Controllers
     [Authorization]
     public class ConfigController : AsyncController
     {
-        private InterfaceMenuRepository MenuRepository;
-        private InterfaceRoleMenuRepository RoleMenuRepository;
-        private InterfaceRoleRepository RoleRepository;
-        private InterfaceUserRepository UserRepository;
-        private InterfaceUserRoleRepository UserRoleRepository;
-        private InterfaceEventLogRepository LogRepository;
-        private InterfaceGuestBookRepository GuestBookRepository;
-        private InterfaceMenuActionRepository MenuActionRepository;
-        private InterfaceRoleActionRepository RoleActionRepository;
-        public ConfigController(InterfaceMenuRepository menu,
-            InterfaceRoleMenuRepository rolemenu,
-            InterfaceRoleRepository role,
-            InterfaceUserRepository user,
-            InterfaceUserRoleRepository userrole,
-            InterfaceEventLogRepository eventlog,
-            InterfaceGuestBookRepository guestbook,
-            InterfaceMenuActionRepository menuaction,
-            InterfaceRoleActionRepository roleaction)
+        private IMenuRepository MenuRepository;
+        private IRoleMenuRepository RoleMenuRepository;
+        private IRoleRepository RoleRepository;
+        private IUserRepository UserRepository;
+        private IUserRoleRepository UserRoleRepository;
+        private IEventLogRepository LogRepository;
+        private IGuestBookRepository GuestBookRepository;
+        private IMenuActionRepository MenuActionRepository;
+        private IRoleActionRepository RoleActionRepository;
+        public ConfigController(IMenuRepository menu,
+            IRoleMenuRepository rolemenu,
+            IRoleRepository role,
+            IUserRepository user,
+            IUserRoleRepository userrole,
+            IEventLogRepository eventlog,
+            IGuestBookRepository guestbook,
+            IMenuActionRepository menuaction,
+            IRoleActionRepository roleaction)
         {
             MenuRepository = menu;
             RoleMenuRepository = rolemenu;

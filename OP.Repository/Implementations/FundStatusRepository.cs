@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class FundStatusRepository : BaseRepository<FundStatus>, InterfaceFundStatusRepository
+    public class FundStatusRepository : BaseRepository<FundStatus>, IFundStatusRepository
     {
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class PartnerRepository : BaseRepository<Partner>, InterfacePartnerRepository
+    public class PartnerRepository : BaseRepository<Partner>, IPartnerRepository
     {
     }
 }

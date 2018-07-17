@@ -2,7 +2,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class UserRepository : BaseRepository<User>, InterfaceUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
     }
 }

@@ -14,18 +14,18 @@ namespace OP.Web.Controllers
     [Authorization]
     public class GoodsController : AsyncController
     {
-        private InterfaceGoodsPurchaseRepository GoodsPurchaseRepository;
-        private InterfaceGoodsMarketingRepository GoodsMarketingRepository;
-        private InterfaceEventLogRepository LogRepository;
-        private InterfaceGoodsFutureRepository GoodsFutureRepository;
-        private InterfaceGoodsPaymentRepository GoodsPaymentRepository;
-        private InterfaceGoodsProfitRepository GoodsProfitRepository;
-        public GoodsController(InterfaceGoodsPurchaseRepository gpr, 
-                               InterfaceGoodsMarketingRepository gmr,
-                               InterfaceEventLogRepository elr,
-                               InterfaceGoodsFutureRepository gfr,
-                               InterfaceGoodsPaymentRepository gpayr,
-                               InterfaceGoodsProfitRepository gpror)
+        private IGoodsPurchaseRepository GoodsPurchaseRepository;
+        private IGoodsMarketingRepository GoodsMarketingRepository;
+        private IEventLogRepository LogRepository;
+        private IGoodsFutureRepository GoodsFutureRepository;
+        private IGoodsPaymentRepository GoodsPaymentRepository;
+        private IGoodsProfitRepository GoodsProfitRepository;
+        public GoodsController(IGoodsPurchaseRepository gpr, 
+                               IGoodsMarketingRepository gmr,
+                               IEventLogRepository elr,
+                               IGoodsFutureRepository gfr,
+                               IGoodsPaymentRepository gpayr,
+                               IGoodsProfitRepository gpror)
         {
             GoodsPurchaseRepository = gpr;
             GoodsMarketingRepository = gmr;

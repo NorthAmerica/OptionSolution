@@ -21,14 +21,14 @@ namespace OP.WebAPI.Controllers
 {
     public class KwinerController : ApiController
     {
-        public static readonly InterfaceOptionsProductRepository OptionsProductRepository = new OptionsProductRepository();
-        public static readonly InterfaceFuturePriceRepository FuturePriceRepository = new FuturePriceRepository();
+        public static readonly IOptionsProductRepository OptionsProductRepository = new OptionsProductRepository();
+        public static readonly IFuturePriceRepository FuturePriceRepository = new FuturePriceRepository();
         public static readonly InterfaceRiseRoleRepository RiseRoleRepository = new RiseRoleRepository();
-        public static readonly InterfaceFallRoleRepository FallRoleRepository = new FallRoleRepository();
-        public static readonly InterfaceTdaysRepository TdaysRepository = new TdaysRepository();
-        public static readonly InterfaceONOFFSetRepository ONOFFSetRepository = new ONOFFSetRepository();
-        public static readonly InterfaceONTimeRepository ONTimeRepository = new ONTimeRepository();
-        public static readonly InterfaceEventLogRepository LogRepository = new EventLogRepository();
+        public static readonly IFallRoleRepository FallRoleRepository = new FallRoleRepository();
+        public static readonly ITdaysRepository TdaysRepository = new TdaysRepository();
+        public static readonly IONOFFSetRepository ONOFFSetRepository = new ONOFFSetRepository();
+        public static readonly IONTimeRepository ONTimeRepository = new ONTimeRepository();
+        public static readonly IEventLogRepository LogRepository = new EventLogRepository();
         //public static readonly InterfaceEventLogRepository LogRepository = new EventLogRepository();
 
         /// <summary>

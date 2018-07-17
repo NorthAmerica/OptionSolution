@@ -3,7 +3,7 @@
 
 namespace OP.Repository.Implementations
 {
-    public class FuturePriceRepository: BaseRepository<FuturePrice>, InterfaceFuturePriceRepository
+    public class FuturePriceRepository: BaseRepository<FuturePrice>, IFuturePriceRepository
     {
     }
 }

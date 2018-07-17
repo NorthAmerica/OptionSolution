@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class TdaysRepository : BaseRepository<Tday>, InterfaceTdaysRepository
+    public class TdaysRepository : BaseRepository<Tday>, ITdaysRepository
     {
     }
 }

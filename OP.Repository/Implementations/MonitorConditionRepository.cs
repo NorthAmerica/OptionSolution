@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class MonitorConditionRepository : BaseRepository<MonitorCondition>, InterfaceMonitorConditionRepository
+    public class MonitorConditionRepository : BaseRepository<MonitorCondition>, IMonitorConditionRepository
     {
     }
 }

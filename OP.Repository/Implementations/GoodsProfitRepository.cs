@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OP.Repository.Implementations
 {
-    public class GoodsProfitRepository : BaseRepository<GoodsProfit>, InterfaceGoodsProfitRepository
+    public class GoodsProfitRepository : BaseRepository<GoodsProfit>, IGoodsProfitRepository
     {
     }
 }
